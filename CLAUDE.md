@@ -48,3 +48,10 @@ Since this is a fresh project, ensure to:
 
 - The project currently has no commits, so the first commit will establish the initial project structure
 - Remember to update the README.md with project-specific information once the framework is chosen
+
+## Search and Development Resources
+
+- For code base searches use the serena mcp server
+- For deep research use the exa mcp server
+- For exact code syntax use the context7 mcp server
+- For UI / UX testing use the playwright mcp server
