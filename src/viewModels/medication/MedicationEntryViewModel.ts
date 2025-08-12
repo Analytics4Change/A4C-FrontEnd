@@ -23,6 +23,8 @@ export class MedicationEntryViewModel {
   dosageForm = '';  // Keep for backward compatibility, will store the final form type
   dosageAmount = '';
   dosageUnit = '';
+  totalAmount = '';
+  totalUnit = '';
   frequency = '';
   condition = '';
   startDate: Date | null = null;
@@ -79,6 +81,8 @@ export class MedicationEntryViewModel {
       this.dosageFormType &&  // Check form type instead of dosageForm
       this.isValidAmount &&
       this.dosageUnit &&
+      this.totalAmount &&
+      this.totalUnit &&
       this.frequency &&
       this.condition &&
       this.errors.size === 0
@@ -130,6 +134,8 @@ export class MedicationEntryViewModel {
     this.dosageForm = '';
     this.dosageAmount = '';
     this.dosageUnit = '';
+    this.totalAmount = '';
+    this.totalUnit = '';
     this.selectedBroadCategories = [];
     this.selectedSpecificCategories = [];
   }
@@ -141,6 +147,7 @@ export class MedicationEntryViewModel {
     this.dosageFormType = '';
     this.dosageForm = '';
     this.dosageUnit = '';
+    this.totalUnit = '';
     this.clearError('dosageFormCategory');
   }
 
@@ -182,6 +189,16 @@ export class MedicationEntryViewModel {
     this.clearError('dosageUnit');
   }
 
+  updateTotalAmount(value: string) {
+    this.totalAmount = value;
+    this.validateTotalAmount();
+  }
+
+  setTotalUnit(unit: string) {
+    this.totalUnit = unit;
+    this.clearError('totalUnit');
+  }
+
   setFrequency(freq: string) {
     this.frequency = freq;
     this.showFrequencyDropdown = false;
@@ -194,13 +211,13 @@ export class MedicationEntryViewModel {
     this.clearError('condition');
   }
 
-  setStartDate(date: Date) {
+  setStartDate(date: Date | null) {
     this.startDate = date;
     this.showStartDateCalendar = false;
     this.clearError('startDate');
   }
 
-  setDiscontinueDate(date: Date) {
+  setDiscontinueDate(date: Date | null) {
     this.discontinueDate = date;
     this.showDiscontinueDateCalendar = false;
     this.clearError('discontinueDate');
@@ -289,6 +306,21 @@ export class MedicationEntryViewModel {
       isValid = false;
     }
     
+    if (!this.totalAmount) {
+      this.setError('totalAmount', 'Please enter the total amount');
+      isValid = false;
+    } else {
+      this.validateTotalAmount();
+      if (this.errors.has('totalAmount')) {
+        isValid = false;
+      }
+    }
+    
+    if (!this.totalUnit) {
+      this.setError('totalUnit', 'Please select a total unit');
+      isValid = false;
+    }
+    
     if (!this.frequency) {
       this.setError('frequency', 'Please select frequency');
       isValid = false;
@@ -309,6 +341,8 @@ export class MedicationEntryViewModel {
     this.dosageForm = '';
     this.dosageAmount = '';
     this.dosageUnit = '';
+    this.totalAmount = '';
+    this.totalUnit = '';
     this.frequency = '';
     this.condition = '';
     this.startDate = null;
@@ -335,12 +369,18 @@ export class MedicationEntryViewModel {
     );
 
     reaction(
+      () => this.totalAmount,
+      () => this.validateTotalAmount()
+    );
+
+    reaction(
       () => this.dosageFormCategory,
       () => {
         // Reset form type and unit when category changes
         this.dosageFormType = '';
-        this.dosageForm = '';
-        this.dosageUnit = '';
+    this.dosageForm = '';
+    this.dosageUnit = '';
+    this.totalUnit = '';
       }
     );
 
@@ -376,6 +416,25 @@ export class MedicationEntryViewModel {
       this.setError('dosageAmount', 'Amount cannot exceed 9999');
     } else {
       this.clearError('dosageAmount');
+    }
+  }
+
+  private validateTotalAmount() {
+    if (!this.totalAmount) {
+      this.clearError('totalAmount');
+      return;
+    }
+    
+    const numValue = parseFloat(this.totalAmount);
+    
+    if (isNaN(numValue)) {
+      this.setError('totalAmount', 'Please enter a valid number');
+    } else if (numValue <= 0) {
+      this.setError('totalAmount', 'Amount must be greater than 0');
+    } else if (numValue > 9999) {
+      this.setError('totalAmount', 'Amount cannot exceed 9999');
+    } else {
+      this.clearError('totalAmount');
     }
   }
 

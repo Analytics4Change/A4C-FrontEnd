@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useViewModel } from '@/hooks/useViewModel';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { MedicationEntryViewModel } from '@/viewModels/medication/MedicationEntryViewModel';
+import { DosageFormCategory } from '@/types/models/Dosage';
 import { MedicationSearch } from './MedicationSearch';
 import { DosageForm } from './DosageForm';
 import { CategorySelection } from './CategorySelection';
@@ -103,23 +104,30 @@ export const MedicationEntryModal = observer(({ onClose }: MedicationEntryModalP
                 dosageForm={vm.dosageForm}
                 dosageAmount={vm.dosageAmount}
                 dosageUnit={vm.dosageUnit}
+                totalAmount={vm.totalAmount}
+                totalUnit={vm.totalUnit}
                 frequency={vm.frequency}
                 condition={vm.condition}
                 availableFormTypes={vm.availableFormTypes}
                 availableUnits={vm.availableUnits}
+                availableTotalUnits={vm.availableUnits}
                 errors={vm.errors}
-                onCategoryChange={(category) => vm.setDosageFormCategory(category)}
+                onCategoryChange={(category) => vm.setDosageFormCategory(category as DosageFormCategory)}
                 onFormTypeChange={(formType) => vm.setDosageFormType(formType)}
                 onFormChange={(form) => vm.setDosageForm(form)}
                 onAmountChange={(amount) => vm.updateDosageAmount(amount)}
                 onUnitChange={(unit) => vm.setDosageUnit(unit)}
+                onTotalAmountChange={(amount) => vm.updateTotalAmount(amount)}
+                onTotalUnitChange={(unit) => vm.setTotalUnit(unit)}
                 onFrequencyChange={(freq) => vm.setFrequency(freq)}
                 onConditionChange={(cond) => vm.setCondition(cond)}
                 focusOnMount={shouldFocusDosageForm}
                 onConditionComplete={() => {
-                  // Focus on category selection or save button
-                  const saveButton = document.querySelector('[data-testid="medication-save-button"]') as HTMLButtonElement;
-                  if (saveButton) saveButton.focus();
+                  // Focus on broad categories button after condition selection
+                  const broadCategoriesButton = document.getElementById('broad-categories-button') as HTMLButtonElement;
+                  if (broadCategoriesButton) {
+                    setTimeout(() => broadCategoriesButton.focus(), 50);
+                  }
                 }}
                 onDropdownOpen={(elementId) => {
                   // Auto-scroll to center the dropdown when opened

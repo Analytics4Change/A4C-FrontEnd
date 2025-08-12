@@ -44,6 +44,8 @@ export const CategorySelection = observer(({
 }: CategorySelectionProps) => {
   const [showBroadCategories, setShowBroadCategories] = useState(false);
   const [showSpecificCategories, setShowSpecificCategories] = useState(false);
+  const broadCategoriesButtonRef = React.useRef<HTMLButtonElement>(null);
+  const specificCategoriesButtonRef = React.useRef<HTMLButtonElement>(null);
 
   return (
     <div className="space-y-4">
@@ -52,10 +54,16 @@ export const CategorySelection = observer(({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Button
+            id="broad-categories-button"
+            ref={broadCategoriesButtonRef}
             type="button"
             variant={selectedBroadCategories.length > 0 ? 'default' : 'outline'}
             className="w-full justify-between"
             onClick={() => setShowBroadCategories(true)}
+            onFocus={() => {
+              // Auto-open dropdown when button receives focus
+              setShowBroadCategories(true);
+            }}
           >
             <span>
               {selectedBroadCategories.length > 0
@@ -68,11 +76,19 @@ export const CategorySelection = observer(({
 
         <div>
           <Button
+            id="specific-categories-button"
+            ref={specificCategoriesButtonRef}
             type="button"
             variant={selectedSpecificCategories.length > 0 ? 'default' : 'outline'}
             className="w-full justify-between"
             onClick={() => setShowSpecificCategories(true)}
             disabled={selectedBroadCategories.length === 0}
+            onFocus={() => {
+              // Auto-open dropdown when button receives focus and is enabled
+              if (selectedBroadCategories.length > 0) {
+                setShowSpecificCategories(true);
+              }
+            }}
           >
             <span>
               {selectedSpecificCategories.length > 0
@@ -117,7 +133,15 @@ export const CategorySelection = observer(({
                 Cancel
               </Button>
               <Button
-                onClick={() => setShowBroadCategories(false)}
+                onClick={() => {
+                  setShowBroadCategories(false);
+                  // Focus on specific categories button after closing broad categories
+                  setTimeout(() => {
+                    if (specificCategoriesButtonRef.current) {
+                      specificCategoriesButtonRef.current.focus();
+                    }
+                  }, 50);
+                }}
               >
                 Done
               </Button>
@@ -152,7 +176,16 @@ export const CategorySelection = observer(({
                 Cancel
               </Button>
               <Button
-                onClick={() => setShowSpecificCategories(false)}
+                onClick={() => {
+                  setShowSpecificCategories(false);
+                  // Focus on start date button after closing specific categories
+                  setTimeout(() => {
+                    const startDateButton = document.getElementById('start-date') as HTMLButtonElement;
+                    if (startDateButton) {
+                      startDateButton.focus();
+                    }
+                  }, 50);
+                }}
               >
                 Done
               </Button>

@@ -18,16 +18,21 @@ interface DosageFormProps {
   dosageForm: string;  // For backward compatibility
   dosageAmount: string;
   dosageUnit: string;
+  totalAmount: string;
+  totalUnit: string;
   frequency: string;
   condition: string;
   availableFormTypes: string[];
   availableUnits: DosageUnit[];
+  availableTotalUnits: DosageUnit[];
   errors: Map<string, string>;
   onCategoryChange: (category: string) => void;
   onFormTypeChange: (formType: string) => void;
   onFormChange: (form: string) => void;  // For backward compatibility
   onAmountChange: (amount: string) => void;
   onUnitChange: (unit: string) => void;
+  onTotalAmountChange: (amount: string) => void;
+  onTotalUnitChange: (unit: string) => void;
   onFrequencyChange: (freq: string) => void;
   onConditionChange: (cond: string) => void;
   onCategoryComplete?: () => void;
@@ -35,6 +40,8 @@ interface DosageFormProps {
   onFormComplete?: () => void;
   onAmountComplete?: () => void;
   onUnitComplete?: () => void;
+  onTotalAmountComplete?: () => void;
+  onTotalUnitComplete?: () => void;
   onFrequencyComplete?: () => void;
   onConditionComplete?: () => void;
   focusOnMount?: boolean;
@@ -47,16 +54,21 @@ export const DosageForm = observer(({
   dosageForm,
   dosageAmount,
   dosageUnit,
+  totalAmount,
+  totalUnit,
   frequency,
   condition,
   availableFormTypes,
   availableUnits,
+  availableTotalUnits,
   errors,
   onCategoryChange,
   onFormTypeChange,
   onFormChange,
   onAmountChange,
   onUnitChange,
+  onTotalAmountChange,
+  onTotalUnitChange,
   onFrequencyChange,
   onConditionChange,
   onCategoryComplete,
@@ -64,6 +76,8 @@ export const DosageForm = observer(({
   onFormComplete,
   onAmountComplete,
   onUnitComplete,
+  onTotalAmountComplete,
+  onTotalUnitComplete,
   onFrequencyComplete,
   onConditionComplete,
   focusOnMount = false,
@@ -78,6 +92,9 @@ export const DosageForm = observer(({
   const amountInputRef = useRef<HTMLInputElement>(null);
   const unitInputContainerRef = useRef<HTMLDivElement>(null);
   const unitInputRef = useRef<HTMLInputElement>(null);
+  const totalAmountInputRef = useRef<HTMLInputElement>(null);
+  const totalUnitInputContainerRef = useRef<HTMLDivElement>(null);
+  const totalUnitInputRef = useRef<HTMLInputElement>(null);
   const frequencyInputContainerRef = useRef<HTMLDivElement>(null);
   const frequencyInputRef = useRef<HTMLInputElement>(null);
   const conditionInputContainerRef = useRef<HTMLDivElement>(null);
@@ -87,6 +104,7 @@ export const DosageForm = observer(({
   const [showFormTypeDropdown, setShowFormTypeDropdown] = React.useState(false);
   const [showFormDropdown, setShowFormDropdown] = React.useState(false);
   const [showUnitDropdown, setShowUnitDropdown] = React.useState(false);
+  const [showTotalUnitDropdown, setShowTotalUnitDropdown] = React.useState(false);
   const [showFrequencyDropdown, setShowFrequencyDropdown] = React.useState(false);
   const [showConditionDropdown, setShowConditionDropdown] = React.useState(false);
 
@@ -94,9 +112,11 @@ export const DosageForm = observer(({
   const [formTypeInput, setFormTypeInput] = React.useState('');
   const [formInput, setFormInput] = React.useState('');
   const [unitInput, setUnitInput] = React.useState('');
+  const [totalUnitInput, setTotalUnitInput] = React.useState('');
   const [frequencyInput, setFrequencyInput] = React.useState('');
   const [conditionInput, setConditionInput] = React.useState('');
   const [amountValidationError, setAmountValidationError] = React.useState(false);
+  const [totalAmountValidationError, setTotalAmountValidationError] = React.useState(false);
 
   // Auto-focus on mount or when focusOnMount changes
   useEffect(() => {
@@ -129,6 +149,12 @@ export const DosageForm = observer(({
   const isUnitHighlighted = (unit: string) => {
     if (!unitInput) return false;
     return unit.toLowerCase().startsWith(unitInput.toLowerCase());
+  };
+
+  const filteredTotalUnits = availableTotalUnits;
+  const isTotalUnitHighlighted = (unit: string) => {
+    if (!totalUnitInput) return false;
+    return unit.toLowerCase().startsWith(totalUnitInput.toLowerCase());
   };
 
   const filteredFrequencies = dosageFrequencies;
@@ -300,7 +326,7 @@ export const DosageForm = observer(({
       <div className="grid grid-cols-2 gap-6">
         <div>
           <Label htmlFor="dosage-amount" className="text-base font-medium">
-            Amount
+            Dosage Amount
           </Label>
           <Input
             ref={amountInputRef}
@@ -355,8 +381,8 @@ export const DosageForm = observer(({
 
         <div className="relative">
           <Label htmlFor="dosage-unit" className="text-base font-medium">
-            Unit
-            </Label>
+            Dosage Unit
+          </Label>
             <div ref={unitInputContainerRef} id="dosage-unit-container" className="relative mt-2">
               <Input
                 ref={unitInputRef}
@@ -380,8 +406,8 @@ export const DosageForm = observer(({
                       onUnitChange(unitToSelect);
                       setUnitInput(unitToSelect);
                       setShowUnitDropdown(false);
-                      // Focus on frequency field after unit selection
-                      setTimeout(() => frequencyInputRef.current?.focus(), 50);
+                      // Focus on total amount field after unit selection
+                      setTimeout(() => totalAmountInputRef.current?.focus(), 50);
                     }
                   }
                 }}
@@ -410,7 +436,123 @@ export const DosageForm = observer(({
           </div>
       </div>
 
-      {/* Third Row: Frequency and Condition */}
+      {/* Third Row: Total Amount and Total Unit */}
+      <div className="grid grid-cols-2 gap-6">
+        <div>
+          <Label htmlFor="total-amount" className="text-base font-medium">
+            Total Amount
+          </Label>
+          <Input
+            ref={totalAmountInputRef}
+            id="total-amount"
+            data-testid="total-amount-input"
+            type="text"
+            value={totalAmount}
+            onChange={(e) => {
+              onTotalAmountChange(e.target.value);
+              // Clear validation error when user types
+              if (totalAmountValidationError) {
+                const isValidNumber = /^\d*\.?\d*$/.test(e.target.value.trim());
+                if (isValidNumber || e.target.value === '') {
+                  setTotalAmountValidationError(false);
+                }
+              }
+            }}
+            onKeyDown={(e) => {
+              if ((e.key === 'Enter' || e.key === 'Tab') && totalAmount) {
+                // Validate numeric value before advancing
+                const isValidNumber = /^\d*\.?\d+$/.test(totalAmount.trim());
+                if (isValidNumber) {
+                  setTotalAmountValidationError(false);
+                  if (e.key === 'Tab') {
+                    // Allow natural tab to total unit field
+                    return;
+                  }
+                  e.preventDefault();
+                  // Focus on total unit field after total amount entry
+                  setTimeout(() => totalUnitInputRef.current?.focus(), 50);
+                } else {
+                  // Invalid number - prevent tab/enter advancement
+                  e.preventDefault();
+                  setTotalAmountValidationError(true);
+                }
+              }
+            }}
+            placeholder="Enter total amount..."
+            className={`mt-2 ${totalAmount && !totalAmountValidationError ? 'border-blue-500 bg-blue-50' : ''} ${
+              errors.get('totalAmount') || totalAmountValidationError ? 'border-red-500' : ''
+            }`}
+            aria-label="Total amount"
+            aria-describedby={errors.get('totalAmount') ? 'total-amount-error' : undefined}
+            aria-invalid={!!errors.get('totalAmount')}
+          />
+          {(errors.get('totalAmount') || totalAmountValidationError) && (
+            <p id="total-amount-error" className="mt-1 text-sm text-red-600" role="alert">
+              {errors.get('totalAmount') || 'Please enter a valid number'}
+            </p>
+          )}
+        </div>
+
+        <div className="relative">
+          <Label htmlFor="total-unit" className="text-base font-medium">
+            Total Unit
+          </Label>
+          <div ref={totalUnitInputContainerRef} id="total-unit-container" className="relative mt-2">
+            <Input
+              ref={totalUnitInputRef}
+              id="total-unit"
+              data-testid="total-unit-input"
+              type="text"
+              value={totalUnit || totalUnitInput}
+              onChange={(e) => {
+                setTotalUnitInput(e.target.value);
+                if (!totalUnit) {
+                  setShowTotalUnitDropdown(true);
+                  onDropdownOpen?.('total-unit-container');
+                }
+              }}
+              onBlur={() => setTimeout(() => setShowTotalUnitDropdown(false), 200)}
+              onKeyDown={(e) => {
+                if ((e.key === 'Tab' || e.key === 'Enter') && !totalUnit && filteredTotalUnits.length > 0) {
+                  const highlighted = filteredTotalUnits.filter(u => isTotalUnitHighlighted(u));
+                  if (highlighted.length === 1 || filteredTotalUnits.length === 1) {
+                    e.preventDefault();
+                    const unitToSelect = highlighted.length === 1 ? highlighted[0] : filteredTotalUnits[0];
+                    onTotalUnitChange(unitToSelect);
+                    setTotalUnitInput(unitToSelect);
+                    setShowTotalUnitDropdown(false);
+                    // Focus on frequency field after total unit selection
+                    setTimeout(() => frequencyInputRef.current?.focus(), 50);
+                  }
+                }
+              }}
+              placeholder="Unit..."
+              className={`pr-10 ${totalUnit ? 'border-blue-500 bg-blue-50' : ''}`}
+              disabled={!dosageFormType || !!totalUnit}
+            />
+            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          </div>
+          
+          <AutocompleteDropdown
+            isOpen={showTotalUnitDropdown && !totalUnit && filteredTotalUnits.length > 0}
+            items={filteredTotalUnits}
+            inputRef={totalUnitInputContainerRef}
+            onSelect={(unit) => {
+              onTotalUnitChange(unit);
+              setTotalUnitInput(unit);
+              setShowTotalUnitDropdown(false);
+              // Focus on frequency field after total unit selection
+              setTimeout(() => frequencyInputRef.current?.focus(), 50);
+            }}
+            getItemKey={(unit) => unit}
+            isItemHighlighted={isTotalUnitHighlighted}
+            testId="total-unit-dropdown"
+            renderItem={(unit) => <div>{unit}</div>}
+          />
+        </div>
+      </div>
+
+      {/* Fourth Row: Frequency and Condition */}
       <div className="grid grid-cols-2 gap-6">
         <div className="relative">
           <Label htmlFor="dosage-frequency" className="text-base font-medium">
