@@ -18,15 +18,30 @@ This document tracks the implementation of the new unified focus management syst
 ## Required Documentation
 **All agents MUST review these documents before beginning any task:**
 
-### 1. focus-rearchitecture.md
+### 1. /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md
 - **Purpose**: Comprehensive architecture plan and implementation examples
 - **Contents**: Design principles, component architecture, implementation patterns, testing strategies
 - **Critical for**: Understanding the target state and migration approach
 
-### 2. current-focus-flow.md  
+### 2. /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md  
 - **Purpose**: Current implementation details with all complexity points
 - **Contents**: Actual code flows, timeout dependencies, modal behaviors, known issues
 - **Critical for**: Understanding what needs to be migrated and potential pitfalls
+
+### 3. /home/lars/dev/A4C-FrontEnd/docs/focus-management/MIGRATION_GUIDE.md
+- **Purpose**: Step-by-step migration guide with examples
+- **Contents**: Hook replacements, migration patterns, common pitfalls, testing strategies
+- **Critical for**: Understanding how to convert old patterns to new system
+
+### 4. /home/lars/dev/A4C-FrontEnd/docs/focus-management/medication-search-analysis.md
+- **Purpose**: Deep analysis of MedicationSearch component complexity
+- **Contents**: Detailed breakdown of focus issues, complexity score, migration risks
+- **Critical for**: Understanding specific migration challenges for complex components
+
+### 5. /home/lars/dev/A4C-FrontEnd/docs/focus-management/INFRASTRUCTURE_TESTS_SUMMARY.md
+- **Purpose**: Summary of all infrastructure testing completed
+- **Contents**: Test coverage reports, edge cases covered, validation approaches
+- **Critical for**: Understanding testing requirements and patterns
 
 ## Migration Phases
 
@@ -35,10 +50,10 @@ This document tracks the implementation of the new unified focus management syst
 **Risk Level**: Low (new code, no breaking changes)
 **Token Budget**: ~40,000 tokens
 
-#### Task 001: Core FocusManagerContext [fullstack-architect] ✅ COMPLETED
+#### Task 001: Core FocusManagerContext [software-architect-dbc] ✅ COMPLETED
 **Required Reading**: 
-- focus-rearchitecture.md: Sections on "Architecture Overview" and "Core Components"
-- current-focus-flow.md: Review current complexity points to avoid
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Sections on "Architecture Overview" and "Core Components"
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Review current complexity points to avoid
 - [x] Create base context with registry system
 - [x] Implement scope management for modal isolation  
 - [x] Add basic navigation (focusNext, focusPrevious, focusField)
@@ -52,13 +67,13 @@ This document tracks the implementation of the new unified focus management syst
 - Included test suite and migration guide
 - Files created in src/contexts/focus/
 
-#### Task 002: Mouse Navigation Support [ui-ux-engineer] ✅ COMPLETED
+#### Task 002: Mouse Navigation Support [fullstack-engineer-tdd] ✅ COMPLETED
 **Completed**: 2025-01-15 3:30 PM
 **Duration**: 45 minutes
 **Dependencies**: task-001 (✅ COMPLETED)
 **Required Reading**:
-- focus-rearchitecture.md: "Mouse Navigation" section and interaction patterns
-- current-focus-flow.md: Current mouse handling limitations
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: "Mouse Navigation" section and interaction patterns
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Current mouse handling limitations
 - [x] Add mouse click handlers to context (enhanced handleMouseNavigation with visual feedback)
 - [x] Implement navigation mode detection (keyboard/mouse/hybrid with AUTO mode)
 - [x] Create jump validation logic (enhanced canJumpToNode with hybrid mode support)
@@ -80,13 +95,13 @@ This document tracks the implementation of the new unified focus management syst
 - Enhanced auto-mode switching with activity timeouts (3 seconds of single-mode activity)
 - Added debug logging throughout for better development experience
 
-#### Task 003: ManagedDialog Wrapper [ui-ux-engineer] ✅ COMPLETED
+#### Task 003: ManagedDialog Wrapper [fullstack-engineer-tdd] ✅ COMPLETED
 **Completed**: 2025-01-15 4:15 PM
 **Duration**: 45 minutes
 **Dependencies**: task-001 (✅ COMPLETED - FocusManagerContext exists in src/contexts/focus/)
 **Required Reading**:
-- focus-rearchitecture.md: "ManagedDialog Component" implementation example
-- current-focus-flow.md: Modal complexity points and auto-open issues
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: "ManagedDialog Component" implementation example
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Modal complexity points and auto-open issues
 - [x] Create Radix Dialog wrapper component (implemented in src/components/focus/ManagedDialog.tsx)
 - [x] Integrate with FocusManager scope push/pop (using openModal/closeModal from context)
 - [x] Implement focus restoration on close (restores to trigger or specified element)
@@ -123,13 +138,13 @@ This document tracks the implementation of the new unified focus management syst
   - /src/components/focus/ManagedDialog.test.tsx (test suite)
   - /src/components/focus/index.ts (exports)
 
-#### Task 004: FocusableField Component [ui-ux-engineer] ✅ COMPLETED
+#### Task 004: FocusableField Component [fullstack-engineer-tdd] ✅ COMPLETED
 **Completed**: 2025-01-15 5:30 PM
 **Duration**: 30 minutes
 **Dependencies**: task-001 (✅ COMPLETED - FocusManagerContext exists in src/contexts/focus/)
 **Required Reading**:
-- focus-rearchitecture.md: "FocusableField Component" implementation
-- current-focus-flow.md: Current field validation and blocking behavior
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: "FocusableField Component" implementation
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Current field validation and blocking behavior
 - [x] Create field wrapper with ref management (implemented with wrapperRef and proper DOM element handling)
 - [x] Add validator support (canReceiveFocus, canLeaveFocus implemented as async functions)
 - [x] Implement mouse override configuration (full MouseNavigationConfig support with captureClicks, preserveFocusOnInteraction, allowDirectJump)
@@ -172,13 +187,13 @@ This document tracks the implementation of the new unified focus management syst
   - /src/components/FocusableField.demo.tsx (interactive demo)
   - /src/components/FocusableField.test.tsx (test suite)
 
-#### Task 005: StepIndicator Component [ui-ux-engineer] ✅ COMPLETED
+#### Task 005: StepIndicator Component [fullstack-engineer-tdd] ✅ COMPLETED
 **Completed**: 2025-01-15 6:00 PM
 **Duration**: 30 minutes
 **Dependencies**: task-002 (✅ COMPLETED - Mouse Navigation Support)
 **Required Reading**:
-- focus-rearchitecture.md: "Visual Progress Indicators" section
-- current-focus-flow.md: Current navigation flow for context
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: "Visual Progress Indicators" section
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Current navigation flow for context
 - [x] Build visual progress component (implemented in src/components/focus/StepIndicator.tsx)
 - [x] Add clickable step navigation (handleStepClick with validation and visual feedback)
 - [x] Implement status tracking (complete/current/upcoming/disabled with proper styling)
@@ -240,53 +255,101 @@ This document tracks the implementation of the new unified focus management syst
   - /src/components/focus/StepIndicator.css (styles and animations)
   - Updated /src/components/focus/index.ts (exports)
 
-#### Task 006: Infrastructure Testing [fullstack-qa-engineer]
+#### Task 006: Infrastructure Testing [qa-test-engineer] ✅ COMPLETED
+**Completed**: 2025-01-17 (via qa-test-engineer agent)
+**Duration**: ~1 hour
 **Dependencies**: task-001, task-003, task-004, task-005
 **Required Reading**:
-- focus-rearchitecture.md: "Testing Strategy" section
-- current-focus-flow.md: Known issues to test against
-- [ ] Unit tests for FocusManagerContext
-- [ ] Integration tests for ManagedDialog
-- [ ] Component tests for FocusableField
-- [ ] Visual tests for StepIndicator
-- [ ] Edge case coverage
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: "Testing Strategy" section
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Known issues to test against
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/INFRASTRUCTURE_TESTS_SUMMARY.md: Test patterns and coverage
+- [x] Unit tests for FocusManagerContext (89 tests created)
+- [x] Unit tests for ManagedDialog (67 tests created)  
+- [x] Component tests for FocusableField (78 tests created)
+- [x] Visual tests for StepIndicator (71 tests created)
+- [x] Edge case coverage (comprehensive edge cases tested)
 **Success Criteria**: 90% coverage ✓ | All passing ✓ | Edge cases handled ✓
+**Implementation Notes**:
+- Created 305 total unit test cases across 49 test suites
+- Test files created in:
+  - src/contexts/focus/__tests__/FocusManagerContext.test.tsx
+  - src/components/focus/__tests__/ManagedDialog.test.tsx  
+  - src/components/__tests__/FocusableField.test.tsx
+  - src/components/focus/__tests__/StepIndicator.test.tsx
+- Comprehensive coverage of registry management, navigation, modal operations, mouse handling
+- Edge cases thoroughly tested including null refs, missing validators, rapid operations
+- All tests follow React Testing Library best practices
+- Note: Integration tests skipped per user request, only unit tests written
 
 ### PHASE 2: Component Migration (Tasks 007-017)
 **Goal**: Migrate existing components to new system
 **Risk Level**: Medium (modifying existing code)
 **Token Budget**: ~60,000 tokens
 
-#### Task 007: Analyze MedicationSearch [fullstack-architect]
+#### Task 007: Analyze MedicationSearch [software-architect-dbc] ✅ COMPLETED
+**Completed**: 2025-01-17 (via software-architect-dbc agent)
+**Duration**: ~30 minutes
 **Required Reading**:
-- focus-rearchitecture.md: Review architecture principles before analysis
-- current-focus-flow.md: "MedicationSearch" section for current implementation
-- [ ] Document current focus implementation
-- [ ] Map timeout dependencies (50ms delays)
-- [ ] Identify dropdown auto-open logic
-- [ ] List all refs and event handlers
-- [ ] Create migration checklist
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Review architecture principles before analysis
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: "MedicationSearch" section for current implementation
+- [x] Document current focus implementation (comprehensive analysis completed)
+- [x] Map timeout dependencies (3 timeouts found: 50ms, 50ms, 200ms)
+- [x] Identify dropdown auto-open logic (onChange triggered with value check)
+- [x] List all refs and event handlers (2 refs, 6 event handlers documented)
+- [x] Create migration checklist (detailed checklist with code examples)
 **Success Criteria**: Flow documented ✓ | Dependencies mapped ✓ | Complexity identified ✓
+**Implementation Notes**:
+- Component located at: src/components/MedicationSearch/MedicationSearch.tsx
+- Complexity Score: 7/10 (high complexity due to timeouts and keyboard handling)
+- Key issues identified:
+  - 3 setTimeout instances (50ms, 50ms, 200ms delays)
+  - Complex onKeyDown with 12 cyclomatic complexity
+  - Manual focus() calls on refs
+  - Tab key preventDefault breaking standard navigation
+  - Tight coupling with parent component for dropdown state
+- Analysis document created: src/contexts/focus/__tests__/medication-search-analysis.md
+- Migration risks identified: High risk for dropdown and Tab handling
+- Recommended phased migration approach documented
 
-#### Task 008: Migrate MedicationSearch [ui-ux-engineer]
+#### Task 008: Migrate MedicationSearch [fullstack-engineer-tdd] ⚠️ SPLIT REQUIRED
 **Dependencies**: task-004, task-007
-**References**: task-007 findings
+**References**: task-007 findings (Complexity: 7/10)
 **Required Reading**:
-- focus-rearchitecture.md: Component migration patterns
-- current-focus-flow.md: MedicationSearch complexity points
-- [ ] Replace manual focus() calls
-- [ ] Remove all setTimeout wrappers
-- [ ] Wrap with FocusableField
-- [ ] Implement search validators
-- [ ] Preserve dropdown functionality
-**Success Criteria**: Migration complete ✓ | No timeouts ✓ | Validators work ✓ | Dropdown functional ✓
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Component migration patterns
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: MedicationSearch complexity points
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/medication-search-analysis.md: Full analysis (Complexity: 7/10)
 
-#### Task 009: Analyze DosageForm [fullstack-architect]
+**⚠️ IMPORTANT**: Based on Task 007 analysis, this component's complexity (7/10) exceeds initial estimates. Recommend splitting into 3 sub-tasks:
+
+##### Task 008a: Dropdown Pattern Development
+- [ ] Create DropdownField wrapper component
+- [ ] Implement AutoCompleteValidator
+- [ ] Add FocusableDropdown integration
+- [ ] Test with simple use case
+
+##### Task 008b: Core MedicationSearch Migration
+- [ ] Replace manual focus() calls (lines 45-47)
+- [ ] Remove all setTimeout wrappers (3 instances)
+- [ ] Wrap with FocusableField
+- [ ] Migrate basic keyboard handlers
+
+##### Task 008c: Complex Logic Migration
+- [ ] Refactor onKeyDown logic (complexity: 12)
+- [ ] Implement search validators
+- [ ] Handle Tab preventDefault properly
+- [ ] Preserve dropdown functionality
+- [ ] Test auto-selection heuristics
+
+**Success Criteria**: Migration complete ✓ | No timeouts ✓ | Validators work ✓ | Dropdown functional ✓
+**Estimated Effort**: 12-16 hours (increased from 8-12)
+**Risk Level**: Medium-High (elevated from Medium)
+
+#### Task 009: Analyze DosageForm [software-architect-dbc]
 **Dependencies**: task-008
 **References**: task-008 challenges
 **Required Reading**:
-- focus-rearchitecture.md: Multi-field form handling patterns
-- current-focus-flow.md: "DosageForm" section with 8-field complexity
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Multi-field form handling patterns
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: "DosageForm" section with 8-field complexity
 - [ ] Map all 8 input refs
 - [ ] Document validation blocking logic
 - [ ] Identify condition-based completion
@@ -294,12 +357,13 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Create field dependency map
 **Success Criteria**: Refs mapped ✓ | Validation documented ✓ | Flow diagram created ✓
 
-#### Task 010: Migrate DosageForm [ui-ux-engineer]
+#### Task 010: Migrate DosageForm [fullstack-engineer-tdd]
 **Dependencies**: task-004, task-009
 **References**: task-009 findings
 **Required Reading**:
-- focus-rearchitecture.md: FocusableField usage in forms
-- current-focus-flow.md: DosageForm validation blocking issues
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: FocusableField usage in forms
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: DosageForm validation blocking issues
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/MIGRATION_GUIDE.md: FocusableField patterns
 - [ ] Wrap all 8 fields with FocusableField
 - [ ] Implement amount validation guards
 - [ ] Add proper field ordering
@@ -307,11 +371,11 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Test validation blocking
 **Success Criteria**: 8 fields migrated ✓ | Validation works ✓ | Flow preserved ✓
 
-#### Task 011: Analyze CategorySelection [fullstack-architect]
+#### Task 011: Analyze CategorySelection [software-architect-dbc]
 **References**: Previous modal findings
 **Required Reading**:
-- focus-rearchitecture.md: Modal management patterns
-- current-focus-flow.md: "CategorySelection" auto-open behavior
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Modal management patterns
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: "CategorySelection" auto-open behavior
 - [ ] Document auto-open on focus behavior
 - [ ] Map broad/specific modal relationship
 - [ ] Identify state management coupling
@@ -319,12 +383,13 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Document selection persistence
 **Success Criteria**: Auto-open documented ✓ | Flow mapped ✓ | Coupling identified ✓
 
-#### Task 012: Migrate CategorySelection [ui-ux-engineer]
+#### Task 012: Migrate CategorySelection [fullstack-engineer-tdd]
 **Dependencies**: task-003, task-011
 **References**: task-011 findings
 **Required Reading**:
-- focus-rearchitecture.md: ManagedDialog implementation
-- current-focus-flow.md: Nested modal complexity
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: ManagedDialog implementation
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Nested modal complexity
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/MIGRATION_GUIDE.md: Modal migration patterns
 - [ ] Convert to ManagedDialog
 - [ ] Remove onFocus auto-open
 - [ ] Implement modal scope management
@@ -332,11 +397,11 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Test both modal flows
 **Success Criteria**: Modals migrated ✓ | Auto-open removed ✓ | Scope works ✓ | Selection preserved ✓
 
-#### Task 013: Analyze DateSelection [fullstack-architect]
+#### Task 013: Analyze DateSelection [software-architect-dbc]
 **References**: Modal patterns from task-011
 **Required Reading**:
-- focus-rearchitecture.md: Conditional navigation patterns
-- current-focus-flow.md: "DateSelection" auto-open and timeout issues
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Conditional navigation patterns
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: "DateSelection" auto-open and timeout issues
 - [ ] Document calendar auto-open
 - [ ] Map temp date state management
 - [ ] Identify Skip/Cancel/Done flow
@@ -344,12 +409,13 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Document conditional relationships
 **Success Criteria**: Calendar documented ✓ | State mapped ✓ | Refs identified ✓
 
-#### Task 014: Migrate DateSelection [ui-ux-engineer]
+#### Task 014: Migrate DateSelection [fullstack-engineer-tdd]
 **Dependencies**: task-003, task-013
 **References**: task-013 findings
 **Required Reading**:
-- focus-rearchitecture.md: Calendar modal patterns
-- current-focus-flow.md: Date selection flow complexity
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Calendar modal patterns
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Date selection flow complexity
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/MIGRATION_GUIDE.md: ManagedDialog usage
 - [ ] Convert both calendars to ManagedDialog
 - [ ] Add conditional validators
 - [ ] Remove auto-open logic
@@ -357,12 +423,13 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Test date relationships
 **Success Criteria**: Calendars migrated ✓ | Conditionals work ✓ | Restoration tested ✓
 
-#### Task 015: Create SideEffectsSelection [ui-ux-engineer]
+#### Task 015: Create SideEffectsSelection [fullstack-engineer-tdd]
 **Dependencies**: task-003
 **Challenge**: New component, nested modal pattern
 **Required Reading**:
-- focus-rearchitecture.md: Nested modal examples and patterns
-- current-focus-flow.md: Expected integration points
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Nested modal examples and patterns (Section 2.4)
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Expected integration points
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/MIGRATION_GUIDE.md: ManagedDialog nested modal support
 - [ ] Implement base selection modal
 - [ ] Add search functionality
 - [ ] Create selection list UI
@@ -370,12 +437,12 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Add text capture for custom effects
 **Success Criteria**: Component created ✓ | Search works ✓ | Nested modal works ✓ | Text captured ✓
 
-#### Task 016: Handle Nested Modal Focus [fullstack-architect]
+#### Task 016: Handle Nested Modal Focus [software-architect-dbc]
 **Dependencies**: task-015
 **References**: task-015 implementation
 **Required Reading**:
-- focus-rearchitecture.md: Modal stack management
-- current-focus-flow.md: Nested modal issues to avoid
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Modal stack management (Lines 226-244)
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Nested modal issues to avoid
 - [ ] Implement nested scope management
 - [ ] Add proper focus restoration chain
 - [ ] Prevent focus loops
@@ -383,12 +450,13 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Document nesting pattern
 **Success Criteria**: Nesting works ✓ | Restoration correct ✓ | No loops ✓
 
-#### Task 017: Integration Testing [fullstack-qa-engineer]
+#### Task 017: Integration Testing [qa-test-engineer]
 **Dependencies**: task-008, task-010, task-012, task-014, task-015
 **References**: All migration challenges
 **Required Reading**:
-- focus-rearchitecture.md: Full testing strategy
-- current-focus-flow.md: All complexity points to verify resolved
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Full testing strategy (Phase 4)
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: All complexity points to verify resolved
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/INFRASTRUCTURE_TESTS_SUMMARY.md: Test patterns to follow
 - [ ] Test complete medication flow
 - [ ] Verify no focus dead ends
 - [ ] Check modal transitions
@@ -401,11 +469,11 @@ This document tracks the implementation of the new unified focus management syst
 **Risk Level**: Low (enhancement layer)
 **Token Budget**: ~30,000 tokens
 
-#### Task 018: Create Flow Configuration [fullstack-architect]
+#### Task 018: Create Flow Configuration [software-architect-dbc]
 **References**: Integration test findings
 **Required Reading**:
-- focus-rearchitecture.md: "Declarative Flow Configuration" section
-- current-focus-flow.md: Current flow for reference
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: "Declarative Flow Configuration" section (Lines 1262-1313)
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Current flow for reference
 - [ ] Define medicationEntryFlow structure
 - [ ] Add node definitions with order
 - [ ] Implement branch conditions
@@ -413,12 +481,12 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Add skip conditions
 **Success Criteria**: Config created ✓ | Branches defined ✓ | Validators work ✓
 
-#### Task 019: Implement useFocusFlow Hook [fullstack-architect]
+#### Task 019: Implement useFocusFlow Hook [software-architect-dbc]
 **Dependencies**: task-018
 **References**: task-018 configuration
 **Required Reading**:
-- focus-rearchitecture.md: Flow hook implementation patterns
-- current-focus-flow.md: Flow complexity to abstract
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Flow hook implementation patterns (Lines 1315-1384)
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Flow complexity to abstract
 - [ ] Process flow configuration
 - [ ] Auto-register nodes
 - [ ] Handle branching logic
@@ -426,12 +494,12 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Add flow navigation methods
 **Success Criteria**: Hook works ✓ | Branching functional ✓ | Skips respected ✓
 
-#### Task 020: Step Indicator Integration [ui-ux-engineer]
+#### Task 020: Step Indicator Integration [fullstack-engineer-tdd]
 **Dependencies**: task-005, task-019
 **References**: Flow configuration
 **Required Reading**:
-- focus-rearchitecture.md: Progress indicator integration
-- current-focus-flow.md: Navigation flow context
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Progress indicator integration (Lines 1105-1258)
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Navigation flow context
 - [ ] Connect to focus flow
 - [ ] Show current position
 - [ ] Update completed steps
@@ -439,12 +507,12 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Add visual feedback
 **Success Criteria**: Steps display ✓ | Status updates ✓ | Navigation works ✓
 
-#### Task 021: Mouse/Keyboard Mode Switching [ui-ux-engineer]
+#### Task 021: Mouse/Keyboard Mode Switching [fullstack-engineer-tdd]
 **Dependencies**: task-002
 **References**: Mouse navigation patterns
 **Required Reading**:
-- focus-rearchitecture.md: Interaction mode detection
-- current-focus-flow.md: Current interaction limitations
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Interaction mode detection (Lines 336-364)
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Current interaction limitations
 - [ ] Add interaction detection
 - [ ] Implement mode switching
 - [ ] Add visual indicators
@@ -457,12 +525,12 @@ This document tracks the implementation of the new unified focus management syst
 **Risk Level**: Low (validation only)
 **Token Budget**: ~40,000 tokens
 
-#### Task 022: Keyboard Navigation Testing [fullstack-qa-engineer]
+#### Task 022: Keyboard Navigation Testing [qa-test-engineer]
 **Dependencies**: task-017
 **References**: All keyboard patterns
 **Required Reading**:
-- focus-rearchitecture.md: Keyboard navigation specifications
-- current-focus-flow.md: Current keyboard issues
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Keyboard navigation specifications (Lines 1666-1690)
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Current keyboard issues
 - [ ] Test Tab/Shift+Tab cycle
 - [ ] Verify Enter advancement
 - [ ] Test Escape in modals
@@ -470,12 +538,12 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Validate all shortcuts
 **Success Criteria**: Tab works ✓ | Enter advances ✓ | Escape closes ✓ | Shortcuts work ✓
 
-#### Task 023: Mouse Navigation Testing [fullstack-qa-engineer]
+#### Task 023: Mouse Navigation Testing [qa-test-engineer]
 **Dependencies**: task-021
 **References**: Mouse implementation
 **Required Reading**:
-- focus-rearchitecture.md: Mouse navigation specifications
-- current-focus-flow.md: Current mouse handling
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Mouse navigation specifications (Lines 1524-1644)
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Current mouse handling
 - [ ] Test click advancement
 - [ ] Verify step indicator clicks
 - [ ] Test invalid jump prevention
@@ -483,11 +551,11 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Validate visual feedback
 **Success Criteria**: Clicks advance ✓ | Steps clickable ✓ | Jumps prevented ✓ | Mode switches ✓
 
-#### Task 024: Accessibility Audit [fullstack-qa-engineer]
+#### Task 024: Accessibility Audit [qa-test-engineer]
 **Dependencies**: task-017
 **Required Reading**:
-- focus-rearchitecture.md: Accessibility requirements
-- current-focus-flow.md: Current accessibility gaps
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Accessibility requirements (Lines 1648-1716)
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Current accessibility gaps
 - [ ] Run axe-core tests
 - [ ] Test NVDA screen reader
 - [ ] Test JAWS screen reader
@@ -495,12 +563,12 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Check color contrast
 **Success Criteria**: No violations ✓ | Readers work ✓ | ARIA correct ✓ | Contrast passes ✓
 
-#### Task 025: Performance Testing [fullstack-qa-engineer]
+#### Task 025: Performance Testing [qa-test-engineer]
 **Dependencies**: task-017
 **References**: Performance metrics
 **Required Reading**:
-- focus-rearchitecture.md: Performance targets
-- current-focus-flow.md: Current performance issues (timeouts)
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Performance targets (Lines 1896-1961)
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Current performance issues (timeouts)
 - [ ] Measure focus transitions
 - [ ] Time modal open/close
 - [ ] Check memory usage
@@ -508,11 +576,11 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Create performance report
 **Success Criteria**: <100ms transitions ✓ | <150ms modals ✓ | <5MB memory ✓ | No bottlenecks ✓
 
-#### Task 026: Error Boundary Implementation [fullstack-architect]
+#### Task 026: Error Boundary Implementation [software-architect-dbc]
 **References**: Error scenarios from testing
 **Required Reading**:
-- focus-rearchitecture.md: Error handling patterns
-- current-focus-flow.md: Known failure modes
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Error handling patterns (Lines 2036-2087)
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Known failure modes
 - [ ] Create FocusErrorBoundary
 - [ ] Add fallback UI
 - [ ] Implement error reporting
@@ -525,12 +593,12 @@ This document tracks the implementation of the new unified focus management syst
 **Risk Level**: Medium (removing old code)
 **Token Budget**: ~30,000 tokens
 
-#### Task 027: Remove Legacy Code [fullstack-architect]
+#### Task 027: Remove Legacy Code [software-architect-dbc]
 **Dependencies**: task-017
 **References**: All legacy patterns found
 **Required Reading**:
-- focus-rearchitecture.md: Target state for comparison
-- current-focus-flow.md: All legacy patterns to remove
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Target state for comparison (Lines 1824-1849)
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: All legacy patterns to remove (Lines 105-182)
 - [ ] Delete setTimeout focus calls
 - [ ] Remove onFocus auto-open
 - [ ] Eliminate focus tracking refs
@@ -538,10 +606,10 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Update imports
 **Success Criteria**: Timeouts removed ✓ | Auto-open deleted ✓ | Refs cleaned ✓ | No legacy remains ✓
 
-#### Task 028: Implement Feature Flags [fullstack-architect]
+#### Task 028: Implement Feature Flags [software-architect-dbc]
 **Required Reading**:
-- focus-rearchitecture.md: Migration strategy section
-- current-focus-flow.md: Risk areas needing flags
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Migration strategy section (Lines 1998-2033)
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Risk areas needing flags
 - [ ] Add environment flags
 - [ ] Support user-specific flags
 - [ ] Enable A/B testing
@@ -549,12 +617,12 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Document flag usage
 **Success Criteria**: Flags work ✓ | Rollback possible ✓ | A/B ready ✓
 
-#### Task 029: Performance Optimization [fullstack-architect]
+#### Task 029: Performance Optimization [software-architect-dbc]
 **Dependencies**: task-025
 **References**: Performance test results
 **Required Reading**:
-- focus-rearchitecture.md: Performance optimization techniques
-- current-focus-flow.md: Performance bottlenecks
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Performance optimization techniques (Lines 1851-1894)
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Performance bottlenecks
 - [ ] Debounce focus updates
 - [ ] Add intersection observer
 - [ ] Optimize registry lookups
@@ -562,12 +630,14 @@ This document tracks the implementation of the new unified focus management syst
 - [ ] Reduce re-renders
 **Success Criteria**: Updates debounced ✓ | Observer works ✓ | Lookups fast ✓ | Performance improved ✓
 
-#### Task 030: Documentation & Handoff [fullstack-architect]
+#### Task 030: Documentation & Handoff [software-architect-dbc]
 **Dependencies**: task-029
 **References**: All implementation learnings
 **Required Reading**:
-- focus-rearchitecture.md: Full document for reference
-- current-focus-flow.md: Migration journey context
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md: Full document for reference
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md: Migration journey context
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/MIGRATION_GUIDE.md: Complete migration patterns
+- /home/lars/dev/A4C-FrontEnd/docs/focus-management/INFRASTRUCTURE_TESTS_SUMMARY.md: Testing approach documentation
 - [ ] Write developer guide
 - [ ] Document migration patterns
 - [ ] Create troubleshooting guide
@@ -602,6 +672,11 @@ Before beginning any task:
 2. **Load Required Documentation**: Read all documents listed in "Required Reading" section
 3. **Review References**: Check findings from referenced tasks
 4. **Update Status**: Add timestamp when starting work (e.g., "Started: 2025-01-15 10:30 AM")
+
+**Document Priority Order for Loading**:
+1. First: `/home/lars/dev/A4C-FrontEnd/docs/focus-management/focus-rearchitecture.md` (target architecture)
+2. Second: `/home/lars/dev/A4C-FrontEnd/docs/focus-management/current-focus-flow.md` (current state)
+3. Then: Task-specific documents as listed in Required Reading
 
 ### During Task Execution
 
@@ -737,11 +812,6 @@ Each task implementation MUST:
    - Include completion timestamp in format: "Completed: YYYY-MM-DD HH:MM AM/PM"
    - Provide duration if significant (e.g., "Duration: 4 hours")
    - Leave clear handoff notes if task is incomplete
-
-### Agent Assignments
-- **fullstack-architect**: Architecture decisions, analysis, optimization
-- **ui-ux-engineer**: Component implementation, UI work
-- **fullstack-qa-engineer**: Testing, validation, quality assurance
 
 ### Context Window Management
 - Each phase designed to fit within ~40-60k tokens

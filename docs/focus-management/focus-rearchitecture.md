@@ -157,13 +157,13 @@ export const FocusManagerProvider = ({ children }) => {
     const focusableElement = element.querySelector('input, button, select, textarea') as HTMLElement;
     const targetElement = focusableElement || element;
     
-    // Set focus with a small delay to ensure DOM is ready
-    setTimeout(() => {
+    // Use requestAnimationFrame to ensure DOM is ready without arbitrary delays
+    requestAnimationFrame(() => {
       targetElement.focus();
       setCurrentFocus(nodeId);
       focusHistory.push(nodeId);
       console.log(`[FocusManager] Focused: ${nodeId}`);
-    }, 50);
+    });
   }, [registry, focusHistory]);
   
   // Focus navigation
@@ -459,7 +459,145 @@ export const ManagedDialog = ({
 };
 ```
 
-### 1.3 Create StepIndicator Component
+### 1.3 Create DropdownField Pattern (NEW - Added based on Task 007 findings)
+```typescript
+// src/components/focus/DropdownField.tsx
+import React, { useRef, useState, useCallback } from 'react';
+import { FocusableField } from './FocusableField';
+import { AutocompleteDropdown } from '@/components/ui/autocomplete-dropdown';
+
+interface DropdownFieldProps<T> {
+  id: string;
+  order: number;
+  items: T[];
+  value: T | null;
+  onSelect: (item: T) => void;
+  onSearch?: (query: string) => void;
+  renderItem: (item: T) => React.ReactNode;
+  getItemKey: (item: T) => string;
+  placeholder?: string;
+  validators?: {
+    isComplete?: () => boolean;
+    canLeaveFocus?: (reason: string) => boolean;
+  };
+}
+
+export function DropdownField<T>({
+  id,
+  order,
+  items,
+  value,
+  onSelect,
+  onSearch,
+  renderItem,
+  getItemKey,
+  placeholder,
+  validators
+}: DropdownFieldProps<T>) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleSelect = useCallback((item: T) => {
+    onSelect(item);
+    setIsOpen(false);
+    setQuery('');
+  }, [onSelect]);
+
+  const handleSearch = useCallback((newQuery: string) => {
+    setQuery(newQuery);
+    onSearch?.(newQuery);
+    if (newQuery && !value) {
+      setIsOpen(true);
+    }
+  }, [onSearch, value]);
+
+  // Auto-selection validator for dropdown behavior
+  const dropdownValidators = {
+    canLeaveFocus: (reason: string) => {
+      // On Tab with results, auto-select first
+      if (reason === 'tab' && !value && items.length > 0) {
+        handleSelect(items[0]);
+        return false; // Prevent focus leave until selection
+      }
+      return validators?.canLeaveFocus?.(reason) ?? true;
+    },
+    isComplete: validators?.isComplete || (() => !!value)
+  };
+
+  return (
+    <FocusableField
+      id={id}
+      order={order}
+      validators={dropdownValidators}
+      mouseNavigation={{
+        allowDirectJump: false,
+        captureClicks: true,
+        onClickOutside: () => setIsOpen(false)
+      }}
+    >
+      <div className="relative">
+        <input
+          ref={inputRef}
+          value={query}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder={placeholder}
+          className="w-full px-3 py-2 border rounded"
+          onFocus={() => items.length > 0 && setIsOpen(true)}
+        />
+        
+        <AutocompleteDropdown
+          isOpen={isOpen}
+          items={items}
+          inputRef={inputRef}
+          onSelect={handleSelect}
+          renderItem={renderItem}
+          getItemKey={getItemKey}
+        />
+      </div>
+    </FocusableField>
+  );
+}
+```
+
+### 1.4 Create AutoCompleteValidator (NEW - Added based on Task 007 findings)
+```typescript
+// src/components/focus/validators/AutoCompleteValidator.ts
+export class AutoCompleteValidator {
+  constructor(
+    private getItems: () => any[],
+    private getValue: () => any,
+    private onAutoSelect?: (item: any) => void
+  ) {}
+
+  canLeaveFocus = (reason: string): boolean => {
+    const items = this.getItems();
+    const value = this.getValue();
+
+    // If Tab pressed with single result, auto-select
+    if (reason === 'tab' && !value && items.length === 1) {
+      this.onAutoSelect?.(items[0]);
+      return false;
+    }
+
+    // If Enter pressed with results, select first
+    if (reason === 'enter' && !value && items.length > 0) {
+      this.onAutoSelect?.(items[0]);
+      return false;
+    }
+
+    // Allow leaving if value selected or no results
+    return !!value || items.length === 0;
+  };
+
+  canReceiveFocus = (): boolean => {
+    // Can receive focus if no value selected
+    return !this.getValue();
+  };
+}
+```
+
+### 1.5 Create StepIndicator Component
 ```typescript
 // src/components/StepIndicator.tsx
 import { cn } from '../utils/cn';
@@ -1820,6 +1958,40 @@ export const trackFocusMetrics = () => {
   return { trackTransition, sendMetrics, metrics };
 };
 ```
+
+## Updated Timeline and Risk Assessment (Based on Task 007 Findings)
+
+### Revised Timeline
+**Original Estimate**: 6 weeks
+**Revised Estimate**: 9 weeks
+
+**Breakdown**:
+- **Phase 1 (Infrastructure)**: 1 week ✅ COMPLETED
+- **Phase 2 (Component Migration)**: 4 weeks → 5 weeks (increased)
+  - MedicationSearch alone: 12-16 hours (was 8-12)
+  - New pattern development needed: +8 hours
+- **Phase 3 (Flow Configuration)**: 1.5 weeks (unchanged)
+- **Phase 4 (Testing & Validation)**: 1 week → 1.5 weeks (increased)
+- **Phase 5 (Cleanup & Optimization)**: 1 week (unchanged)
+
+### Elevated Risk Areas
+Based on MedicationSearch analysis (Complexity: 7/10):
+
+**High Risk** (was Medium):
+- Dropdown auto-open/close logic with parent state coupling
+- Tab key preventDefault interfering with natural flow
+- Complex auto-selection heuristics (12 cyclomatic complexity)
+
+**Medium-High Risk** (NEW):
+- Components with similar patterns may have hidden complexity
+- Timeline pressure due to underestimated complexity
+- Need for additional architectural patterns not initially planned
+
+**New Architectural Requirements**:
+1. DropdownField wrapper pattern (added to section 1.3)
+2. AutoCompleteValidator class (added to section 1.4)
+3. FocusableDropdown integration pattern
+4. Enhanced validation system for complex interactions
 
 ## Risk Mitigation
 
