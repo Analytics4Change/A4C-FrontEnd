@@ -5,6 +5,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 import { StepIndicator, VerticalStepIndicator, CompactStepIndicator } from './StepIndicator';
 import { FocusManagerProvider } from '../../contexts/focus/FocusManagerContext';
 import { useFocusManager } from '../../contexts/focus/useFocusManager';
@@ -12,7 +13,7 @@ import { StepIndicatorData } from '../../contexts/focus/types';
 import { FocusableField } from '../FocusableField';
 
 // Mock the useFocusManager hook
-jest.mock('../../contexts/focus/useFocusManager');
+vi.mock('../../contexts/focus/useFocusManager');
 
 describe('StepIndicator Component', () => {
   const mockSteps: StepIndicatorData[] = [
@@ -47,11 +48,11 @@ describe('StepIndicator Component', () => {
   ];
   
   const mockFocusManager = {
-    getVisibleSteps: jest.fn(() => mockSteps),
-    handleMouseNavigation: jest.fn(),
-    canJumpToNode: jest.fn((id) => mockSteps.find(s => s.id === id)?.isClickable || false),
-    setNavigationMode: jest.fn(),
-    focusField: jest.fn(),
+    getVisibleSteps: vi.fn(() => mockSteps),
+    handleMouseNavigation: vi.fn(),
+    canJumpToNode: vi.fn((id) => mockSteps.find(s => s.id === id)?.isClickable || false),
+    setNavigationMode: vi.fn(),
+    focusField: vi.fn(),
     state: {
       currentFocusId: 'step-2',
       navigationMode: 'keyboard'
@@ -59,8 +60,8 @@ describe('StepIndicator Component', () => {
   };
   
   beforeEach(() => {
-    jest.clearAllMocks();
-    (useFocusManager as jest.Mock).mockReturnValue(mockFocusManager);
+    vi.clearAllMocks();
+    (useFocusManager as any).mockReturnValue(mockFocusManager);
   });
   
   describe('Basic Rendering', () => {
@@ -169,7 +170,7 @@ describe('StepIndicator Component', () => {
   
   describe('Click Navigation', () => {
     it('should handle clicks on clickable steps', () => {
-      const onStepClick = jest.fn();
+      const onStepClick = vi.fn();
       
       render(
         <FocusManagerProvider>
@@ -187,7 +188,7 @@ describe('StepIndicator Component', () => {
     });
     
     it('should prevent navigation to non-clickable steps', () => {
-      const onStepClick = jest.fn();
+      const onStepClick = vi.fn();
       
       render(
         <FocusManagerProvider>
@@ -204,7 +205,7 @@ describe('StepIndicator Component', () => {
     });
     
     it('should allow jumping when allowJumping is true', () => {
-      const onStepClick = jest.fn();
+      const onStepClick = vi.fn();
       
       render(
         <FocusManagerProvider>
@@ -364,7 +365,7 @@ describe('StepIndicator Component', () => {
   
   describe('Custom Rendering', () => {
     it('should use custom renderStepContent function', () => {
-      const renderStepContent = jest.fn((step, index) => `Custom ${index}`);
+      const renderStepContent = vi.fn((step, index) => `Custom ${index}`);
       
       render(
         <FocusManagerProvider>

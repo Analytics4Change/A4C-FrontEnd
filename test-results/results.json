@@ -1,0 +1,419 @@
+{
+  "config": {
+    "configFile": "/home/lars/dev/A4C-FrontEnd/playwright.config.ts",
+    "rootDir": "/home/lars/dev/A4C-FrontEnd/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 6
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "test-results/results.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/home/lars/dev/A4C-FrontEnd/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/lars/dev/A4C-FrontEnd/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/lars/dev/A4C-FrontEnd/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/home/lars/dev/A4C-FrontEnd/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/lars/dev/A4C-FrontEnd/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/home/lars/dev/A4C-FrontEnd/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/lars/dev/A4C-FrontEnd/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "/home/lars/dev/A4C-FrontEnd/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/lars/dev/A4C-FrontEnd/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "/home/lars/dev/A4C-FrontEnd/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/lars/dev/A4C-FrontEnd/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 6
+        },
+        "id": "Tablet Chrome",
+        "name": "Tablet Chrome",
+        "testDir": "/home/lars/dev/A4C-FrontEnd/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.54.2",
+    "workers": 16,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": true,
+      "timeout": 30000
+    }
+  },
+  "suites": [
+    {
+      "title": "focus-management-integration.spec.ts",
+      "file": "focus-management-integration.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Focus Management Integration Tests (Task 017)",
+          "file": "focus-management-integration.spec.ts",
+          "line": 65,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Scenario 1: Complete medication entry flow",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1000,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-19T07:21:01.417Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b4d0a72eef4950f3f068-f65552aee801d8c060c3",
+              "file": "focus-management-integration.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "Scenario 2: No focus dead ends detection",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1718,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Potential focus loop detected at step 6\n"
+                        },
+                        {
+                          "text": "Focus history: [\n  {\n    element: {\n      tagName: \u001b[32m'DIV'\u001b[39m,\n      id: \u001b[32m''\u001b[39m,\n      testId: \u001b[32m'client-card-1'\u001b[39m,\n      className: \u001b[32m'bg-card text-card-foreground flex flex-col gap-6 rounded-xl border cursor-pointer hover:shadow-lg transition-shadow min-h-[44px]'\u001b[39m\n    },\n    step: \u001b[33m3\u001b[39m\n  },\n  {\n    element: {\n      tagName: \u001b[32m'DIV'\u001b[39m,\n      id: \u001b[32m''\u001b[39m,\n      testId: \u001b[32m'client-card-2'\u001b[39m,\n      className: \u001b[32m'bg-card text-card-foreground flex flex-col gap-6 rounded-xl border cursor-pointer hover:shadow-lg transition-shadow min-h-[44px]'\u001b[39m\n    },\n    step: \u001b[33m4\u001b[39m\n  },\n  {\n    element: { tagName: \u001b[32m'BODY'\u001b[39m, id: \u001b[32m''\u001b[39m, testId: \u001b[1mnull\u001b[22m, className: \u001b[32m''\u001b[39m },\n    step: \u001b[33m5\u001b[39m\n  },\n  {\n    element: {\n      tagName: \u001b[32m'INPUT'\u001b[39m,\n      id: \u001b[32m'client-search'\u001b[39m,\n      testId: \u001b[32m'client-search-input'\u001b[39m,\n      className: \u001b[32m'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base bg-input-background transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive max-w-md'\u001b[39m\n    },\n    step: \u001b[33m6\u001b[39m\n  }\n]\n"
+                        },
+                        {
+                          "text": "Focus history summary: [\n  { step: \u001b[33m0\u001b[39m, testId: \u001b[1mnull\u001b[22m, tagName: \u001b[32m'BODY'\u001b[39m, id: \u001b[32m''\u001b[39m },\n  {\n    step: \u001b[33m1\u001b[39m,\n    testId: \u001b[32m'client-search-input'\u001b[39m,\n    tagName: \u001b[32m'INPUT'\u001b[39m,\n    id: \u001b[32m'client-search'\u001b[39m\n  },\n  { step: \u001b[33m2\u001b[39m, testId: \u001b[32m'client-card-0'\u001b[39m, tagName: \u001b[32m'DIV'\u001b[39m, id: \u001b[32m''\u001b[39m },\n  { step: \u001b[33m3\u001b[39m, testId: \u001b[32m'client-card-1'\u001b[39m, tagName: \u001b[32m'DIV'\u001b[39m, id: \u001b[32m''\u001b[39m },\n  { step: \u001b[33m4\u001b[39m, testId: \u001b[32m'client-card-2'\u001b[39m, tagName: \u001b[32m'DIV'\u001b[39m, id: \u001b[32m''\u001b[39m },\n  { step: \u001b[33m5\u001b[39m, testId: \u001b[1mnull\u001b[22m, tagName: \u001b[32m'BODY'\u001b[39m, id: \u001b[32m''\u001b[39m },\n  {\n    step: \u001b[33m6\u001b[39m,\n    testId: \u001b[32m'client-search-input'\u001b[39m,\n    tagName: \u001b[32m'INPUT'\u001b[39m,\n    id: \u001b[32m'client-search'\u001b[39m\n  }\n]\n"
+                        },
+                        {
+                          "text": "Navigated through 7 focus states without obvious loops ✓\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-19T07:21:01.421Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b4d0a72eef4950f3f068-a77d97d1cf9bfbc1e2a1",
+              "file": "focus-management-integration.spec.ts",
+              "line": 108,
+              "column": 3
+            },
+            {
+              "title": "Scenario 3: Modal focus restoration",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 1031,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Initial focus in modal: { tagName: \u001b[32m'BODY'\u001b[39m, id: \u001b[32m''\u001b[39m, testId: \u001b[1mnull\u001b[22m, className: \u001b[32m''\u001b[39m }\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-19T07:21:01.416Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b4d0a72eef4950f3f068-7db6a58bc0e65ff91823",
+              "file": "focus-management-integration.spec.ts",
+              "line": 156,
+              "column": 3
+            },
+            {
+              "title": "Scenario 4: Keyboard navigation patterns",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2050,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Forward navigation steps: [\n  { testId: \u001b[1mnull\u001b[22m, tagName: \u001b[32m'BODY'\u001b[39m },\n  { testId: \u001b[32m'client-search-input'\u001b[39m, tagName: \u001b[32m'INPUT'\u001b[39m },\n  { testId: \u001b[32m'client-card-0'\u001b[39m, tagName: \u001b[32m'DIV'\u001b[39m },\n  { testId: \u001b[32m'client-card-1'\u001b[39m, tagName: \u001b[32m'DIV'\u001b[39m },\n  { testId: \u001b[32m'client-card-2'\u001b[39m, tagName: \u001b[32m'DIV'\u001b[39m }\n]\n"
+                        },
+                        {
+                          "text": "Backward navigation steps: [\n  { testId: \u001b[32m'client-card-2'\u001b[39m, tagName: \u001b[32m'DIV'\u001b[39m },\n  { testId: \u001b[32m'client-card-1'\u001b[39m, tagName: \u001b[32m'DIV'\u001b[39m },\n  { testId: \u001b[32m'client-card-0'\u001b[39m, tagName: \u001b[32m'DIV'\u001b[39m }\n]\n"
+                        },
+                        {
+                          "text": "Before Enter: {\n  tagName: \u001b[32m'INPUT'\u001b[39m,\n  id: \u001b[32m'client-search'\u001b[39m,\n  testId: \u001b[32m'client-search-input'\u001b[39m,\n  className: \u001b[32m'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base bg-input-background transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive max-w-md'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "After Enter: {\n  tagName: \u001b[32m'INPUT'\u001b[39m,\n  id: \u001b[32m'client-search'\u001b[39m,\n  testId: \u001b[32m'client-search-input'\u001b[39m,\n  className: \u001b[32m'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base bg-input-background transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive max-w-md'\u001b[39m\n}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-19T07:21:01.416Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b4d0a72eef4950f3f068-5d36d89a69136fd2a557",
+              "file": "focus-management-integration.spec.ts",
+              "line": 202,
+              "column": 3
+            },
+            {
+              "title": "Scenario 5: Error recovery and validation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 880,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-19T07:21:01.417Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b4d0a72eef4950f3f068-2be432792ced76610ffb",
+              "file": "focus-management-integration.spec.ts",
+              "line": 251,
+              "column": 3
+            },
+            {
+              "title": "Integration: Complete flow verification",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 2581,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Step 1: Medication search completed ✓\n"
+                        },
+                        {
+                          "text": "Complete integration flow test passed ✓\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-08-19T07:21:01.416Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b4d0a72eef4950f3f068-59a3232107301ef46412",
+              "file": "focus-management-integration.spec.ts",
+              "line": 293,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-08-19T07:21:00.909Z",
+    "duration": 3171.652,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

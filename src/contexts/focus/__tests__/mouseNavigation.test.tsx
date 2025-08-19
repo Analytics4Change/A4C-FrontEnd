@@ -338,7 +338,7 @@ describe('Mouse Navigation Support', () => {
   });
   
   it('should dispatch custom event for invalid jumps', async () => {
-    const invalidJumpHandler = jest.fn();
+    const invalidJumpHandler = vi.fn();
     document.addEventListener('focusInvalidJump', invalidJumpHandler);
     
     const { getByTestId } = render(

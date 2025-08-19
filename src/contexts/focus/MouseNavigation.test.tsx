@@ -152,7 +152,7 @@ describe('Mouse Navigation', () => {
 
   describe('Jump Validation', () => {
     it('should allow direct jump when allowDirectJump is true', async () => {
-      const mockFocus = jest.fn();
+      const mockFocus = vi.fn();
       
       render(
         <FocusManagerProvider>
@@ -367,7 +367,7 @@ describe('Mouse Navigation', () => {
 
   describe('Click Handler Integration', () => {
     it('should call custom click handler when provided', async () => {
-      const customHandler = jest.fn();
+      const customHandler = vi.fn();
       
       const TestComponentWithHandler = () => {
         const ref = useRef<HTMLButtonElement>(null);

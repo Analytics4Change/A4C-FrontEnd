@@ -383,7 +383,7 @@ describe('ManagedDialog', () => {
   
   describe('Completion Callback', () => {
     it('should call onComplete when dialog closes', async () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       
       renderWithFocusManager(
         <ManagedDialog

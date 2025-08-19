@@ -137,9 +137,9 @@ export interface FocusableElement {
   /** Parent element ID if nested */
   parentId?: string;
   /** Whether focus can leave this element (for validation) */
-  canLeaveFocus?: (target: string) => boolean | Promise<boolean>;
+  canLeaveFocus?: (target?: string) => boolean | Promise<boolean>;
   /** Whether this element can receive focus from a specific source */
-  canReceiveFocus?: (source: string) => boolean | Promise<boolean>;
+  canReceiveFocus?: (source?: string) => boolean | Promise<boolean>;
   /** Mouse navigation configuration */
   mouseNavigation?: MouseNavigationConfig;
   /** Visual indicator configuration for step progress */
@@ -275,29 +275,29 @@ export interface FocusManagerContextValue {
   
   // Navigation methods
   /** Focus next element */
-  focusNext: (options?: FocusNavigationOptions) => boolean;
+  focusNext: (options?: FocusNavigationOptions) => Promise<boolean>;
   /** Focus previous element */
-  focusPrevious: (options?: FocusNavigationOptions) => boolean;
+  focusPrevious: (options?: FocusNavigationOptions) => Promise<boolean>;
   /** Focus specific field by ID */
-  focusField: (id: string, reason?: FocusChangeReason) => boolean;
+  focusField: (id: string, reason?: FocusChangeReason) => Promise<boolean>;
   /** Focus first element in current scope */
-  focusFirst: (options?: FocusNavigationOptions) => boolean;
+  focusFirst: (options?: FocusNavigationOptions) => Promise<boolean>;
   /** Focus last element in current scope */
-  focusLast: (options?: FocusNavigationOptions) => boolean;
+  focusLast: (options?: FocusNavigationOptions) => Promise<boolean>;
   
   // Modal management
   /** Open a modal and manage focus */
-  openModal: (scopeId: string, options?: ModalStackEntry['options']) => void;
+  openModal: (scopeId: string, options?: ModalStackEntry['options']) => Promise<void>;
   /** Close current modal and restore focus */
-  closeModal: () => void;
+  closeModal: () => Promise<void>;
   /** Check if a modal is open */
   isModalOpen: () => boolean;
   
   // History management
   /** Undo last focus change */
-  undoFocus: () => boolean;
+  undoFocus: () => Promise<boolean>;
   /** Redo focus change */
-  redoFocus: () => boolean;
+  redoFocus: () => Promise<boolean>;
   /** Clear focus history */
   clearHistory: () => void;
   /** Get focus history */
@@ -321,9 +321,9 @@ export interface FocusManagerContextValue {
   /** Get the current navigation mode */
   getNavigationMode: () => NavigationMode;
   /** Check if direct jump to node is allowed */
-  canJumpToNode: (nodeId: string) => boolean;
+  canJumpToNode: (nodeId: string) => Promise<boolean>;
   /** Get visible steps for step indicator */
-  getVisibleSteps: () => StepIndicatorData[];
+  getVisibleSteps: () => Promise<StepIndicatorData[]>;
 }
 
 /**

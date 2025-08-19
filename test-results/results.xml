@@ -1,0 +1,109 @@
+<testsuites id="" name="" tests="6" failures="0" skipped="0" errors="0" time="3.171652">
+<testsuite name="focus-management-integration.spec.ts" timestamp="2025-08-19T07:21:01.067Z" hostname="chromium" tests="6" failures="0" skipped="0" time="9.26" errors="0">
+<testcase name="Focus Management Integration Tests (Task 017) › Scenario 1: Complete medication entry flow" classname="focus-management-integration.spec.ts" time="1">
+</testcase>
+<testcase name="Focus Management Integration Tests (Task 017) › Scenario 2: No focus dead ends detection" classname="focus-management-integration.spec.ts" time="1.718">
+<system-out>
+<![CDATA[Potential focus loop detected at step 6
+Focus history: [
+  {
+    element: {
+      tagName: [32m'DIV'[39m,
+      id: [32m''[39m,
+      testId: [32m'client-card-1'[39m,
+      className: [32m'bg-card text-card-foreground flex flex-col gap-6 rounded-xl border cursor-pointer hover:shadow-lg transition-shadow min-h-[44px]'[39m
+    },
+    step: [33m3[39m
+  },
+  {
+    element: {
+      tagName: [32m'DIV'[39m,
+      id: [32m''[39m,
+      testId: [32m'client-card-2'[39m,
+      className: [32m'bg-card text-card-foreground flex flex-col gap-6 rounded-xl border cursor-pointer hover:shadow-lg transition-shadow min-h-[44px]'[39m
+    },
+    step: [33m4[39m
+  },
+  {
+    element: { tagName: [32m'BODY'[39m, id: [32m''[39m, testId: [1mnull[22m, className: [32m''[39m },
+    step: [33m5[39m
+  },
+  {
+    element: {
+      tagName: [32m'INPUT'[39m,
+      id: [32m'client-search'[39m,
+      testId: [32m'client-search-input'[39m,
+      className: [32m'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base bg-input-background transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive max-w-md'[39m
+    },
+    step: [33m6[39m
+  }
+]
+Focus history summary: [
+  { step: [33m0[39m, testId: [1mnull[22m, tagName: [32m'BODY'[39m, id: [32m''[39m },
+  {
+    step: [33m1[39m,
+    testId: [32m'client-search-input'[39m,
+    tagName: [32m'INPUT'[39m,
+    id: [32m'client-search'[39m
+  },
+  { step: [33m2[39m, testId: [32m'client-card-0'[39m, tagName: [32m'DIV'[39m, id: [32m''[39m },
+  { step: [33m3[39m, testId: [32m'client-card-1'[39m, tagName: [32m'DIV'[39m, id: [32m''[39m },
+  { step: [33m4[39m, testId: [32m'client-card-2'[39m, tagName: [32m'DIV'[39m, id: [32m''[39m },
+  { step: [33m5[39m, testId: [1mnull[22m, tagName: [32m'BODY'[39m, id: [32m''[39m },
+  {
+    step: [33m6[39m,
+    testId: [32m'client-search-input'[39m,
+    tagName: [32m'INPUT'[39m,
+    id: [32m'client-search'[39m
+  }
+]
+Navigated through 7 focus states without obvious loops ✓
+]]>
+</system-out>
+</testcase>
+<testcase name="Focus Management Integration Tests (Task 017) › Scenario 3: Modal focus restoration" classname="focus-management-integration.spec.ts" time="1.031">
+<system-out>
+<![CDATA[Initial focus in modal: { tagName: [32m'BODY'[39m, id: [32m''[39m, testId: [1mnull[22m, className: [32m''[39m }
+]]>
+</system-out>
+</testcase>
+<testcase name="Focus Management Integration Tests (Task 017) › Scenario 4: Keyboard navigation patterns" classname="focus-management-integration.spec.ts" time="2.05">
+<system-out>
+<![CDATA[Forward navigation steps: [
+  { testId: [1mnull[22m, tagName: [32m'BODY'[39m },
+  { testId: [32m'client-search-input'[39m, tagName: [32m'INPUT'[39m },
+  { testId: [32m'client-card-0'[39m, tagName: [32m'DIV'[39m },
+  { testId: [32m'client-card-1'[39m, tagName: [32m'DIV'[39m },
+  { testId: [32m'client-card-2'[39m, tagName: [32m'DIV'[39m }
+]
+Backward navigation steps: [
+  { testId: [32m'client-card-2'[39m, tagName: [32m'DIV'[39m },
+  { testId: [32m'client-card-1'[39m, tagName: [32m'DIV'[39m },
+  { testId: [32m'client-card-0'[39m, tagName: [32m'DIV'[39m }
+]
+Before Enter: {
+  tagName: [32m'INPUT'[39m,
+  id: [32m'client-search'[39m,
+  testId: [32m'client-search-input'[39m,
+  className: [32m'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base bg-input-background transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive max-w-md'[39m
+}
+After Enter: {
+  tagName: [32m'INPUT'[39m,
+  id: [32m'client-search'[39m,
+  testId: [32m'client-search-input'[39m,
+  className: [32m'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base bg-input-background transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive max-w-md'[39m
+}
+]]>
+</system-out>
+</testcase>
+<testcase name="Focus Management Integration Tests (Task 017) › Scenario 5: Error recovery and validation" classname="focus-management-integration.spec.ts" time="0.88">
+</testcase>
+<testcase name="Focus Management Integration Tests (Task 017) › Integration: Complete flow verification" classname="focus-management-integration.spec.ts" time="2.581">
+<system-out>
+<![CDATA[Step 1: Medication search completed ✓
+Complete integration flow test passed ✓
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

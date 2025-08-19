@@ -5,7 +5,7 @@
  * to show navigation steps and allow clickable navigation between them.
  */
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useFocusManager } from '../../contexts/focus/useFocusManager';
 import { StepIndicatorData } from '../../contexts/focus/types';
 
@@ -70,15 +70,37 @@ export const StepIndicator: React.FC<StepIndicatorProps> = ({
     focusField
   } = useFocusManager();
   
-  // Use custom steps or get from focus manager
-  const steps = useMemo(() => {
-    return customSteps || getVisibleSteps();
+  // State for async steps loading
+  const [steps, setSteps] = useState<StepIndicatorData[]>([]);
+  const [isLoadingSteps, setIsLoadingSteps] = useState(false);
+
+  // Load steps asynchronously
+  useEffect(() => {
+    if (customSteps) {
+      setSteps(customSteps);
+      return;
+    }
+
+    const loadSteps = async () => {
+      setIsLoadingSteps(true);
+      try {
+        const visibleSteps = await getVisibleSteps();
+        setSteps(visibleSteps);
+      } catch (error) {
+        console.error('[StepIndicator] Error loading steps:', error);
+        setSteps([]);
+      } finally {
+        setIsLoadingSteps(false);
+      }
+    };
+
+    loadSteps();
   }, [customSteps, getVisibleSteps]);
   
   /**
    * Handle step click with validation
    */
-  const handleStepClick = useCallback((
+  const handleStepClick = useCallback(async (
     step: StepIndicatorData,
     event: React.MouseEvent
   ) => {
@@ -87,8 +109,16 @@ export const StepIndicator: React.FC<StepIndicatorProps> = ({
     // Set navigation mode to hybrid when clicking steps
     setNavigationMode('hybrid' as any);
     
-    // Check if jumping is allowed
-    const canJump = allowJumping || step.isClickable || canJumpToNode(step.id);
+    // Check if jumping is allowed - await async canJumpToNode
+    let canJump = allowJumping || step.isClickable;
+    if (!canJump) {
+      try {
+        canJump = await canJumpToNode(step.id);
+      } catch (error) {
+        console.error(`[StepIndicator] Error checking if can jump to ${step.id}:`, error);
+        canJump = false;
+      }
+    }
     
     if (!canJump) {
       // Add visual feedback for invalid jump
@@ -102,11 +132,18 @@ export const StepIndicator: React.FC<StepIndicatorProps> = ({
       return;
     }
     
-    // Handle the navigation through focus manager
-    handleMouseNavigation(step.id, event.nativeEvent);
-    
-    // Alternative: Direct focus if handleMouseNavigation is not available
-    focusField(step.id);
+    // Handle the navigation through focus manager (this is now async too)
+    try {
+      await handleMouseNavigation(step.id, event.nativeEvent);
+    } catch (error) {
+      console.error(`[StepIndicator] Error during mouse navigation to ${step.id}:`, error);
+      // Fallback to direct focus
+      try {
+        await focusField(step.id);
+      } catch (focusError) {
+        console.error(`[StepIndicator] Error focusing ${step.id}:`, focusError);
+      }
+    }
     
     // Call parent handler if provided
     onStepClick?.(step.id);

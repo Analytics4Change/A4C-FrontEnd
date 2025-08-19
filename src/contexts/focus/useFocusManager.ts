@@ -166,17 +166,27 @@ export function useModalFocus(
 export function useFocusNavigation(options?: FocusNavigationOptions) {
   const { focusNext, focusPrevious, focusFirst, focusLast } = useFocusManager();
   
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+  const handleKeyDown = useCallback(async (e: KeyboardEvent) => {
     switch (e.key) {
       case 'Tab':
         if (!e.defaultPrevented) {
           if (e.shiftKey) {
-            if (focusPrevious(options)) {
-              e.preventDefault();
+            try {
+              const success = await focusPrevious(options);
+              if (success) {
+                e.preventDefault();
+              }
+            } catch (error) {
+              console.error('[useFocusNavigation] Error in focusPrevious:', error);
             }
           } else {
-            if (focusNext(options)) {
-              e.preventDefault();
+            try {
+              const success = await focusNext(options);
+              if (success) {
+                e.preventDefault();
+              }
+            } catch (error) {
+              console.error('[useFocusNavigation] Error in focusNext:', error);
             }
           }
         }
@@ -184,16 +194,26 @@ export function useFocusNavigation(options?: FocusNavigationOptions) {
       
       case 'Home':
         if (e.ctrlKey || e.metaKey) {
-          if (focusFirst(options)) {
-            e.preventDefault();
+          try {
+            const success = await focusFirst(options);
+            if (success) {
+              e.preventDefault();
+            }
+          } catch (error) {
+            console.error('[useFocusNavigation] Error in focusFirst:', error);
           }
         }
         break;
       
       case 'End':
         if (e.ctrlKey || e.metaKey) {
-          if (focusLast(options)) {
-            e.preventDefault();
+          try {
+            const success = await focusLast(options);
+            if (success) {
+              e.preventDefault();
+            }
+          } catch (error) {
+            console.error('[useFocusNavigation] Error in focusLast:', error);
           }
         }
         break;
@@ -438,22 +458,46 @@ export function useMouseNavigation(
  */
 export function useStepIndicator() {
   const { getVisibleSteps, handleMouseNavigation, setNavigationMode, canJumpToNode } = useFocusManager();
-  const steps = getVisibleSteps();
+  const [steps, setSteps] = useState<any[]>([]);
   
-  const handleStepClick = useCallback((stepId: string, event: React.MouseEvent) => {
+  useEffect(() => {
+    const loadSteps = async () => {
+      try {
+        const visibleSteps = await getVisibleSteps();
+        setSteps(visibleSteps);
+      } catch (error) {
+        console.error('[useStepIndicator] Error loading steps:', error);
+        setSteps([]);
+      }
+    };
+    
+    loadSteps();
+  }, [getVisibleSteps]);
+  
+  const handleStepClick = useCallback(async (stepId: string, event: React.MouseEvent) => {
     event.preventDefault();
     
     // Set navigation mode to hybrid when clicking steps
     setNavigationMode(NavigationMode.HYBRID);
     
     // Check if jumping is allowed
-    if (!canJumpToNode(stepId)) {
-      console.log(`Cannot jump to step: ${stepId}`);
+    try {
+      const canJump = await canJumpToNode(stepId);
+      if (!canJump) {
+        console.log(`Cannot jump to step: ${stepId}`);
+        return;
+      }
+    } catch (error) {
+      console.error(`Error checking if can jump to step ${stepId}:`, error);
       return;
     }
     
     // Handle the mouse navigation
-    handleMouseNavigation(stepId, event.nativeEvent);
+    try {
+      await handleMouseNavigation(stepId, event.nativeEvent);
+    } catch (error) {
+      console.error(`Error during mouse navigation to step ${stepId}:`, error);
+    }
   }, [handleMouseNavigation, setNavigationMode, canJumpToNode]);
   
   return {

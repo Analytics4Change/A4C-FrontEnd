@@ -38,36 +38,24 @@ export const MedicationSearch = observer(({
   const inputRef = useRef<HTMLInputElement>(null);
   const inputContainerRef = useRef<HTMLDivElement>(null);
 
-  // Auto-focus on mount
-  useEffect(() => {
-    if (!selectedMedication) {
-      // Small delay to ensure DOM is ready
-      const timeoutId = setTimeout(() => {
-        inputRef.current?.focus();
-      }, 50);
-      
-      return () => clearTimeout(timeoutId);
-    }
-  }, [selectedMedication]);
+  // Focus is now managed by FocusableField wrapper - no manual focus needed
 
   const handleSelection = (medication: Medication) => {
     onSelect(medication);
     if (onFieldComplete) {
-      setTimeout(() => onFieldComplete(), 50);
+      onFieldComplete();
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if ((e.key === 'Enter' || e.key === 'Tab') && !selectedMedication && searchResults.length > 0) {
+    // Handle Enter key (existing logic)
+    if (e.key === 'Enter' && !selectedMedication && searchResults.length > 0) {
       const exactMatch = searchResults.find(med => 
         med.name.toLowerCase() === value.toLowerCase()
       );
       
       if (exactMatch) {
         handleSelection(exactMatch);
-        if (e.key === 'Tab') {
-          e.preventDefault(); // Prevent default tab to allow our focus management
-        }
       } else {
         const highlightedOptions = searchResults.filter(med =>
           med.name.toLowerCase().startsWith(value.toLowerCase())
@@ -75,20 +63,42 @@ export const MedicationSearch = observer(({
         
         if (highlightedOptions.length === 1) {
           handleSelection(highlightedOptions[0]);
-          if (e.key === 'Tab') {
-            e.preventDefault(); // Prevent default tab to allow our focus management
-          }
         } else if (highlightedOptions.length === 0 && searchResults.length === 1) {
           // If no highlights but only one result, select it
           handleSelection(searchResults[0]);
-          if (e.key === 'Tab') {
-            e.preventDefault();
-          }
-        } else if (e.key === 'Enter' && searchResults.length > 0) {
+        } else {
           // Enter key selects first result if multiple exist
           handleSelection(searchResults[0]);
         }
       }
+    }
+    
+    // Handle Tab key auto-selection (restored from Task 008b)
+    // This preserves the original behavior while working with FocusManager
+    if (e.key === 'Tab' && !selectedMedication && searchResults.length > 0) {
+      // Apply the same selection logic as Enter key
+      const exactMatch = searchResults.find(med => 
+        med.name.toLowerCase() === value.toLowerCase()
+      );
+      
+      if (exactMatch) {
+        handleSelection(exactMatch);
+      } else {
+        const highlightedOptions = searchResults.filter(med =>
+          med.name.toLowerCase().startsWith(value.toLowerCase())
+        );
+        
+        if (highlightedOptions.length === 1) {
+          handleSelection(highlightedOptions[0]);
+        } else if (highlightedOptions.length === 0 && searchResults.length === 1) {
+          // If no highlights but only one result, select it
+          handleSelection(searchResults[0]);
+        } else {
+          // Tab key selects first result if multiple exist (original behavior)
+          handleSelection(searchResults[0]);
+        }
+      }
+      // Note: We don't preventDefault here - let FocusManager handle focus advancement
     }
   };
 
@@ -117,7 +127,7 @@ export const MedicationSearch = observer(({
             }
           }}
           onKeyDown={handleKeyDown}
-          onBlur={() => setTimeout(() => {}, 200)}
+          onBlur={() => {}}
           placeholder="Start typing medication name..."
           className={`pl-10 ${selectedMedication ? 'border-blue-500 bg-blue-50' : ''} ${error ? 'border-red-500' : ''}`}
           disabled={!!selectedMedication}

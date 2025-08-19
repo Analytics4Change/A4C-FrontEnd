@@ -236,6 +236,7 @@ export function ManagedDialog({
         data-managed-dialog={id}
         aria-labelledby={title ? `${id}-title` : undefined}
         aria-describedby={description ? `${id}-description` : undefined}
+        showCloseButton={showCloseButton}
       >
         {(title || description) && (
           <DialogHeader>

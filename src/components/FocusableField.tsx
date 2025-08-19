@@ -40,9 +40,9 @@ export interface FocusableFieldProps {
   /** Validation functions */
   validators?: {
     /** Determines if this field can receive focus */
-    canReceiveFocus?: () => boolean;
+    canReceiveFocus?: (source?: string) => boolean | Promise<boolean>;
     /** Determines if focus can leave this field */
-    canLeaveFocus?: () => boolean;
+    canLeaveFocus?: () => boolean | Promise<boolean>;
   };
   
   /** Mouse interaction overrides */
@@ -163,7 +163,7 @@ export const FocusableField: React.FC<FocusableFieldProps> = ({
     // Create the focusable element
     const element: Omit<FocusableElement, 'registeredAt'> = {
       id,
-      ref: wrapperRef,
+      ref: wrapperRef as React.RefObject<HTMLElement>,
       type: type || FocusableType.CUSTOM,
       scopeId: scope,
       skipInNavigation,
@@ -174,10 +174,16 @@ export const FocusableField: React.FC<FocusableFieldProps> = ({
       },
       parentId,
       canReceiveFocus: validators?.canReceiveFocus 
-        ? async () => validators.canReceiveFocus!() 
+        ? (source?: string) => {
+            const result = validators.canReceiveFocus!(source);
+            return result instanceof Promise ? result : Promise.resolve(result);
+          }
         : undefined,
       canLeaveFocus: validators?.canLeaveFocus 
-        ? async () => validators.canLeaveFocus!() 
+        ? () => {
+            const result = validators.canLeaveFocus!();
+            return result instanceof Promise ? result : Promise.resolve(result);
+          }
         : undefined,
       mouseNavigation: mouseNavConfig,
       visualIndicator: visualIndicatorConfig
@@ -210,7 +216,7 @@ export const FocusableField: React.FC<FocusableFieldProps> = ({
   /**
    * Handle keyboard events
    */
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback(async (e: React.KeyboardEvent) => {
     setLastInteraction('keyboard');
     
     // Enter key handling
@@ -221,14 +227,30 @@ export const FocusableField: React.FC<FocusableFieldProps> = ({
       if (shouldAdvance) {
         e.preventDefault();
         
-        // Check if focus can leave this field
-        if (validators?.canLeaveFocus && !validators.canLeaveFocus()) {
-          console.log(`[FocusableField] Cannot leave field: ${id}`);
-          return;
+        // Check if focus can leave this field - handle async validators
+        if (validators?.canLeaveFocus) {
+          try {
+            const canLeaveResult = validators.canLeaveFocus();
+            const canLeave = canLeaveResult instanceof Promise 
+              ? await canLeaveResult 
+              : canLeaveResult;
+            
+            if (!canLeave) {
+              console.log(`[FocusableField] Cannot leave field: ${id}`);
+              return;
+            }
+          } catch (error) {
+            console.error(`[FocusableField] Error in canLeaveFocus validator for ${id}:`, error);
+            return; // Don't advance on error
+          }
         }
         
-        // Advance to next field
-        focusNext({ skipValidation: false });
+        // Advance to next field - await the async operation
+        try {
+          await focusNext({ skipValidation: false });
+        } catch (error) {
+          console.error(`[FocusableField] Error advancing focus from ${id}:`, error);
+        }
       }
     }
     
@@ -238,13 +260,31 @@ export const FocusableField: React.FC<FocusableFieldProps> = ({
       setNavigationMode('hybrid' as any);
     }
     
-    // Tab key navigation
+    // Tab key navigation with auto-selection logic
     if (e.key === 'Tab') {
-      // Check if focus can leave this field
-      if (validators?.canLeaveFocus && !validators.canLeaveFocus()) {
-        e.preventDefault();
-        console.log(`[FocusableField] Tab blocked - cannot leave field: ${id}`);
-        return;
+      // Check if focus can leave this field - handle async validators
+      if (validators?.canLeaveFocus) {
+        try {
+          const canLeaveResult = validators.canLeaveFocus();
+          const canLeave = canLeaveResult instanceof Promise 
+            ? await canLeaveResult 
+            : canLeaveResult;
+          
+          if (!canLeave) {
+            e.preventDefault();
+            console.log(`[FocusableField] Tab blocked - cannot leave field: ${id}`);
+            
+            // For dropdowns/comboboxes, try auto-selection if canLeaveFocus blocked Tab
+            // This allows validators to implement auto-selection logic as shown in architecture
+            // The validator should handle auto-selection and return false to block initial Tab
+            // Then allow subsequent Tab after auto-selection is complete
+            return;
+          }
+        } catch (error) {
+          console.error(`[FocusableField] Error in canLeaveFocus validator for ${id}:`, error);
+          e.preventDefault(); // Block navigation on error
+          return;
+        }
       }
       
       // Let the focus manager handle tab navigation
@@ -256,7 +296,7 @@ export const FocusableField: React.FC<FocusableFieldProps> = ({
   /**
    * Handle mouse click events
    */
-  const handleMouseClick = useCallback((e: React.MouseEvent) => {
+  const handleMouseClick = useCallback(async (e: React.MouseEvent) => {
     setLastInteraction('mouse');
     setNavigationMode('hybrid' as any);
     
@@ -267,13 +307,30 @@ export const FocusableField: React.FC<FocusableFieldProps> = ({
       const shouldAdvance = onComplete ? onComplete() : false;
       
       if (shouldAdvance && mouseOverride.preserveFocusOnInteraction) {
-        // Check if focus can leave this field
-        if (validators?.canLeaveFocus && !validators.canLeaveFocus()) {
-          console.log(`[FocusableField] Click advance blocked - cannot leave field: ${id}`);
-          return;
+        // Check if focus can leave this field - handle async validators
+        if (validators?.canLeaveFocus) {
+          try {
+            const canLeaveResult = validators.canLeaveFocus();
+            const canLeave = canLeaveResult instanceof Promise 
+              ? await canLeaveResult 
+              : canLeaveResult;
+            
+            if (!canLeave) {
+              console.log(`[FocusableField] Click advance blocked - cannot leave field: ${id}`);
+              return;
+            }
+          } catch (error) {
+            console.error(`[FocusableField] Error in canLeaveFocus validator for ${id}:`, error);
+            return; // Don't advance on error
+          }
         }
         
-        focusNext({ skipValidation: false });
+        // Advance to next field - await the async operation
+        try {
+          await focusNext({ skipValidation: false });
+        } catch (error) {
+          console.error(`[FocusableField] Error advancing focus from ${id}:`, error);
+        }
       }
     }
   }, [id, mouseOverride, onComplete, validators, focusNext, setNavigationMode]);

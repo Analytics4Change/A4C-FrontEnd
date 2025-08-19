@@ -6,6 +6,9 @@ import { useViewModel } from '@/hooks/useViewModel';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { MedicationEntryViewModel } from '@/viewModels/medication/MedicationEntryViewModel';
 import { DosageFormCategory } from '@/types/models/Dosage';
+import { FocusManagerProvider } from '@/contexts/focus/FocusManagerContext';
+import { FocusableField } from '@/components/FocusableField';
+import { FocusableType } from '@/contexts/focus/types';
 import { MedicationSearch } from './MedicationSearch';
 import { DosageForm } from './DosageForm';
 import { CategorySelection } from './CategorySelection';
@@ -46,55 +49,79 @@ export const MedicationEntryModal = observer(({ onClose }: MedicationEntryModalP
   }, [onClose]);
 
   return (
-    <div 
-      className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-40"
-      data-testid="medication-entry-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="medication-modal-title"
-    >
+    <FocusManagerProvider debug={process.env.NODE_ENV === 'development'}>
       <div 
-        ref={modalRef}
-        className="bg-white rounded-3xl max-w-4xl w-full m-4 max-h-[90vh] overflow-hidden flex flex-col"
+        className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-40"
+        data-testid="medication-entry-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="medication-modal-title"
       >
-        <div className="bg-white border-b px-8 py-6 flex justify-between items-center flex-shrink-0">
-          <h2 id="medication-modal-title" className="text-2xl font-semibold">Add New Prescribed Medication</h2>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="rounded-full min-w-[44px] min-h-[44px]"
-            data-testid="medication-modal-close"
-            aria-label="Close medication modal"
-          >
-            <X size={24} />
-          </Button>
-        </div>
-        
         <div 
-          ref={contentRef}
-          className="p-8 space-y-8 overflow-y-auto invisible-scrollbar flex-1"
+          ref={modalRef}
+          className="bg-white rounded-3xl max-w-4xl w-full m-4 max-h-[90vh] overflow-hidden flex flex-col"
         >
-          <MedicationSearch
-            value={vm.medicationName}
-            searchResults={vm.searchResults}
-            isLoading={vm.isLoading}
-            showDropdown={vm.showMedicationDropdown}
-            selectedMedication={vm.selectedMedication}
-            error={vm.errors.get('medication')}
-            onSearch={(query) => vm.searchMedications(query)}
-            onSelect={handleMedicationSelect}
-            onClear={() => vm.clearMedication()}
-            onDropdownOpen={(elementId) => {
-              // Auto-scroll to center the dropdown when opened
-              setTimeout(() => {
-                const element = document.getElementById(elementId);
-                if (element) {
-                  scrollWhenVisible(element, { behavior: 'smooth' });
-                }
-              }, 100);
+          <div className="bg-white border-b px-8 py-6 flex justify-between items-center flex-shrink-0">
+            <h2 id="medication-modal-title" className="text-2xl font-semibold">Add New Prescribed Medication</h2>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="rounded-full min-w-[44px] min-h-[44px]"
+              data-testid="medication-modal-close"
+              aria-label="Close medication modal"
+            >
+              <X size={24} />
+            </Button>
+          </div>
+          
+          <div 
+            ref={contentRef}
+            className="p-8 space-y-8 overflow-y-auto invisible-scrollbar flex-1"
+          >
+          <FocusableField
+            id="medication-search"
+            order={1}
+            scope="medication-modal"
+            type={FocusableType.COMBOBOX}
+            onComplete={() => !!vm.selectedMedication}
+            validators={{
+              canReceiveFocus: () => !vm.selectedMedication,
+              canLeaveFocus: () => !!vm.selectedMedication || vm.searchResults.length === 0
             }}
-          />
+            mouseOverride={{
+              captureClicks: false,
+              preserveFocusOnInteraction: true,
+              allowDirectJump: true
+            }}
+            stepIndicator={{
+              label: 'Select Medication',
+              description: 'Search and select a medication',
+              allowDirectAccess: true
+            }}
+            data-testid="medication-search-wrapper"
+          >
+            <MedicationSearch
+              value={vm.medicationName}
+              searchResults={vm.searchResults}
+              isLoading={vm.isLoading}
+              showDropdown={vm.showMedicationDropdown}
+              selectedMedication={vm.selectedMedication}
+              error={vm.errors.get('medication')}
+              onSearch={(query) => vm.searchMedications(query)}
+              onSelect={handleMedicationSelect}
+              onClear={() => vm.clearMedication()}
+              onDropdownOpen={(elementId) => {
+                // Auto-scroll to center the dropdown when opened (existing behavior preserved)
+                setTimeout(() => {
+                  const element = document.getElementById(elementId);
+                  if (element) {
+                    scrollWhenVisible(element, { behavior: 'smooth' });
+                  }
+                }, 100);
+              }}
+            />
+          </FocusableField>
 
           {vm.selectedMedication && (
             <>
@@ -206,8 +233,9 @@ export const MedicationEntryModal = observer(({ onClose }: MedicationEntryModalP
               </div>
             </>
           )}
+          </div>
         </div>
       </div>
-    </div>
+    </FocusManagerProvider>
   );
 });

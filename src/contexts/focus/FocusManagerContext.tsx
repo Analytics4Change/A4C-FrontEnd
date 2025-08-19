@@ -31,7 +31,8 @@ import {
   openDropdownIfNeeded,
   debugLog,
   isFocusWithinScope,
-  restoreFocus
+  restoreFocus,
+  delay
 } from './utils';
 
 // Action types for the reducer
@@ -295,8 +296,8 @@ export function FocusManagerProvider({
       
       // Restore focus if needed
       if (currentScope.restoreFocusTo) {
-        setTimeout(() => {
-          restoreFocus(currentScope.restoreFocusTo!, state.elements);
+        setTimeout(async () => {
+          await restoreFocus(currentScope.restoreFocusTo!, state.elements);
         }, 50);
       }
       
@@ -323,11 +324,21 @@ export function FocusManagerProvider({
       return false;
     }
     
-    // Validate if needed
+    // Validate if needed using both validator and canReceiveFocus
     const isValid = await validateElement(element);
     if (!isValid) {
       debugLog(state.debug, `Validation failed for element: ${id}`);
       return false;
+    }
+    
+    // Check canReceiveFocus if available
+    if (element.canReceiveFocus) {
+      const canReceiveResult = element.canReceiveFocus(state.currentFocusId);
+      const canReceive = await Promise.resolve(canReceiveResult);
+      if (!canReceive) {
+        debugLog(state.debug, `canReceiveFocus blocked for element: ${id}`);
+        return false;
+      }
     }
     
     // Get the actual input element
@@ -338,7 +349,7 @@ export function FocusManagerProvider({
     }
     
     // Focus the element
-    const success = focusElement(inputElement, defaultOptionsRef.current?.behavior);
+    const success = await focusElement(inputElement, defaultOptionsRef.current?.behavior);
     
     if (success) {
       // Update state
@@ -504,7 +515,7 @@ export function FocusManagerProvider({
   }, [state.enabled, state.elements, state.activeScopeId, state.debug, focusField]);
   
   // Open modal
-  const openModal = useCallback((scopeId: string, options?: ModalStackEntry['options']) => {
+  const openModal = useCallback(async (scopeId: string, options?: ModalStackEntry['options']): Promise<void> => {
     // Create modal scope
     const modalScope: FocusScope = {
       id: scopeId,
@@ -516,7 +527,12 @@ export function FocusManagerProvider({
     };
     
     // Push scope
-    pushScope(modalScope);
+    try {
+      pushScope(modalScope);
+    } catch (error) {
+      console.error(`[FocusManager] Error pushing modal scope ${scopeId}:`, error);
+      throw error;
+    }
     
     // Add to modal stack
     const modalEntry: ModalStackEntry = {
@@ -530,22 +546,29 @@ export function FocusManagerProvider({
   }, [state.currentFocusId, state.debug, pushScope]);
   
   // Close modal
-  const closeModal = useCallback(() => {
+  const closeModal = useCallback(async (): Promise<void> => {
     if (state.modalStack.length === 0) return;
     
     const currentModal = state.modalStack[state.modalStack.length - 1];
     
     // Pop scope
-    popScope();
+    try {
+      popScope();
+    } catch (error) {
+      console.error(`[FocusManager] Error popping modal scope ${currentModal.scopeId}:`, error);
+    }
     
     // Pop from modal stack
     dispatch({ type: ActionType.POP_MODAL });
     
-    // Restore focus
+    // Restore focus with proper async handling
     if (currentModal.previousFocusId) {
-      setTimeout(() => {
-        restoreFocus(currentModal.previousFocusId!, state.elements);
-      }, 50);
+      try {
+        await delay(50); // Use Promise-based delay
+        await restoreFocus(currentModal.previousFocusId, state.elements);
+      } catch (error) {
+        console.error(`[FocusManager] Error restoring focus after closing modal ${currentModal.scopeId}:`, error);
+      }
     }
     
     debugLog(state.debug, `Closed modal: ${currentModal.scopeId}`);
@@ -557,25 +580,25 @@ export function FocusManagerProvider({
   }, [state.modalStack]);
   
   // Undo focus
-  const undoFocus = useCallback((): boolean => {
+  const undoFocus = useCallback(async (): Promise<boolean> => {
     if (state.historyIndex <= 0) return false;
     
     const previousEntry = state.history[state.historyIndex - 1];
     if (!previousEntry) return false;
     
     dispatch({ type: ActionType.SET_HISTORY_INDEX, payload: state.historyIndex - 1 });
-    return focusField(previousEntry.elementId, FocusChangeReason.PROGRAMMATIC);
+    return await focusField(previousEntry.elementId, FocusChangeReason.PROGRAMMATIC);
   }, [state.history, state.historyIndex, focusField]);
   
   // Redo focus
-  const redoFocus = useCallback((): boolean => {
+  const redoFocus = useCallback(async (): Promise<boolean> => {
     if (state.historyIndex >= state.history.length - 1) return false;
     
     const nextEntry = state.history[state.historyIndex + 1];
     if (!nextEntry) return false;
     
     dispatch({ type: ActionType.SET_HISTORY_INDEX, payload: state.historyIndex + 1 });
-    return focusField(nextEntry.elementId, FocusChangeReason.PROGRAMMATIC);
+    return await focusField(nextEntry.elementId, FocusChangeReason.PROGRAMMATIC);
   }, [state.history, state.historyIndex, focusField]);
   
   // Clear history
@@ -624,7 +647,7 @@ export function FocusManagerProvider({
   }, [state.navigationMode]);
   
   // Enhanced validation logic for jump navigation
-  const canJumpToNode = useCallback((nodeId: string): boolean => {
+  const canJumpToNode = useCallback(async (nodeId: string): Promise<boolean> => {
     const node = state.elements.get(nodeId);
     if (!node) return false;
     
@@ -634,10 +657,38 @@ export function FocusManagerProvider({
       return false;
     }
     
-    // Check custom validator
-    if (node.validator && !node.validator()) {
-      debugLog(state.debug, `Node ${nodeId} validator returned false`);
-      return false;
+    // Check custom validator - properly handle async
+    if (node.validator) {
+      try {
+        const validatorResult = node.validator();
+        const isValid = validatorResult instanceof Promise 
+          ? await validatorResult 
+          : validatorResult;
+        if (!isValid) {
+          debugLog(state.debug, `Node ${nodeId} validator returned false`);
+          return false;
+        }
+      } catch (error) {
+        debugLog(state.debug, `Node ${nodeId} validator threw error:`, error);
+        return false;
+      }
+    }
+    
+    // Check canReceiveFocus validator - properly handle async
+    if (node.canReceiveFocus) {
+      try {
+        const canReceiveResult = node.canReceiveFocus(state.currentFocusId);
+        const canReceive = canReceiveResult instanceof Promise 
+          ? await canReceiveResult 
+          : canReceiveResult;
+        if (!canReceive) {
+          debugLog(state.debug, `Node ${nodeId} canReceiveFocus returned false`);
+          return false;
+        }
+      } catch (error) {
+        debugLog(state.debug, `Node ${nodeId} canReceiveFocus threw error:`, error);
+        return false;
+      }
     }
     
     // Check mouse navigation settings - allow if explicitly permitted
@@ -679,7 +730,7 @@ export function FocusManagerProvider({
   }, [state.elements, state.history, state.mouseInteractionHistory, state.navigationMode, state.debug]);
   
   // Handle mouse navigation with enhanced validation and feedback
-  const handleMouseNavigation = useCallback((nodeId: string, event: MouseEvent) => {
+  const handleMouseNavigation = useCallback(async (nodeId: string, event: MouseEvent) => {
     const node = state.elements.get(nodeId);
     if (!node) {
       debugLog(state.debug, `Node not found for mouse navigation: ${nodeId}`);
@@ -687,7 +738,7 @@ export function FocusManagerProvider({
     }
     
     // Check if mouse navigation is allowed
-    const canJump = canJumpToNode(nodeId);
+    const canJump = await canJumpToNode(nodeId);
     
     // Record interaction in history
     const interaction: MouseInteraction = {
@@ -742,16 +793,28 @@ export function FocusManagerProvider({
   }, [state.elements, state.navigationMode, state.debug, canJumpToNode, focusField, focusNext]);
   
   // Get visible steps for step indicator
-  const getVisibleSteps = useCallback((): StepIndicatorData[] => {
+  const getVisibleSteps = useCallback(async (): Promise<StepIndicatorData[]> => {
     const steps: StepIndicatorData[] = [];
     
-    state.elements.forEach((element) => {
+    // Need to process elements sequentially to handle async canJumpToNode calls
+    for (const [, element] of state.elements) {
       if (element.visualIndicator?.showInStepper) {
         const isComplete = state.history.some(h => h.elementId === element.id) ||
                           state.mouseInteractionHistory.some(m => m.elementId === element.id);
         const isCurrent = state.currentFocusId === element.id;
-        const canReceiveFocus = element.canFocus !== false && 
-                               (!element.validator || element.validator());
+        
+        // Handle async validator properly
+        let canReceiveFocus = element.canFocus !== false;
+        if (canReceiveFocus && element.validator) {
+          try {
+            const validatorResult = element.validator();
+            canReceiveFocus = validatorResult instanceof Promise 
+              ? await validatorResult 
+              : validatorResult;
+          } catch (error) {
+            canReceiveFocus = false;
+          }
+        }
         
         let status: StepIndicatorData['status'];
         if (isCurrent) {
@@ -764,15 +827,18 @@ export function FocusManagerProvider({
           status = 'upcoming';
         }
         
+        // Await the async canJumpToNode call
+        const isClickable = await canJumpToNode(element.id);
+        
         steps.push({
           id: element.id,
           label: element.visualIndicator.stepLabel || element.id,
           description: element.visualIndicator.stepDescription,
           status,
-          isClickable: canJumpToNode(element.id)
+          isClickable
         });
       }
-    });
+    }
     
     // Sort by tab index or registration order
     return steps.sort((a, b) => {

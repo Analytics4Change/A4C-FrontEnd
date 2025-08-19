@@ -221,7 +221,7 @@ describe('FocusManager', () => {
   
   describe('Modal Management', () => {
     it('should trap focus within modal', async () => {
-      const handleClose = jest.fn();
+      const handleClose = vi.fn();
       
       const { rerender } = render(
         <FocusManagerProvider>
@@ -247,7 +247,7 @@ describe('FocusManager', () => {
     });
     
     it('should close modal on escape', async () => {
-      const handleClose = jest.fn();
+      const handleClose = vi.fn();
       
       render(
         <FocusManagerProvider>

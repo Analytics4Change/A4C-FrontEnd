@@ -161,6 +161,7 @@ export function applyNavigationOptions(
 
 /**
  * Validate element before focusing
+ * Supports both synchronous and asynchronous validators
  */
 export async function validateElement(
   element: FocusableElement,
@@ -171,7 +172,34 @@ export async function validateElement(
   }
   
   try {
-    return await element.validator();
+    const result = element.validator();
+    // Handle both sync and async validators
+    return await Promise.resolve(result);
+  } catch (error) {
+    console.error(`Validation failed for element ${element.id}:`, error);
+    return false;
+  }
+}
+
+/**
+ * Validate element synchronously if possible
+ * Falls back to Promise for async validators
+ */
+export function validateElementSync(
+  element: FocusableElement,
+  skipValidation?: boolean
+): boolean | Promise<boolean> {
+  if (skipValidation || !element.validator) {
+    return true;
+  }
+  
+  try {
+    const result = element.validator();
+    // If result is a Promise, return it as-is
+    if (result && typeof (result as any).then === 'function') {
+      return result as Promise<boolean>;
+    }
+    return result as boolean;
   } catch (error) {
     console.error(`Validation failed for element ${element.id}:`, error);
     return false;
@@ -180,31 +208,44 @@ export async function validateElement(
 
 /**
  * Focus an HTML element with optional scroll behavior
+ * Uses requestAnimationFrame to ensure DOM is ready and returns Promise indicating success
  */
 export function focusElement(
   element: HTMLElement,
   behavior: 'smooth' | 'instant' = 'instant'
-): boolean {
-  try {
-    // Check if element can receive focus
-    if (!isElementVisible(element)) {
-      return false;
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    try {
+      // Check if element can receive focus
+      if (!isElementVisible(element)) {
+        resolve(false);
+        return;
+      }
+      
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        try {
+          // Focus the element
+          element.focus();
+          
+          // Scroll into view if needed
+          if (behavior === 'smooth') {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          
+          // Check if focus was successful
+          const success = document.activeElement === element;
+          resolve(success);
+        } catch (error) {
+          console.error('Failed to focus element:', error);
+          resolve(false);
+        }
+      });
+    } catch (error) {
+      console.error('Failed to focus element:', error);
+      resolve(false);
     }
-    
-    // Focus the element
-    element.focus();
-    
-    // Scroll into view if needed
-    if (behavior === 'smooth') {
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    
-    // Check if focus was successful
-    return document.activeElement === element;
-  } catch (error) {
-    console.error('Failed to focus element:', error);
-    return false;
-  }
+  });
 }
 
 /**
@@ -382,18 +423,27 @@ export function isFocusWithinScope(scopeId: string, elements: Map<string, Focusa
 /**
  * Restore focus to a specific element safely
  */
-export function restoreFocus(elementId: string, elements: Map<string, FocusableElement>): boolean {
+export async function restoreFocus(elementId: string, elements: Map<string, FocusableElement>): Promise<boolean> {
   const element = elements.get(elementId);
   if (!element?.ref.current) return false;
   
   try {
     const inputElement = getInputElement(element.ref.current);
     if (inputElement) {
-      return focusElement(inputElement);
+      return await focusElement(inputElement);
     }
     return false;
   } catch (error) {
     console.error(`Failed to restore focus to element ${elementId}:`, error);
     return false;
   }
+}
+
+/**
+ * Promise-based delay utility to replace setTimeout in async functions
+ * @param ms - Milliseconds to delay
+ * @returns Promise that resolves after the specified delay
+ */
+export function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }

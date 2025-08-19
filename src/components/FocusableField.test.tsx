@@ -267,7 +267,7 @@ describe('FocusableField Component', () => {
       const wrapper = container.querySelector('[data-focus-id="test-field"]');
       
       const event = new KeyboardEvent('keydown', { key: 'Tab' });
-      const preventDefaultSpy = jest.spyOn(event, 'preventDefault');
+      const preventDefaultSpy = vi.spyOn(event, 'preventDefault');
       
       wrapper!.dispatchEvent(event);
       
@@ -329,7 +329,7 @@ describe('FocusableField Component', () => {
     });
     
     it('should handle onClickOutside callback', async () => {
-      const onClickOutside = jest.fn();
+      const onClickOutside = vi.fn();
       
       const { container } = renderWithFocusManager(
         <div>

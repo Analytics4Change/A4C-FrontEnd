@@ -103,6 +103,21 @@ This directory contains all documentation related to the focus management system
 - Edge cases covered
 - Test patterns to follow
 
+### 7. 🐛 [task-008a-issues.md](./task-008a-issues.md)
+**Purpose**: Documentation of issues identified during Task 008a implementation  
+**Use When**:
+- Working on Task 008b or 008c
+- Troubleshooting focus management issues
+- Planning test environment improvements
+- Reviewing validation logic patterns
+
+**Key Contents**:
+- Test environment limitations (jsdom focus management)
+- Validator logic concerns (empty search results handling)
+- Mouse click capture configuration risks
+- Design by Contract analysis for each issue
+- Proposed resolutions with priority levels
+
 ## Quick Reference
 
 ### For New Agents Starting Work
