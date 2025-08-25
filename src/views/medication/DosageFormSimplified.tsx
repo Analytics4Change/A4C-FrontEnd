@@ -155,7 +155,21 @@ export const DosageForm = observer((props: DosageFormProps) => {
               aria-label="Dosage form category"
               aria-describedby={errors.get('dosageFormCategory') ? 'dosage-category-error' : undefined}
             />
-            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <button
+              type="button"
+              className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded"
+              onClick={() => {
+                if (!dosageFormCategory) {
+                  setShowCategoryDropdown(true);
+                  categoryInputContainerRef.current?.querySelector('input')?.focus();
+                  onDropdownOpen?.('dosage-category-container');
+                }
+              }}
+              aria-label="Open dosage form dropdown"
+              disabled={!!dosageFormCategory}
+            >
+              <ChevronDown className="text-gray-400" size={20} />
+            </button>
           </div>
           
           <AutocompleteDropdown
@@ -210,7 +224,21 @@ export const DosageForm = observer((props: DosageFormProps) => {
               disabled={!!dosageFormType || !dosageFormCategory}
               aria-label="Form type"
             />
-            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <button
+              type="button"
+              className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded"
+              onClick={() => {
+                if (!dosageFormType && dosageFormCategory) {
+                  setShowFormTypeDropdown(true);
+                  formTypeInputContainerRef.current?.querySelector('input')?.focus();
+                  onDropdownOpen?.('form-type-container');
+                }
+              }}
+              aria-label="Open form type dropdown"
+              disabled={!!dosageFormType || !dosageFormCategory}
+            >
+              <ChevronDown className="text-gray-400" size={20} />
+            </button>
           </div>
           
           <AutocompleteDropdown
@@ -289,7 +317,21 @@ export const DosageForm = observer((props: DosageFormProps) => {
               disabled={!!dosageUnit}
               aria-label="Dosage unit"
             />
-            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <button
+              type="button"
+              className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded"
+              onClick={() => {
+                if (!dosageUnit) {
+                  setShowUnitDropdown(true);
+                  unitInputContainerRef.current?.querySelector('input')?.focus();
+                  onDropdownOpen?.('dosage-unit-container');
+                }
+              }}
+              aria-label="Open dosage unit dropdown"
+              disabled={!!dosageUnit}
+            >
+              <ChevronDown className="text-gray-400" size={20} />
+            </button>
           </div>
           
           <AutocompleteDropdown
@@ -367,7 +409,21 @@ export const DosageForm = observer((props: DosageFormProps) => {
               disabled={!!totalUnit || !totalAmount}
               aria-label="Total unit"
             />
-            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <button
+              type="button"
+              className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded"
+              onClick={() => {
+                if (!totalUnit && totalAmount) {
+                  setShowTotalUnitDropdown(true);
+                  totalUnitInputContainerRef.current?.querySelector('input')?.focus();
+                  onDropdownOpen?.('total-unit-container');
+                }
+              }}
+              aria-label="Open total unit dropdown"
+              disabled={!!totalUnit || !totalAmount}
+            >
+              <ChevronDown className="text-gray-400" size={20} />
+            </button>
           </div>
           
           <AutocompleteDropdown
@@ -418,7 +474,21 @@ export const DosageForm = observer((props: DosageFormProps) => {
               disabled={!!frequency}
               aria-label="Dosage frequency"
             />
-            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <button
+              type="button"
+              className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded"
+              onClick={() => {
+                if (!frequency) {
+                  setShowFrequencyDropdown(true);
+                  frequencyInputContainerRef.current?.querySelector('input')?.focus();
+                  onDropdownOpen?.('dosage-frequency-container');
+                }
+              }}
+              aria-label="Open frequency dropdown"
+              disabled={!!frequency}
+            >
+              <ChevronDown className="text-gray-400" size={20} />
+            </button>
           </div>
           
           <AutocompleteDropdown
@@ -472,7 +542,21 @@ export const DosageForm = observer((props: DosageFormProps) => {
               disabled={!!condition}
               aria-label="Dosage condition"
             />
-            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <button
+              type="button"
+              className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded"
+              onClick={() => {
+                if (!condition) {
+                  setShowConditionDropdown(true);
+                  conditionInputContainerRef.current?.querySelector('input')?.focus();
+                  onDropdownOpen?.('dosage-condition-container');
+                }
+              }}
+              aria-label="Open condition dropdown"
+              disabled={!!condition}
+            >
+              <ChevronDown className="text-gray-400" size={20} />
+            </button>
           </div>
           
           <AutocompleteDropdown
