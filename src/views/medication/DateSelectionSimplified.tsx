@@ -1,8 +1,8 @@
 import React from 'react';
-import { Calendar, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 
 interface DateSelectionProps {
@@ -63,24 +63,16 @@ export const DateSelection: React.FC<DateSelectionProps> = ({
             type="date"
             value={startDate}
             onChange={handleStartDateInputChange}
-            className="pr-10"
-            aria-label="Start date"
-            aria-describedby="start-date-format"
-          />
-          <Button
-            type="button"
             onClick={() => {
               onToggleStartDateCalendar();
               if (!showStartDateCalendar && onCalendarOpen) {
                 onCalendarOpen('start-date-calendar');
               }
             }}
-            className="absolute right-1 top-1/2 -translate-y-1/2 p-1 h-8 w-8"
-            variant="ghost"
-            aria-label="Open start date calendar"
-          >
-            <Calendar size={16} />
-          </Button>
+            className="cursor-pointer"
+            aria-label="Start date"
+            aria-describedby="start-date-format"
+          />
         </div>
         <span id="start-date-format" className="text-xs text-gray-500">
           YYYY-MM-DD
@@ -124,25 +116,17 @@ export const DateSelection: React.FC<DateSelectionProps> = ({
             type="date"
             value={discontinueDate}
             onChange={handleDiscontinueDateInputChange}
-            className={`pr-10 ${error ? 'border-red-500' : ''}`}
-            aria-label="Discontinue date"
-            aria-describedby={error ? 'discontinue-date-error' : 'discontinue-date-format'}
-            aria-invalid={!!error}
-          />
-          <Button
-            type="button"
             onClick={() => {
               onToggleDiscontinueDateCalendar();
               if (!showDiscontinueDateCalendar && onCalendarOpen) {
                 onCalendarOpen('discontinue-date-calendar');
               }
             }}
-            className="absolute right-1 top-1/2 -translate-y-1/2 p-1 h-8 w-8"
-            variant="ghost"
-            aria-label="Open discontinue date calendar"
-          >
-            <Calendar size={16} />
-          </Button>
+            className={`cursor-pointer ${error ? 'border-red-500' : ''}`}
+            aria-label="Discontinue date"
+            aria-describedby={error ? 'discontinue-date-error' : 'discontinue-date-format'}
+            aria-invalid={!!error}
+          />
         </div>
         
         {error ? (
