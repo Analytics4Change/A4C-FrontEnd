@@ -358,40 +358,8 @@ export function getInputElement(container: HTMLElement): HTMLElement | null {
   return input || container;
 }
 
-/**
- * Check if an element is a dropdown trigger
- */
-export function isDropdownTrigger(element: HTMLElement): boolean {
-  const role = element.getAttribute('role');
-  const ariaExpanded = element.getAttribute('aria-expanded');
-  const ariaHaspopup = element.getAttribute('aria-haspopup');
-  
-  return (
-    role === 'combobox' ||
-    ariaHaspopup === 'true' ||
-    ariaHaspopup === 'listbox' ||
-    ariaHaspopup === 'menu' ||
-    ariaExpanded !== null
-  );
-}
-
-/**
- * Trigger dropdown open if element is a dropdown
- */
-export function openDropdownIfNeeded(element: HTMLElement): void {
-  if (isDropdownTrigger(element)) {
-    // Simulate click to open dropdown
-    element.click();
-    
-    // Also try to trigger with keyboard event
-    const event = new KeyboardEvent('keydown', {
-      key: 'ArrowDown',
-      bubbles: true,
-      cancelable: true
-    });
-    element.dispatchEvent(event);
-  }
-}
+// Note: isDropdownTrigger and openDropdownIfNeeded removed per architectural requirements
+// Components should handle their own opening behavior explicitly
 
 /**
  * Debug logger for focus operations

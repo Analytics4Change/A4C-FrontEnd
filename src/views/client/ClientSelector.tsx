@@ -44,7 +44,7 @@ export const ClientSelector = observer(({ onClientSelect }: ClientSelectorProps)
             <div className="text-center py-8 text-red-600" data-testid="client-error" role="alert">{vm.error}</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="clients-grid">
-              {vm.clients.map((client, index) => (
+              {(vm.clients || []).map((client, index) => (
                 <Card
                   key={client.id}
                   className="cursor-pointer hover:shadow-lg transition-shadow min-h-[44px]"

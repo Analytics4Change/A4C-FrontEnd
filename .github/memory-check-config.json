@@ -1,0 +1,99 @@
+{
+  "thresholds": {
+    "heap": {
+      "warning": 104857600,
+      "critical": 209715200,
+      "description": "Heap memory usage limits (100MB warning, 200MB critical)"
+    },
+    "rss": {
+      "warning": 209715200,
+      "critical": 419430400,
+      "description": "RSS memory usage limits (200MB warning, 400MB critical)"
+    },
+    "external": {
+      "warning": 52428800,
+      "critical": 104857600,
+      "description": "External memory usage limits (50MB warning, 100MB critical)"
+    },
+    "duration": {
+      "warning": 30000,
+      "critical": 60000,
+      "description": "Individual test duration limits (30s warning, 60s critical)"
+    },
+    "totalDuration": {
+      "warning": 300000,
+      "critical": 600000,
+      "description": "Total test suite duration limits (5min warning, 10min critical)"
+    },
+    "leakGrowthRate": {
+      "warning": 0.05,
+      "critical": 0.10,
+      "description": "Memory growth rate from baseline (5% warning, 10% critical)"
+    }
+  },
+  "limits": {
+    "maxMemoryLeaks": 5,
+    "maxCriticalIssues": 0,
+    "maxFailedTests": 3,
+    "description": "Maximum allowed issues before CI fails"
+  },
+  "execution": {
+    "timeout": 60000,
+    "maxHeapSize": 2048,
+    "gcBetweenTests": true,
+    "isolateTests": true,
+    "singleThread": true,
+    "description": "Test execution configuration"
+  },
+  "triggers": {
+    "testFilePatterns": [
+      "**/*.test.js",
+      "**/*.test.ts",
+      "**/*.test.jsx", 
+      "**/*.test.tsx",
+      "**/*.spec.js",
+      "**/*.spec.ts",
+      "**/*.spec.jsx",
+      "**/*.spec.tsx"
+    ],
+    "sourceFilePatterns": [
+      "src/**/*.js",
+      "src/**/*.ts",
+      "src/**/*.jsx",
+      "src/**/*.tsx"
+    ],
+    "skipDocumentationOnly": true,
+    "documentationPatterns": [
+      "**/*.md",
+      "**/*.txt",
+      "**/*.yml",
+      "**/*.yaml",
+      "docs/**/*",
+      "README*",
+      "CHANGELOG*",
+      "LICENSE*"
+    ]
+  },
+  "reporting": {
+    "generateCharts": true,
+    "generateTrend": true,
+    "generateSummary": true,
+    "includeBaseline": true,
+    "maxTopConsumers": 10,
+    "maxReportedIssues": 20
+  },
+  "baseline": {
+    "autoUpdate": true,
+    "updateOnMainBranch": true,
+    "backupCount": 5,
+    "retentionDays": 30
+  },
+  "notifications": {
+    "commentOnPR": true,
+    "updateExistingComment": true,
+    "notifyOnCritical": true,
+    "notifyOnRegression": true,
+    "includeCharts": true,
+    "includeRecommendations": true
+  }
+}

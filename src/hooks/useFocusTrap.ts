@@ -79,10 +79,8 @@ export function useFocusTrap(isActive: boolean) {
       }
     };
 
-    // Set initial focus
-    setTimeout(() => {
-      focusFirstElement();
-    }, 100);
+    // Note: Auto-focus removed per architectural requirements
+    // Focus control must remain with user interaction, not automatic
 
     // Add event listeners
     document.addEventListener('keydown', handleKeyDown);
@@ -93,10 +91,8 @@ export function useFocusTrap(isActive: boolean) {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keydown', handleEscape);
       
-      // Restore focus to the previously focused element
-      if (previousActiveElement.current && previousActiveElement.current.focus) {
-        previousActiveElement.current.focus();
-      }
+      // Note: Auto-focus restoration removed per architectural requirements
+      // Focus control must remain with user interaction, not automatic
     };
   }, [isActive]);
 

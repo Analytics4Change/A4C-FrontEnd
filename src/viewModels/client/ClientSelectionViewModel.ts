@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 import { IClientApi } from '@/services/api/interfaces/IClientApi';
 import { Client } from '@/types/models';
 
@@ -15,44 +15,64 @@ export class ClientSelectionViewModel {
   }
 
   async loadClients() {
-    this.isLoading = true;
-    this.error = null;
+    runInAction(() => {
+      this.isLoading = true;
+      this.error = null;
+    });
     
     try {
-      this.clients = await this.clientApi.getClients();
+      const clients = await this.clientApi.getClients();
+      runInAction(() => {
+        this.clients = clients;
+      });
     } catch (error) {
       this.handleError('Failed to load clients', error);
     } finally {
-      this.isLoading = false;
+      runInAction(() => {
+        this.isLoading = false;
+      });
     }
   }
 
   async searchClients(query: string) {
-    this.searchQuery = query;
+    runInAction(() => {
+      this.searchQuery = query;
+    });
     
     if (!query) {
       await this.loadClients();
       return;
     }
 
-    this.isLoading = true;
-    this.error = null;
+    runInAction(() => {
+      this.isLoading = true;
+      this.error = null;
+    });
     
     try {
-      this.clients = await this.clientApi.searchClients(query);
+      const clients = await this.clientApi.searchClients(query);
+      runInAction(() => {
+        this.clients = clients;
+      });
     } catch (error) {
       this.handleError('Failed to search clients', error);
     } finally {
-      this.isLoading = false;
+      runInAction(() => {
+        this.isLoading = false;
+      });
     }
   }
 
   selectClient(client: Client) {
-    this.selectedClient = client;
+    runInAction(() => {
+      this.selectedClient = client;
+    });
   }
 
   clearSelection() {
-    this.selectedClient = null;
+    runInAction(() => {
+      this.selectedClient = null;
+    });
   }
 
   getClientFullName(client: Client): string {
@@ -74,6 +94,8 @@ export class ClientSelectionViewModel {
 
   private handleError(message: string, error: any) {
     console.error(message, error);
-    this.error = message;
+    runInAction(() => {
+      this.error = message;
+    });
   }
 }

@@ -1,0 +1,512 @@
+/**
+ * FocusFallbackUI Styles
+ * 
+ * Accessible, high-contrast styles for error fallback UI
+ * Meets WCAG AA standards for color contrast and readability
+ */
+
+.focus-fallback-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.focus-fallback-content {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 32px;
+  position: relative;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .focus-fallback-content {
+    background: #1e1e1e;
+    color: #ffffff;
+    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Icon */
+.focus-fallback-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+/* Title */
+.focus-fallback-title {
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 16px 0;
+  color: #212121;
+}
+
+@media (prefers-color-scheme: dark) {
+  .focus-fallback-title {
+    color: #ffffff;
+  }
+}
+
+/* Severity Badge */
+.focus-fallback-severity {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 4px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin: 0 auto 16px;
+  display: block;
+  width: fit-content;
+}
+
+/* Message */
+.focus-fallback-message {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #424242;
+  text-align: center;
+  margin: 0 0 24px 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .focus-fallback-message {
+    color: #e0e0e0;
+  }
+}
+
+/* Actions */
+.focus-fallback-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+/* Buttons */
+.focus-fallback-button {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  min-width: 120px;
+  text-align: center;
+}
+
+.focus-fallback-button:focus {
+  outline: 3px solid #4CAF50;
+  outline-offset: 2px;
+}
+
+.focus-fallback-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.focus-fallback-button-primary {
+  background: #2196F3;
+  color: white;
+  border-color: #2196F3;
+}
+
+.focus-fallback-button-primary:hover {
+  background: #1976D2;
+  border-color: #1976D2;
+}
+
+.focus-fallback-button-secondary {
+  background: transparent;
+  color: #2196F3;
+  border-color: #2196F3;
+}
+
+.focus-fallback-button-secondary:hover {
+  background: rgba(33, 150, 243, 0.1);
+}
+
+.focus-fallback-button-danger {
+  background: #f44336;
+  color: white;
+  border-color: #f44336;
+}
+
+.focus-fallback-button-danger:hover {
+  background: #d32f2f;
+  border-color: #d32f2f;
+}
+
+.focus-fallback-button-text {
+  background: transparent;
+  color: #757575;
+  border: none;
+  text-decoration: underline;
+}
+
+.focus-fallback-button-text:hover {
+  color: #424242;
+}
+
+.focus-fallback-button-link {
+  background: transparent;
+  border: none;
+  color: #2196F3;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+.focus-fallback-button-link:hover {
+  color: #1976D2;
+}
+
+.focus-fallback-button-link:focus {
+  outline: 2px solid #2196F3;
+  outline-offset: 2px;
+}
+
+.focus-fallback-button-small {
+  padding: 6px 12px;
+  font-size: 12px;
+  min-width: auto;
+}
+
+/* Dark mode button adjustments */
+@media (prefers-color-scheme: dark) {
+  .focus-fallback-button-secondary {
+    color: #64B5F6;
+    border-color: #64B5F6;
+  }
+  
+  .focus-fallback-button-text {
+    color: #BDBDBD;
+  }
+  
+  .focus-fallback-button-link {
+    color: #64B5F6;
+  }
+}
+
+/* Recovering State */
+.focus-fallback-recovering {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  background: #E3F2FD;
+  border-radius: 4px;
+  margin-bottom: 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .focus-fallback-recovering {
+    background: rgba(33, 150, 243, 0.1);
+  }
+}
+
+.focus-fallback-spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #E3F2FD;
+  border-top-color: #2196F3;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Hint Section */
+.focus-fallback-hint {
+  background: #FFF9C4;
+  border-left: 4px solid #FFC107;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  border-radius: 4px;
+}
+
+.focus-fallback-hint strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #F57C00;
+}
+
+.focus-fallback-hint ul {
+  margin: 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.focus-fallback-hint li {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #616161;
+}
+
+@media (prefers-color-scheme: dark) {
+  .focus-fallback-hint {
+    background: rgba(255, 193, 7, 0.1);
+    border-left-color: #FFA000;
+  }
+  
+  .focus-fallback-hint strong {
+    color: #FFB300;
+  }
+  
+  .focus-fallback-hint li {
+    color: #E0E0E0;
+  }
+}
+
+/* Details Section */
+.focus-fallback-details-section {
+  border-top: 1px solid #E0E0E0;
+  padding-top: 16px;
+  margin-top: 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .focus-fallback-details-section {
+    border-top-color: #424242;
+  }
+}
+
+.focus-fallback-details {
+  margin-top: 16px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.focus-fallback-detail-content {
+  background: #F5F5F5;
+  border-radius: 4px;
+  padding: 16px;
+  font-size: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .focus-fallback-detail-content {
+    background: #2e2e2e;
+  }
+}
+
+.focus-fallback-detail-content h2 {
+  font-size: 16px;
+  margin: 0 0 12px 0;
+  color: #424242;
+}
+
+.focus-fallback-detail-content h3 {
+  font-size: 14px;
+  margin: 16px 0 8px 0;
+  color: #616161;
+}
+
+@media (prefers-color-scheme: dark) {
+  .focus-fallback-detail-content h2 {
+    color: #E0E0E0;
+  }
+  
+  .focus-fallback-detail-content h3 {
+    color: #BDBDBD;
+  }
+}
+
+.focus-fallback-detail-content dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+  margin: 0;
+}
+
+.focus-fallback-detail-content dt {
+  font-weight: 600;
+  color: #616161;
+}
+
+.focus-fallback-detail-content dd {
+  margin: 0;
+  color: #424242;
+  word-break: break-word;
+}
+
+@media (prefers-color-scheme: dark) {
+  .focus-fallback-detail-content dt {
+    color: #BDBDBD;
+  }
+  
+  .focus-fallback-detail-content dd {
+    color: #E0E0E0;
+  }
+}
+
+.focus-fallback-stack {
+  background: #ECEFF1;
+  border: 1px solid #CFD8DC;
+  border-radius: 4px;
+  padding: 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  overflow-x: auto;
+  max-height: 200px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+@media (prefers-color-scheme: dark) {
+  .focus-fallback-stack {
+    background: #1e1e1e;
+    border-color: #424242;
+    color: #B0BEC5;
+  }
+}
+
+/* Support Section */
+.focus-fallback-support {
+  text-align: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #E0E0E0;
+  font-size: 14px;
+  color: #757575;
+}
+
+@media (prefers-color-scheme: dark) {
+  .focus-fallback-support {
+    border-top-color: #424242;
+    color: #BDBDBD;
+  }
+}
+
+.focus-fallback-support a {
+  color: #2196F3;
+  text-decoration: underline;
+}
+
+.focus-fallback-support a:hover {
+  color: #1976D2;
+}
+
+.focus-fallback-support a:focus {
+  outline: 2px solid #2196F3;
+  outline-offset: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .focus-fallback-support a {
+    color: #64B5F6;
+  }
+  
+  .focus-fallback-support a:hover {
+    color: #90CAF9;
+  }
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .focus-fallback-content {
+    padding: 24px 16px;
+  }
+  
+  .focus-fallback-title {
+    font-size: 20px;
+  }
+  
+  .focus-fallback-message {
+    font-size: 14px;
+  }
+  
+  .focus-fallback-actions {
+    flex-direction: column;
+  }
+  
+  .focus-fallback-button {
+    width: 100%;
+  }
+  
+  .focus-fallback-detail-content dl {
+    grid-template-columns: 1fr;
+  }
+  
+  .focus-fallback-detail-content dt {
+    margin-top: 8px;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .focus-fallback-container {
+    background: white;
+  }
+  
+  .focus-fallback-content {
+    border: 2px solid black;
+    box-shadow: none;
+  }
+  
+  .focus-fallback-button:focus {
+    outline-width: 4px;
+  }
+  
+  .focus-fallback-severity {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .focus-fallback-container,
+  .focus-fallback-details,
+  .focus-fallback-button {
+    animation: none;
+    transition: none;
+  }
+  
+  .focus-fallback-button:hover {
+    transform: none;
+  }
+}

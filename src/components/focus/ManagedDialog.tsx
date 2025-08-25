@@ -76,6 +76,22 @@ export interface ManagedDialogProps {
   
   /** Footer content for the dialog */
   footer?: React.ReactNode;
+  
+  /** ARIA attributes for accessibility (WCAG 2.1 AA compliance) */
+  aria?: {
+    /** Custom aria-label for the dialog */
+    label?: string;
+    /** Custom ID for aria-labelledby (defaults to title) */
+    labelledby?: string;
+    /** Custom ID for aria-describedby (defaults to description) */
+    describedby?: string;
+    /** Whether this is a modal dialog (default: true) */
+    modal?: boolean;
+    /** Live region for announcements */
+    live?: 'polite' | 'assertive' | 'off';
+    /** Custom role (default: 'dialog') */
+    role?: string;
+  };
 }
 
 /**
@@ -97,11 +113,12 @@ export function ManagedDialog({
   closeOnEscape = true,
   closeOnOutsideClick = true,
   preventScroll = true,
-  autoFocus = true,
+  autoFocus = false,
   restoreFocus = true,
   contentClassName,
   showCloseButton = true,
   footer,
+  aria,
 }: ManagedDialogProps) {
   const { 
     pushScope, 
@@ -157,11 +174,9 @@ export function ManagedDialog({
       if (restoreFocus) {
         const restoreToId = focusRestorationId || previousFocusRef.current;
         if (restoreToId) {
-          // Use setTimeout to ensure dialog is fully closed before restoring focus
-          setTimeout(() => {
-            focusField(restoreToId);
-            console.log(`[ManagedDialog] Restored focus to: ${restoreToId}`);
-          }, 100);
+          // Note: Auto-focus removed per architectural requirements
+          // Focus restoration should be handled by user interaction, not automatic
+          console.log(`[ManagedDialog] Focus restoration disabled - user controls focus`);
         }
       }
       
@@ -234,24 +249,28 @@ export function ManagedDialog({
         onEscapeKeyDown={handleEscapeKeyDown as any}
         onInteractOutside={handleInteractOutside as any}
         data-managed-dialog={id}
-        aria-labelledby={title ? `${id}-title` : undefined}
-        aria-describedby={description ? `${id}-description` : undefined}
+        data-modal-id={id}
+        aria-label={aria?.label}
+        aria-labelledby={aria?.labelledby || (title ? `${id}-title` : undefined)}
+        aria-describedby={aria?.describedby || (description ? `${id}-description` : undefined)}
+        aria-modal={aria?.modal !== false ? 'true' : 'false'}
+        aria-live={aria?.live}
+        role={aria?.role || 'dialog'}
         showCloseButton={showCloseButton}
       >
-        {(title || description) && (
-          <DialogHeader>
-            {title && (
-              <DialogTitle id={`${id}-title`}>
-                {title}
-              </DialogTitle>
-            )}
-            {description && (
-              <DialogDescription id={`${id}-description`}>
-                {description}
-              </DialogDescription>
-            )}
-          </DialogHeader>
-        )}
+        <DialogHeader>
+          <DialogTitle 
+            id={`${id}-title`}
+            className={!title ? 'sr-only' : undefined}
+          >
+            {title || `Dialog ${id}`}
+          </DialogTitle>
+          {description && (
+            <DialogDescription id={`${id}-description`}>
+              {description}
+            </DialogDescription>
+          )}
+        </DialogHeader>
         
         <div className="managed-dialog-body">
           {children}

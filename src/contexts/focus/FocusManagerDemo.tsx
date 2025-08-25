@@ -138,7 +138,7 @@ const MigratedModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
   const { scopeId, open, close } = useModalFocus('demo-modal', {
     closeOnEscape: true,
     closeOnOutsideClick: true,
-    autoFocus: true
+    autoFocus: false
   });
   
   const { ref: titleRef } = useFocusable('modal-title', {
@@ -183,7 +183,7 @@ const MigratedModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
             id="modal-title"
             type="text"
             placeholder="Enter title..."
-            autoFocus
+            // autoFocus removed per architectural requirements
           />
         </div>
         

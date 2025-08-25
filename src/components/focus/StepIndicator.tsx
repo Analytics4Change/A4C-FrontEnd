@@ -298,11 +298,12 @@ export const StepIndicator: React.FC<StepIndicatorProps> = ({
               disabled={step.status === 'disabled' && !allowJumping}
               aria-current={step.status === 'current' ? 'step' : undefined}
               aria-label={`
-                Step ${index + 1}: ${step.label}
+                Step ${index + 1}: ${step.label || step.id}
                 ${step.status === 'complete' ? ' (completed)' : ''}
                 ${step.status === 'current' ? ' (current)' : ''}
                 ${step.status === 'disabled' ? ' (disabled)' : ''}
-              `.trim()}
+              `.trim().replace(/\s+/g, ' ')}
+              aria-describedby={step.description ? `${step.id}-description` : undefined}
               data-step-id={step.id}
               data-step-status={step.status}
               title={step.description || step.label}

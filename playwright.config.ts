@@ -31,7 +31,7 @@ export default defineConfig({
   /* Shared settings for all projects */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:3000',
+    baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000',
     
     /* Collect trace when retrying the failed test. */
     trace: 'on-first-retry',
@@ -43,13 +43,18 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
 
-  /* Configure projects for major browsers */
+  /* Configure projects for major browsers - Task 022 Cross-Browser Testing */
   projects: [
+    // Desktop Browsers - Core Testing
     {
       name: 'chromium',
       use: { 
         ...devices['Desktop Chrome'],
-        viewport: { width: 1280, height: 720 }
+        viewport: { width: 1280, height: 720 },
+        // Enhanced for focus management testing
+        launchOptions: {
+          args: ['--disable-web-security', '--disable-features=VizDisplayCompositor']
+        }
       },
     },
 
@@ -57,7 +62,14 @@ export default defineConfig({
       name: 'firefox',
       use: { 
         ...devices['Desktop Firefox'],
-        viewport: { width: 1280, height: 720 }
+        viewport: { width: 1280, height: 720 },
+        // Firefox-specific configurations for focus testing
+        launchOptions: {
+          firefoxUserPrefs: {
+            'accessibility.tabfocus': 7, // Enable full keyboard navigation
+            'browser.tabs.remote.autostart': false
+          }
+        }
       },
     },
 
@@ -65,31 +77,57 @@ export default defineConfig({
       name: 'webkit',
       use: { 
         ...devices['Desktop Safari'],
-        viewport: { width: 1280, height: 720 }
+        viewport: { width: 1280, height: 720 },
+        // Safari handles scrollbars natively - no configuration needed
       },
     },
 
-    /* Mobile Testing */
+    {
+      name: 'edge',
+      use: { 
+        ...devices['Desktop Edge'],
+        viewport: { width: 1280, height: 720 },
+        channel: 'msedge',
+        // Edge-specific configurations
+        launchOptions: {
+          args: ['--disable-web-security']
+        }
+      },
+    },
+
+    /* Mobile Testing - Focus Management on Touch Devices */
     {
       name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
+      use: { 
+        ...devices['Pixel 5'],
+        // Mobile-specific focus testing configurations
+        hasTouch: true,
+        isMobile: true
+      },
     },
     {
       name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
+      use: { 
+        ...devices['iPhone 12'],
+        hasTouch: true,
+        isMobile: true
+      },
     },
 
-    /* Tablet Testing */
+    /* Tablet Testing - Hybrid Input Methods */
     {
       name: 'Tablet Chrome',
-      use: { ...devices['iPad Pro'] },
+      use: { 
+        ...devices['iPad Pro'],
+        hasTouch: true
+      },
     }
   ],
 
   /* Run your local dev server before starting the tests */
   webServer: {
     command: 'npm run dev',
-    url: 'http://localhost:3000',
+    url: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 30000,
   },

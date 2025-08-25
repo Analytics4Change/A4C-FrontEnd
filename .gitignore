@@ -1,0 +1,78 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+/coverage
+test-results/
+playwright-report/
+
+# Production builds
+/build
+/dist
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE files
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Memory Reports - Generated Content
+memory-reports/*.json
+memory-reports/html/*.html
+memory-reports/markdown/*.md
+memory-reports/data/*.json
+memory-reports/snapshots/*.heapsnapshot
+
+# Memory Reports - Keep Directory Structure
+!memory-reports/
+!memory-reports/html/
+!memory-reports/markdown/
+!memory-reports/data/
+!memory-reports/snapshots/
+!memory-reports/analysis/
+!memory-reports/test-snapshots/
+
+# Memory Reports - Keep Sample/Template Files
+!memory-reports/html/.gitkeep
+!memory-reports/markdown/.gitkeep
+!memory-reports/data/.gitkeep
+!memory-reports/snapshots/.gitkeep
+
+# Temporary files
+*.tmp
+*.temp
+
+# Cache
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+
+# Debug
+debug.log
+debug.txt

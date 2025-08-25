@@ -28,7 +28,6 @@ import {
   createHistoryEntry,
   generateScopeId,
   getInputElement,
-  openDropdownIfNeeded,
   debugLog,
   isFocusWithinScope,
   restoreFocus,
@@ -146,13 +145,8 @@ function focusManagerReducer(state: FocusManagerState, action: Action): FocusMan
     }
     
     case ActionType.ADD_HISTORY: {
-      const { maxHistorySize = 50 } = {};
+      // This case is now handled in the boundReducer
       let newHistory = [...state.history.slice(0, state.historyIndex + 1), action.payload];
-      
-      // Limit history size
-      if (newHistory.length > maxHistorySize) {
-        newHistory = newHistory.slice(-maxHistorySize);
-      }
       
       return {
         ...state,
@@ -229,7 +223,29 @@ export function FocusManagerProvider({
   maxHistorySize = 50,
   defaultOptions
 }: FocusManagerProviderProps) {
-  const [state, dispatch] = useReducer(focusManagerReducer, {
+  // Create a reducer with maxHistorySize bound to it
+  const boundReducer = useCallback((state: FocusManagerState, action: Action) => {
+    if (action.type === ActionType.ADD_HISTORY) {
+      // Handle history limiting here where we have access to maxHistorySize
+      let newHistory = [...state.history.slice(0, state.historyIndex + 1), action.payload];
+      
+      // Limit history size
+      if (newHistory.length > maxHistorySize) {
+        newHistory = newHistory.slice(-maxHistorySize);
+      }
+      
+      return {
+        ...state,
+        history: newHistory,
+        historyIndex: newHistory.length - 1
+      };
+    }
+    
+    // For all other actions, use the original reducer
+    return focusManagerReducer(state, action);
+  }, [maxHistorySize]);
+
+  const [state, dispatch] = useReducer(boundReducer, {
     ...initialState,
     debug,
     enabled
@@ -273,15 +289,8 @@ export function FocusManagerProvider({
     dispatch({ type: ActionType.PUSH_SCOPE, payload: fullScope });
     debugLog(state.debug, `Pushed scope: ${scope.id}`, fullScope);
     
-    // Auto-focus first element if requested
-    if (scope.autoFocus) {
-      setTimeout(() => {
-        const elements = filterElementsByScope(state.elements, scope.id);
-        if (elements.length > 0 && elements[0].ref.current) {
-          focusField(elements[0].id, FocusChangeReason.PROGRAMMATIC);
-        }
-      }, 50);
-    }
+    // Note: Auto-focus removed per architectural requirements
+    // Focus control must remain with user interaction, not automatic
   }, [state.debug, state.elements]);
   
   // Pop scope
@@ -296,9 +305,15 @@ export function FocusManagerProvider({
       
       // Restore focus if needed
       if (currentScope.restoreFocusTo) {
-        setTimeout(async () => {
-          await restoreFocus(currentScope.restoreFocusTo!, state.elements);
-        }, 50);
+        delay(50).then(async () => {
+          try {
+            await restoreFocus(currentScope.restoreFocusTo!, state.elements);
+          } catch (error) {
+            console.error('Error restoring focus:', error);
+          }
+        }).catch(error => {
+          console.error('Error in delayed focus restore:', error);
+        });
       }
       
       dispatch({ type: ActionType.POP_SCOPE });
@@ -364,10 +379,8 @@ export function FocusManagerProvider({
       );
       dispatch({ type: ActionType.ADD_HISTORY, payload: historyEntry });
       
-      // Open dropdown if needed
-      if (element.type === 'combobox' || element.type === 'dropdown') {
-        setTimeout(() => openDropdownIfNeeded(inputElement), 50);
-      }
+      // Note: Auto-open dropdown removed per architectural requirements
+      // Components should handle their own opening behavior explicitly
       
       debugLog(state.debug, `Focused element: ${id}`, { reason, element });
     }
@@ -409,8 +422,18 @@ export function FocusManagerProvider({
     if (!mergedOptions.skipValidation) {
       const isValid = await validateElement(nextElement);
       if (!isValid) {
-        // Try next element if validation fails
-        return focusNext({ ...mergedOptions, skipValidation: false });
+        // Try next element if validation fails, but prevent infinite loops
+        const remainingAttempts = (mergedOptions as any)._remainingAttempts ?? navigableElements.length;
+        if (remainingAttempts > 0) {
+          return focusNext({ 
+            ...mergedOptions, 
+            skipValidation: false,
+            _remainingAttempts: remainingAttempts - 1 
+          } as any);
+        } else {
+          debugLog(state.debug, 'No valid elements found after exhaustive search');
+          return false;
+        }
       }
     }
     
@@ -451,8 +474,18 @@ export function FocusManagerProvider({
     if (!mergedOptions.skipValidation) {
       const isValid = await validateElement(previousElement);
       if (!isValid) {
-        // Try previous element if validation fails
-        return focusPrevious({ ...mergedOptions, skipValidation: false });
+        // Try previous element if validation fails, but prevent infinite loops
+        const remainingAttempts = (mergedOptions as any)._remainingAttempts ?? navigableElements.length;
+        if (remainingAttempts > 0) {
+          return focusPrevious({ 
+            ...mergedOptions, 
+            skipValidation: false,
+            _remainingAttempts: remainingAttempts - 1 
+          } as any);
+        } else {
+          debugLog(state.debug, 'No valid elements found after exhaustive search');
+          return false;
+        }
       }
     }
     
@@ -586,9 +619,22 @@ export function FocusManagerProvider({
     const previousEntry = state.history[state.historyIndex - 1];
     if (!previousEntry) return false;
     
-    dispatch({ type: ActionType.SET_HISTORY_INDEX, payload: state.historyIndex - 1 });
-    return await focusField(previousEntry.elementId, FocusChangeReason.PROGRAMMATIC);
-  }, [state.history, state.historyIndex, focusField]);
+    // Get element and focus it directly without adding to history
+    const element = state.elements.get(previousEntry.elementId);
+    if (!element?.ref.current) return false;
+    
+    const inputElement = getInputElement(element.ref.current);
+    if (!inputElement) return false;
+    
+    const success = await focusElement(inputElement);
+    
+    if (success) {
+      dispatch({ type: ActionType.SET_HISTORY_INDEX, payload: state.historyIndex - 1 });
+      dispatch({ type: ActionType.SET_CURRENT_FOCUS, payload: previousEntry.elementId });
+    }
+    
+    return success;
+  }, [state.history, state.historyIndex, state.elements]);
   
   // Redo focus
   const redoFocus = useCallback(async (): Promise<boolean> => {
@@ -597,9 +643,22 @@ export function FocusManagerProvider({
     const nextEntry = state.history[state.historyIndex + 1];
     if (!nextEntry) return false;
     
-    dispatch({ type: ActionType.SET_HISTORY_INDEX, payload: state.historyIndex + 1 });
-    return await focusField(nextEntry.elementId, FocusChangeReason.PROGRAMMATIC);
-  }, [state.history, state.historyIndex, focusField]);
+    // Get element and focus it directly without adding to history
+    const element = state.elements.get(nextEntry.elementId);
+    if (!element?.ref.current) return false;
+    
+    const inputElement = getInputElement(element.ref.current);
+    if (!inputElement) return false;
+    
+    const success = await focusElement(inputElement);
+    
+    if (success) {
+      dispatch({ type: ActionType.SET_HISTORY_INDEX, payload: state.historyIndex + 1 });
+      dispatch({ type: ActionType.SET_CURRENT_FOCUS, payload: nextEntry.elementId });
+    }
+    
+    return success;
+  }, [state.history, state.historyIndex, state.elements]);
   
   // Clear history
   const clearHistory = useCallback(() => {
@@ -621,7 +680,9 @@ export function FocusManagerProvider({
   // Check if element can focus
   const canFocusElement = useCallback((id: string): boolean => {
     const element = state.elements.get(id);
-    return element?.canFocus !== false && element?.ref.current !== null;
+    if (!element) return false;
+    
+    return element.canFocus !== false && element.ref.current !== null;
   }, [state.elements]);
   
   // Set enabled
@@ -757,9 +818,11 @@ export function FocusManagerProvider({
       if (node.ref.current) {
         const element = node.ref.current;
         element.classList.add('focus-invalid-jump');
-        setTimeout(() => {
+        delay(300).then(() => {
           element.classList.remove('focus-invalid-jump');
-        }, 300);
+        }).catch(error => {
+          console.error('Error removing invalid jump class:', error);
+        });
       }
       
       // Dispatch custom event for additional handling
@@ -782,12 +845,14 @@ export function FocusManagerProvider({
         node.mouseNavigation.clickHandler(event);
       }
       
-      // Handle click advances behavior
+      // Handle click advances behavior using delay utility
       if (node.mouseNavigation?.clickAdvancesBehavior === 'next') {
-        setTimeout(() => focusNext(), 50);
+        // Use delay utility instead of setTimeout for cleaner async handling
+        delay(50).then(() => focusNext());
       } else if (node.mouseNavigation?.clickAdvancesBehavior === 'specific' && 
                  node.mouseNavigation?.clickAdvancesTo) {
-        setTimeout(() => focusField(node.mouseNavigation.clickAdvancesTo!, FocusChangeReason.MOUSE), 50);
+        // Use delay utility instead of setTimeout for cleaner async handling
+        delay(50).then(() => focusField(node.mouseNavigation.clickAdvancesTo!, FocusChangeReason.MOUSE));
       }
     }
   }, [state.elements, state.navigationMode, state.debug, canJumpToNode, focusField, focusNext]);

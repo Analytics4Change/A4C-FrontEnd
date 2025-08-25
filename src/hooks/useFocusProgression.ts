@@ -30,19 +30,8 @@ export function useFocusProgression() {
     for (let i = currentIndex + 1; i < focusOrder.current.length; i++) {
       const field = focusOrder.current[i];
       if (!field.isComplete && field.ref.current) {
-        // Focus the input element within the container if it exists
-        const input = field.ref.current.querySelector('input, select, textarea') as HTMLElement;
-        if (input) {
-          setTimeout(() => {
-            input.focus();
-            // Trigger click to open dropdown if it's a dropdown field
-            if (input.getAttribute('role') === 'combobox') {
-              input.click();
-            }
-          }, 100);
-        } else {
-          setTimeout(() => field.ref.current?.focus(), 100);
-        }
+        // Note: Auto-focus removed per architectural requirements
+        // Focus control must remain with user interaction, not automatic
         break;
       }
     }
@@ -56,12 +45,8 @@ export function useFocusProgression() {
     for (let i = currentIndex - 1; i >= 0; i--) {
       const field = focusOrder.current[i];
       if (field.ref.current) {
-        const input = field.ref.current.querySelector('input, select, textarea') as HTMLElement;
-        if (input) {
-          setTimeout(() => input.focus(), 100);
-        } else {
-          setTimeout(() => field.ref.current?.focus(), 100);
-        }
+        // Note: Auto-focus removed per architectural requirements
+        // Focus control must remain with user interaction, not automatic
         break;
       }
     }
@@ -69,14 +54,8 @@ export function useFocusProgression() {
 
   const focusFirst = useCallback(() => {
     const firstIncomplete = focusOrder.current.find(f => !f.isComplete && f.ref.current);
-    if (firstIncomplete?.ref.current) {
-      const input = firstIncomplete.ref.current.querySelector('input, select, textarea') as HTMLElement;
-      if (input) {
-        setTimeout(() => input.focus(), 100);
-      } else {
-        setTimeout(() => firstIncomplete.ref.current?.focus(), 100);
-      }
-    }
+    // Note: Auto-focus removed per architectural requirements
+    // Focus control must remain with user interaction, not automatic
   }, []);
 
   return {

@@ -1,4 +1,4 @@
-import { makeAutoObservable, reaction } from 'mobx';
+import { makeAutoObservable, reaction, runInAction } from 'mobx';
 import { IMedicationApi } from '@/services/api/interfaces/IMedicationApi';
 import { 
   Medication, 
@@ -95,131 +95,162 @@ export class MedicationEntryViewModel {
   }
 
   async searchMedications(query: string) {
-    this.medicationName = query;
+    runInAction(() => {
+      this.medicationName = query;
+      this.isLoading = true;
+    });
     
-    // Always show all medications and use highlighting for filtering
-    // This matches the A4C-figma behavior
-    this.isLoading = true;
     try {
       // Always fetch all medications - filtering is done visually via highlighting
       // Pass empty string to get all medications
-      this.searchResults = await this.medicationApi.searchMedications('');
-      this.showMedicationDropdown = this.searchResults.length > 0;
+      const results = await this.medicationApi.searchMedications('');
+      runInAction(() => {
+        this.searchResults = results;
+        this.showMedicationDropdown = this.searchResults.length > 0;
+      });
     } catch (error) {
       this.handleError('Failed to search medications', error);
     } finally {
-      this.isLoading = false;
+      runInAction(() => {
+        this.isLoading = false;
+      });
     }
   }
 
   selectMedication(medication: Medication) {
-    this.selectedMedication = medication;
-    this.medicationName = medication.name;
-    this.showMedicationDropdown = false;
+    runInAction(() => {
+      this.selectedMedication = medication;
+      this.medicationName = medication.name;
+      this.showMedicationDropdown = false;
+      
+      if (medication.categories) {
+        this.selectedBroadCategories = [medication.categories.broad];
+        this.selectedSpecificCategories = [medication.categories.specific];
+      }
+    });
     this.clearError('medication');
-    
-    if (medication.categories) {
-      this.selectedBroadCategories = [medication.categories.broad];
-      this.selectedSpecificCategories = [medication.categories.specific];
-    }
   }
 
   clearMedication() {
-    this.selectedMedication = null;
-    this.medicationName = '';
-    this.searchResults = [];
-    this.showMedicationDropdown = false;
-    this.dosageFormCategory = '';
-    this.dosageFormType = '';
-    this.dosageForm = '';
-    this.dosageAmount = '';
-    this.dosageUnit = '';
-    this.totalAmount = '';
-    this.totalUnit = '';
-    this.selectedBroadCategories = [];
-    this.selectedSpecificCategories = [];
+    runInAction(() => {
+      this.selectedMedication = null;
+      this.medicationName = '';
+      this.searchResults = [];
+      this.showMedicationDropdown = false;
+      this.dosageFormCategory = '';
+      this.dosageFormType = '';
+      this.dosageForm = '';
+      this.dosageAmount = '';
+      this.dosageUnit = '';
+      this.totalAmount = '';
+      this.totalUnit = '';
+      this.selectedBroadCategories = [];
+      this.selectedSpecificCategories = [];
+    });
   }
 
   setDosageFormCategory(category: DosageFormCategory) {
-    this.dosageFormCategory = category;
-    this.showFormCategoryDropdown = false;
-    // Reset form type and unit when category changes
-    this.dosageFormType = '';
-    this.dosageForm = '';
-    this.dosageUnit = '';
-    this.totalUnit = '';
+    runInAction(() => {
+      this.dosageFormCategory = category;
+      this.showFormCategoryDropdown = false;
+      // Reset form type and unit when category changes
+      this.dosageFormType = '';
+      this.dosageForm = '';
+      this.dosageUnit = '';
+      this.totalUnit = '';
+    });
     this.clearError('dosageFormCategory');
   }
 
   setDosageForm(form: string) {
-    // This is now used for setting the category (backward compatibility)
-    this.dosageForm = form;
-    this.showFormDropdown = false;
-    // Auto-set category if not already set
-    if (!this.dosageFormCategory) {
-      const category = getCategoryForDosageForm(form);
-      if (category) {
-        this.dosageFormCategory = category;
+    runInAction(() => {
+      // This is now used for setting the category (backward compatibility)
+      this.dosageForm = form;
+      this.showFormDropdown = false;
+      // Auto-set category if not already set
+      if (!this.dosageFormCategory) {
+        const category = getCategoryForDosageForm(form);
+        if (category) {
+          this.dosageFormCategory = category;
+        }
       }
-    }
-    // Reset form type and unit when changing
-    this.dosageFormType = '';
-    this.dosageUnit = '';
+      // Reset form type and unit when changing
+      this.dosageFormType = '';
+      this.dosageUnit = '';
+    });
     this.clearError('dosageForm');
   }
 
   setDosageFormType(formType: string) {
-    // Set the specific form type (Tablet, Capsule, etc.)
-    this.dosageFormType = formType;
-    this.dosageForm = formType;  // Keep dosageForm in sync for backward compatibility
-    this.showFormTypeDropdown = false;
-    // Reset unit when form type changes
-    this.dosageUnit = '';
+    runInAction(() => {
+      // Set the specific form type (Tablet, Capsule, etc.)
+      this.dosageFormType = formType;
+      this.dosageForm = formType;  // Keep dosageForm in sync for backward compatibility
+      this.showFormTypeDropdown = false;
+      // Reset unit when form type changes
+      this.dosageUnit = '';
+    });
     this.clearError('dosageFormType');
   }
 
   updateDosageAmount(value: string) {
-    this.dosageAmount = value;
+    runInAction(() => {
+      this.dosageAmount = value;
+    });
     this.validateDosageAmount();
   }
 
   setDosageUnit(unit: string) {
-    this.dosageUnit = unit;
-    this.showUnitDropdown = false;
+    runInAction(() => {
+      this.dosageUnit = unit;
+      this.showUnitDropdown = false;
+    });
     this.clearError('dosageUnit');
   }
 
   updateTotalAmount(value: string) {
-    this.totalAmount = value;
+    runInAction(() => {
+      this.totalAmount = value;
+    });
     this.validateTotalAmount();
   }
 
   setTotalUnit(unit: string) {
-    this.totalUnit = unit;
+    runInAction(() => {
+      this.totalUnit = unit;
+    });
     this.clearError('totalUnit');
   }
 
   setFrequency(freq: string) {
-    this.frequency = freq;
-    this.showFrequencyDropdown = false;
+    runInAction(() => {
+      this.frequency = freq;
+      this.showFrequencyDropdown = false;
+    });
     this.clearError('frequency');
   }
 
   setCondition(cond: string) {
-    this.condition = cond;
-    this.showConditionDropdown = false;
+    runInAction(() => {
+      this.condition = cond;
+      this.showConditionDropdown = false;
+    });
     this.clearError('condition');
   }
 
   setStartDate(date: Date | null) {
-    this.startDate = date;
-    this.showStartDateCalendar = false;
+    runInAction(() => {
+      this.startDate = date;
+      this.showStartDateCalendar = false;
+    });
     this.clearError('startDate');
   }
 
   setDiscontinueDate(date: Date | null) {
-    this.discontinueDate = date;
-    this.showDiscontinueDateCalendar = false;
+    runInAction(() => {
+      this.discontinueDate = date;
+      this.showDiscontinueDateCalendar = false;
+    });
     this.clearError('discontinueDate');
   }
 
@@ -262,14 +293,19 @@ export class MedicationEntryViewModel {
       notes: this.notes || undefined
     };
 
-    this.isLoading = true;
+    runInAction(() => {
+      this.isLoading = true;
+    });
+    
     try {
       await this.medicationApi.saveMedication(dosageInfo);
       this.reset();
     } catch (error) {
       this.handleError('Failed to save medication', error);
     } finally {
-      this.isLoading = false;
+      runInAction(() => {
+        this.isLoading = false;
+      });
     }
   }
   

@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { ClientSelector } from '@/views/client/ClientSelector';
-import { MedicationEntryModal } from '@/views/medication/MedicationEntryModal';
+// Use the refactored modal with declarative focus flow
+import { MedicationEntryModal } from '@/views/medication/MedicationEntryModalRefactored';
+import { FocusManagerProvider } from '@/contexts/focus/FocusManagerContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardAction } from '@/components/ui/card';
 import { Plus, Pill } from 'lucide-react';
 import './index.css';
+
+// Development utilities removed - using simplified components
 
 function App() {
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
@@ -26,13 +30,13 @@ function App() {
     }
   };
 
-  if (!selectedClientId) {
-    return <ClientSelector onClientSelect={handleClientSelect} />;
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50" data-testid="app-container">
-      <div className="max-w-7xl mx-auto p-6">
+    <FocusManagerProvider debug={process.env.NODE_ENV === 'development'}>
+      {!selectedClientId ? (
+        <ClientSelector onClientSelect={handleClientSelect} />
+      ) : (
+      <div className="min-h-screen bg-gray-50" data-testid="app-container">
+        <div className="max-w-7xl mx-auto p-6">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Medication Management</h1>
           <p className="text-gray-600 mt-2" data-testid="selected-client-id">Client ID: {selectedClientId}</p>
@@ -66,6 +70,7 @@ function App() {
           <div 
             className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-40"
             data-testid="medication-type-modal"
+            data-modal-id="medication-type-selection"
             role="dialog"
             aria-modal="true"
             aria-labelledby="medication-type-title"
@@ -100,32 +105,38 @@ function App() {
                   className="w-full justify-start min-h-[44px]"
                   onClick={() => handleMedicationType('Supplement')}
                   data-testid="supplement-button"
-                  aria-label="Add supplement or vitamin"
+                  aria-label="Add supplement"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Supplement / Vitamin
+                  Dietary Supplement
                 </Button>
-                <div className="pt-3">
-                  <Button
-                    variant="ghost"
-                    className="w-full min-h-[44px]"
-                    onClick={() => setShowMedicationTypeSelection(false)}
-                    data-testid="medication-type-cancel-button"
-                    aria-label="Cancel medication type selection"
-                  >
-                    Cancel
-                  </Button>
-                </div>
+                <Button
+                  variant="ghost"
+                  className="w-full"
+                  onClick={() => setShowMedicationTypeSelection(false)}
+                  data-testid="cancel-button"
+                >
+                  Cancel
+                </Button>
               </CardContent>
             </Card>
           </div>
         )}
 
         {showMedicationModal && (
-          <MedicationEntryModal onClose={() => setShowMedicationModal(false)} />
+          <MedicationEntryModal 
+            clientId={selectedClientId}
+            onClose={() => setShowMedicationModal(false)}
+            onSave={(medication) => {
+              console.log('Medication saved:', medication);
+              setShowMedicationModal(false);
+            }}
+          />
         )}
       </div>
     </div>
+      )}
+    </FocusManagerProvider>
   );
 }
 

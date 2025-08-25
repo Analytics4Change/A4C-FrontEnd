@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { FocusableField } from '@/components/FocusableField';
+// Removed FocusableField - using simplified approach
 import { ManagedDialog, ManagedDialogClose } from '@/components/focus/ManagedDialog';
 import * as Dialog from '@radix-ui/react-dialog';
 
@@ -87,90 +87,84 @@ export const SideEffectsSelection = observer(({
       <div className="space-y-2">
         <Label className="text-base font-medium">Side Effects</Label>
         
-        <FocusableField
-          id="side-effects"
-          order={15}
-          scope="medication-entry"
+        <ManagedDialog
+          id="side-effects-modal"
+          trigger={
+            <Button
+              id="side-effects-button"
+              type="button"
+              variant={selectedEffects.length > 0 ? 'default' : 'outline'}
+              className="w-full justify-between"
+            >
+              <span>{getButtonText()}</span>
+              <ChevronDown size={20} />
+            </Button>
+          }
+          title="Side Effects Selection"
         >
-          <ManagedDialog
-            id="side-effects-modal"
-            trigger={
-              <Button
-                id="side-effects-button"
-                type="button"
-                variant={selectedEffects.length > 0 ? 'default' : 'outline'}
-                className="w-full justify-between"
-              >
-                <span>{getButtonText()}</span>
-                <ChevronDown size={20} />
-              </Button>
-            }
-            title="Side Effects Selection"
-          >
-            <div className="space-y-4">
-              {/* Search Input */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  type="text"
-                  placeholder="Search side effects..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-10"
-                />
-                {searchTerm && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearSearch}
-                    className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-                    aria-label="Clear search"
-                  >
-                    <X size={14} />
-                  </Button>
-                )}
-              </div>
-
-              {/* Side Effects List */}
-              <div className="space-y-3 max-h-60 overflow-y-auto">
-                {filteredEffects.map((effect) => (
-                  <label
-                    key={effect}
-                    className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded"
-                  >
-                    <Checkbox
-                      checked={selectedEffects.includes(effect)}
-                      onCheckedChange={() => handleToggleEffect(effect)}
-                      aria-label={effect}
-                    />
-                    <span>{effect}</span>
-                  </label>
-                ))}
-                
-                {/* Other Option */}
-                <label className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
-                  <Checkbox
-                    checked={false}
-                    onCheckedChange={handleOtherClick}
-                    aria-label="Other"
-                  />
-                  <span>Other</span>
-                </label>
-              </div>
-
-              {/* Modal Actions */}
-              <div className="flex justify-end gap-3">
-                <ManagedDialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </ManagedDialogClose>
-                <ManagedDialogClose asChild>
-                  <Button>Done</Button>
-                </ManagedDialogClose>
-              </div>
+          <div className="space-y-4">
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Search side effects..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-10"
+              />
+              {searchTerm && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearSearch}
+                  className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                  aria-label="Clear search"
+                >
+                  <X size={14} />
+                </Button>
+              )}
             </div>
-          </ManagedDialog>
-        </FocusableField>
+
+            {/* Side Effects List */}
+            <div className="space-y-3 max-h-60 overflow-y-auto">
+              {filteredEffects.map((effect) => (
+                <label
+                  key={effect}
+                  className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                >
+                  <Checkbox
+                    checked={selectedEffects.includes(effect)}
+                    onCheckedChange={() => handleToggleEffect(effect)}
+                    aria-label={effect}
+                  />
+                  <span>{effect}</span>
+                </label>
+              ))}
+              
+              {/* Other Option */}
+              <label className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                <Checkbox
+                  checked={false}
+                  onCheckedChange={handleOtherClick}
+                  aria-label="Other"
+                />
+                <span>Other</span>
+              </label>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex justify-end gap-3">
+              <ManagedDialogClose>
+                <Button variant="outline">Cancel</Button>
+              </ManagedDialogClose>
+              <ManagedDialogClose>
+                <Button>Done</Button>
+              </ManagedDialogClose>
+            </div>
+          </div>
+        </ManagedDialog>
 
         {/* Error Message */}
         {error && (

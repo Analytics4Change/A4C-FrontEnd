@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../App';
 
-// Mock the missing UI components that would cause import failures
+// Mock the UI components using standardized patterns
 vi.mock('@/components/ui/button', () => ({
   Button: ({ children, onClick, disabled, className, ...props }: any) => (
     <button 
@@ -21,7 +21,8 @@ vi.mock('@/components/ui/card', () => ({
   Card: ({ children, className }: any) => <div className={className}>{children}</div>,
   CardContent: ({ children, className }: any) => <div className={className}>{children}</div>,
   CardHeader: ({ children, className }: any) => <div className={className}>{children}</div>,
-  CardTitle: ({ children, className }: any) => <h2 className={className}>{children}</h2>
+  CardTitle: ({ children, className }: any) => <h2 className={className}>{children}</h2>,
+  CardAction: ({ children, className }: any) => <div className={className}>{children}</div>
 }));
 
 // Mock the view components that should exist

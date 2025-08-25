@@ -65,8 +65,6 @@ export {
   generateScopeId,
   generateElementId,
   getInputElement,
-  isDropdownTrigger,
-  openDropdownIfNeeded,
   debugLog,
   isFocusWithinScope,
   restoreFocus

@@ -12,6 +12,7 @@ interface AutocompleteDropdownProps<T> {
   isItemHighlighted?: (item: T) => boolean;
   className?: string;
   testId?: string;
+  modalId?: string;
 }
 
 export function AutocompleteDropdown<T>({
@@ -23,7 +24,8 @@ export function AutocompleteDropdown<T>({
   getItemKey,
   isItemHighlighted = () => false,
   className,
-  testId = 'autocomplete-dropdown'
+  testId = 'autocomplete-dropdown',
+  modalId
 }: AutocompleteDropdownProps<T>) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownPosition = useDropdownPosition(inputRef, isOpen && items.length > 0);
@@ -44,6 +46,7 @@ export function AutocompleteDropdown<T>({
     <div
       ref={dropdownRef}
       data-testid={testId}
+      {...(modalId && { 'data-modal-id': modalId })}
       className={cn(
         "fixed bg-white border border-gray-200 rounded-lg shadow-2xl max-h-60 overflow-y-auto z-[100]",
         className

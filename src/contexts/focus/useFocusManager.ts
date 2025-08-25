@@ -273,7 +273,7 @@ export function useFocusScope(
       id: scopeIdRef.current,
       type: 'default',
       trapFocus: options?.trapFocus || false,
-      autoFocus: options?.autoFocus || false,
+      autoFocus: false, // Auto-focus disabled per architectural requirements
       restoreFocusTo: options?.restoreFocusOnClose ? document.activeElement?.id : undefined
     };
     
@@ -389,21 +389,15 @@ export function useFocusTrap(
       id: scopeId.current,
       type: 'default',
       trapFocus: true,
-      autoFocus: true,
+      autoFocus: false, // Auto-focus disabled per architectural requirements
       restoreFocusTo: options?.returnFocus ? previousFocus.current?.id : undefined
     };
     
     pushScope(scope);
     
-    // Focus initial element or first element
-    if (options?.initialFocus) {
-      // Focus specific element
-      const element = document.getElementById(options.initialFocus);
-      element?.focus();
-    } else {
-      // Focus first element in scope
-      setTimeout(() => focusFirst(), 50);
-    }
+    // Note: Auto-focus removed per architectural requirements
+    // Focus control must remain with user interaction, not automatic
+    // User can manually focus elements as needed
     
     return () => {
       popScope();

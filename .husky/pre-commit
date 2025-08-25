@@ -1,0 +1,60 @@
+#!/bin/sh
+# Pre-commit hook for memory leak detection in test files
+# This hook checks for memory issues in changed test files before allowing commits
+
+# Exit early if this is a merge commit (avoids interference with automated merges)
+if [ -f .git/MERGE_HEAD ]; then
+  echo "Merge commit detected, skipping memory checks..."
+  exit 0
+fi
+
+# Check if memory check should be skipped
+# Usage: git commit --no-verify (bypasses all pre-commit hooks)
+# Or set environment variable: SKIP_MEMORY_CHECK=true git commit
+if [ "$SKIP_MEMORY_CHECK" = "true" ]; then
+  echo "Memory check skipped via SKIP_MEMORY_CHECK environment variable"
+  exit 0
+fi
+
+# Get list of changed test files in this commit
+CHANGED_TESTS=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(test|spec)\.(js|jsx|ts|tsx)$')
+
+# If no test files changed, skip memory check
+if [ -z "$CHANGED_TESTS" ]; then
+  echo "No test files changed, skipping memory check"
+  exit 0
+fi
+
+echo "🔍 Running memory leak detection on changed test files..."
+echo "Changed test files:"
+echo "$CHANGED_TESTS" | sed 's/^/  - /'
+
+# Run the memory check script
+# Use node with garbage collection exposed for accurate memory profiling
+node --expose-gc scripts/pre-commit-memory-check.cjs $CHANGED_TESTS
+
+# Capture exit code from memory check
+MEMORY_CHECK_RESULT=$?
+
+# If memory check failed, provide helpful information
+if [ $MEMORY_CHECK_RESULT -ne 0 ]; then
+  echo ""
+  echo "❌ Memory leak detected in test files!"
+  echo ""
+  echo "📋 What you can do:"
+  echo "  1. Fix memory leaks in the failing tests"
+  echo "  2. Run 'npm run test:memory:single <test-file>' to debug specific tests"
+  echo "  3. Check memory reports in 'memory-reports/' directory"
+  echo "  4. Use 'git commit --no-verify' to bypass (NOT recommended)"
+  echo ""
+  echo "💡 Common fixes:"
+  echo "  - Add proper cleanup in afterEach() hooks"
+  echo "  - Clear event listeners and timers"
+  echo "  - Reset mocks and test data"
+  echo "  - Use vi.clearAllMocks() and cleanup()"
+  echo ""
+  exit $MEMORY_CHECK_RESULT
+fi
+
+echo "✅ Memory check passed!"
+exit 0
