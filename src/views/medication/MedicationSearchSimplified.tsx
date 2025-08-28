@@ -89,11 +89,16 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
         break;
       
       case 'Escape':
-        e.preventDefault();
-        setHighlightedIndex(0);
-        if (inputRef.current) {
-          inputRef.current.blur();
+        if (showDropdown && searchResults.length > 0) {
+          // If dropdown is open, just close it without propagating
+          e.preventDefault();
+          e.stopPropagation();
+          setHighlightedIndex(0);
+          // Clear search but keep focus
+          setLocalValue('');
+          onSearch('');
         }
+        // If dropdown is not open, let the event bubble up to close the modal
         break;
     }
   };
@@ -105,6 +110,14 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
     if (onFieldComplete) {
       onFieldComplete();
     }
+    // After selection, focus the clear button so user can review
+    // The clear button has tabIndex={1} when medication is selected
+    setTimeout(() => {
+      const clearButton = document.querySelector('[aria-label="Clear medication selection"]') as HTMLElement;
+      if (clearButton) {
+        clearButton.focus();
+      }
+    }, 100);
   };
 
   // Scroll highlighted item into view
@@ -160,6 +173,7 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
               size="sm"
               onClick={onClear}
               aria-label="Clear medication selection"
+              tabIndex={1}
             >
               <X size={16} />
             </Button>
@@ -187,6 +201,7 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
               aria-controls={showDropdown ? 'medication-dropdown' : undefined}
               aria-expanded={showDropdown}
               autoComplete="off"
+              tabIndex={1}
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2">
               {isLoading ? (

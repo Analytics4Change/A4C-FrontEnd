@@ -154,7 +154,7 @@ export const DosageForm = observer((props: DosageFormProps) => {
               disabled={!!dosageFormCategory}
               aria-label="Dosage form category"
               aria-describedby={errors.get('dosageFormCategory') ? 'dosage-category-error' : undefined}
-              tabIndex={1}
+              tabIndex={3}
             />
             <button
               type="button"
@@ -168,7 +168,7 @@ export const DosageForm = observer((props: DosageFormProps) => {
               }}
               aria-label="Open dosage form dropdown"
               disabled={!!dosageFormCategory}
-              tabIndex={2}
+              tabIndex={4}
             >
               <ChevronDown className="text-gray-400" size={20} />
             </button>
@@ -225,7 +225,7 @@ export const DosageForm = observer((props: DosageFormProps) => {
               className={`pr-10 ${dosageFormType ? 'border-blue-500 bg-blue-50' : ''} ${errors.get('dosageFormType') ? 'border-red-500' : ''}`}
               disabled={!!dosageFormType || !dosageFormCategory}
               aria-label="Form type"
-              tabIndex={3}
+              tabIndex={5}
             />
             <button
               type="button"
@@ -239,7 +239,7 @@ export const DosageForm = observer((props: DosageFormProps) => {
               }}
               aria-label="Open form type dropdown"
               disabled={!!dosageFormType || !dosageFormCategory}
-              tabIndex={4}
+              tabIndex={6}
             >
               <ChevronDown className="text-gray-400" size={20} />
             </button>
@@ -289,7 +289,7 @@ export const DosageForm = observer((props: DosageFormProps) => {
             className={`mt-2 ${errors.get('dosageAmount') ? 'border-red-500' : ''}`}
             aria-label="Dosage amount"
             aria-describedby={errors.get('dosageAmount') ? 'dosage-amount-error' : undefined}
-            tabIndex={5}
+            tabIndex={7}
           />
           {errors.get('dosageAmount') && (
             <p id="dosage-amount-error" className="mt-1 text-sm text-red-600" role="alert">
@@ -321,7 +321,7 @@ export const DosageForm = observer((props: DosageFormProps) => {
               className={`pr-10 ${dosageUnit ? 'border-blue-500 bg-blue-50' : ''} ${errors.get('dosageUnit') ? 'border-red-500' : ''}`}
               disabled={!!dosageUnit}
               aria-label="Dosage unit"
-              tabIndex={6}
+              tabIndex={8}
             />
             <button
               type="button"
@@ -335,7 +335,7 @@ export const DosageForm = observer((props: DosageFormProps) => {
               }}
               aria-label="Open dosage unit dropdown"
               disabled={!!dosageUnit}
-              tabIndex={7}
+              tabIndex={9}
             >
               <ChevronDown className="text-gray-400" size={20} />
             </button>
@@ -384,7 +384,7 @@ export const DosageForm = observer((props: DosageFormProps) => {
             placeholder="Enter total amount..."
             className={`mt-2 ${errors.get('totalAmount') ? 'border-red-500' : ''}`}
             aria-label="Total amount"
-            tabIndex={8}
+            tabIndex={10}
           />
           {errors.get('totalAmount') && (
             <p className="mt-1 text-sm text-red-600" role="alert">
@@ -416,7 +416,7 @@ export const DosageForm = observer((props: DosageFormProps) => {
               className={`pr-10 ${totalUnit ? 'border-blue-500 bg-blue-50' : ''}`}
               disabled={!!totalUnit || !totalAmount}
               aria-label="Total unit"
-              tabIndex={9}
+              tabIndex={11}
             />
             <button
               type="button"
@@ -430,7 +430,7 @@ export const DosageForm = observer((props: DosageFormProps) => {
               }}
               aria-label="Open total unit dropdown"
               disabled={!!totalUnit || !totalAmount}
-              tabIndex={10}
+              tabIndex={12}
             >
               <ChevronDown className="text-gray-400" size={20} />
             </button>
@@ -483,7 +483,7 @@ export const DosageForm = observer((props: DosageFormProps) => {
               className={`pr-10 ${frequency ? 'border-blue-500 bg-blue-50' : ''} ${errors.get('frequency') ? 'border-red-500' : ''}`}
               disabled={!!frequency}
               aria-label="Dosage frequency"
-              tabIndex={11}
+              tabIndex={13}
             />
             <button
               type="button"
@@ -497,7 +497,7 @@ export const DosageForm = observer((props: DosageFormProps) => {
               }}
               aria-label="Open frequency dropdown"
               disabled={!!frequency}
-              tabIndex={12}
+              tabIndex={14}
             >
               <ChevronDown className="text-gray-400" size={20} />
             </button>
@@ -553,7 +553,7 @@ export const DosageForm = observer((props: DosageFormProps) => {
               className={`pr-10 ${condition ? 'border-blue-500 bg-blue-50' : ''}`}
               disabled={!!condition}
               aria-label="Dosage condition"
-              tabIndex={13}
+              tabIndex={15}
             />
             <button
               type="button"
@@ -567,7 +567,7 @@ export const DosageForm = observer((props: DosageFormProps) => {
               }}
               aria-label="Open condition dropdown"
               disabled={!!condition}
-              tabIndex={14}
+              tabIndex={16}
             >
               <ChevronDown className="text-gray-400" size={20} />
             </button>

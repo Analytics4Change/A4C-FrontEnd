@@ -83,8 +83,8 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
   const handleMedicationSelect = (medication: any) => {
     vm.selectMedication(medication);
     markNodeComplete('medication-search');
-    // Auto-advance to next field
-    navigateNext();
+    // Don't auto-advance - let user review their selection
+    // User can press Tab or click to continue
   };
 
   // Handle field completions
@@ -150,6 +150,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
             className="rounded-full min-w-[44px] min-h-[44px]"
             data-testid="medication-modal-close"
             aria-label="Close medication modal"
+            tabIndex={2}
           >
             <X size={24} />
           </Button>
@@ -337,6 +338,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
               variant="outline"
               onClick={onClose}
               className="min-w-[100px]"
+              tabIndex={vm.selectedMedication ? 17 : 3}
             >
               Cancel
             </Button>
@@ -346,6 +348,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
               disabled={!isFlowComplete() || vm.isLoading}
               className="min-w-[100px]"
               data-testid="medication-save-button"
+              tabIndex={vm.selectedMedication ? 18 : 4}
             >
               {vm.isLoading ? 'Saving...' : 'Save'}
             </Button>
