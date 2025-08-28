@@ -64,6 +64,24 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Handle Tab trapping even when dropdown is open
+    if (e.key === 'Tab' && showDropdown && searchResults.length > 0) {
+      e.preventDefault();
+      // Move selection like arrow keys
+      if (e.shiftKey) {
+        // Shift+Tab - move up
+        setHighlightedIndex(prev => 
+          prev > 0 ? prev - 1 : searchResults.length - 1
+        );
+      } else {
+        // Tab - move down
+        setHighlightedIndex(prev => 
+          prev < searchResults.length - 1 ? prev + 1 : 0
+        );
+      }
+      return;
+    }
+    
     if (!showDropdown || searchResults.length === 0) return;
     
     switch (e.key) {
@@ -100,6 +118,21 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
         }
         // If dropdown is not open, let the event bubble up to close the modal
         break;
+      
+      // Prevent other navigation keys from leaving focus context
+      case 'PageUp':
+      case 'PageDown':
+      case 'Home':
+      case 'End':
+        if (showDropdown && searchResults.length > 0) {
+          e.preventDefault();
+          if (e.key === 'Home') {
+            setHighlightedIndex(0);
+          } else if (e.key === 'End') {
+            setHighlightedIndex(searchResults.length - 1);
+          }
+        }
+        break;
     }
   };
 
@@ -129,6 +162,37 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
       });
     }
   }, [highlightedIndex, showDropdown]);
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
+      // Check if click is outside both the input and dropdown
+      if (
+        showDropdown && 
+        dropdownRef.current && 
+        !dropdownRef.current.contains(target) &&
+        inputRef.current &&
+        !inputRef.current.contains(target)
+      ) {
+        // Close dropdown on outside click
+        setLocalValue('');
+        onSearch('');
+        setHighlightedIndex(0);
+      }
+    };
+
+    if (showDropdown && searchResults.length > 0) {
+      // Add a small delay to avoid immediate triggering
+      setTimeout(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+      }, 0);
+      
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [showDropdown, searchResults.length, onSearch]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -200,6 +264,7 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
               aria-autocomplete="list"
               aria-controls={showDropdown ? 'medication-dropdown' : undefined}
               aria-expanded={showDropdown}
+              aria-activedescendant={showDropdown && searchResults.length > 0 ? `medication-option-${highlightedIndex}` : undefined}
               autoComplete="off"
               tabIndex={1}
             />
@@ -225,6 +290,7 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
                 <button
                   key={result.id || index}
                   ref={el => { listItemRefs.current[index] = el; }}
+                  id={`medication-option-${index}`}
                   type="button"
                   className={`w-full text-left px-4 py-3 hover:bg-gray-50 focus:bg-gray-50 transition-colors ${
                     index === highlightedIndex ? 'bg-blue-50' : ''
