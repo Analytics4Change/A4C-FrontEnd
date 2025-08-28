@@ -179,7 +179,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
         {/* Content */}
         <div 
           ref={contentRef}
-          className="p-8 space-y-8 overflow-y-auto invisible-scrollbar flex-1"
+          className="p-8 space-y-8 overflow-visible invisible-scrollbar flex-1 min-h-[500px]"
         >
           {/* Medication Search - Always visible as it's the first step */}
           <div id="medication-search" data-flow-node="true">

@@ -184,7 +184,7 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
       {/* Search Input */}
       {!selectedMedication && (
         <>
-          <div className="relative">
+          <div className="relative z-40">
             <Input
               ref={inputRef}
               id="medication-search"
@@ -193,7 +193,7 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
               onChange={(e) => handleSearch(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type medication name..."
-              className={`pr-10 ${error ? 'border-red-500' : ''}`}
+              className={`pr-10 relative z-50 ${error ? 'border-red-500' : ''}`}
               aria-label="Search for medication"
               aria-describedby={error ? 'medication-error' : undefined}
               aria-invalid={!!error}
@@ -203,7 +203,7 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
               autoComplete="off"
               tabIndex={1}
             />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 z-50">
               {isLoading ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-blue-600" />
               ) : (
@@ -211,13 +211,13 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
               )}
             </div>
             
-            {/* Search Results Dropdown - Now inside relative container */}
+            {/* Search Results Dropdown - Positioned below input */}
             {showDropdown && searchResults.length > 0 && (
               <div
                 ref={dropdownRef}
                 id="medication-dropdown"
                 data-modal-id="medication-search-results"
-                className="absolute z-50 w-full top-full mt-1 bg-white border rounded-lg shadow-lg max-h-[400px] overflow-y-auto"
+                className="absolute z-30 w-full left-0 right-0 mt-12 bg-white border rounded-lg shadow-xl max-h-[400px] overflow-y-auto"
                 role="listbox"
                 aria-label="Medication search results"
               >
@@ -249,9 +249,9 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
             </div>
             )}
 
-            {/* No Results Message - Now inside relative container */}
+            {/* No Results Message - Positioned below input */}
             {showDropdown && searchResults.length === 0 && !isLoading && localValue.length >= 2 && (
-              <div className="absolute z-50 w-full top-full mt-1 bg-white border rounded-lg shadow-lg p-4">
+              <div className="absolute z-30 w-full left-0 right-0 mt-12 bg-white border rounded-lg shadow-xl p-4">
                 <p className="text-gray-500 text-sm text-center">
                   No medications found matching "{localValue}"
                 </p>
