@@ -217,7 +217,7 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
                 ref={dropdownRef}
                 id="medication-dropdown"
                 data-modal-id="medication-search-results"
-                className="absolute z-50 w-full top-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto"
+                className="absolute z-50 w-full top-full mt-1 bg-white border rounded-lg shadow-lg max-h-[400px] overflow-y-auto"
                 role="listbox"
                 aria-label="Medication search results"
               >
