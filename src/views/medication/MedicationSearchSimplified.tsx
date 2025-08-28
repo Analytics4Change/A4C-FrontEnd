@@ -210,25 +210,17 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
                 <Search size={16} className="text-gray-400" />
               )}
             </div>
-          </div>
-
-          {/* Error Display */}
-          {error && (
-            <p id="medication-error" className="text-red-600 text-sm">
-              {error}
-            </p>
-          )}
-
-          {/* Search Results Dropdown */}
-          {showDropdown && searchResults.length > 0 && (
-            <div
-              ref={dropdownRef}
-              id="medication-dropdown"
-              data-modal-id="medication-search-results"
-              className="absolute z-50 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto"
-              role="listbox"
-              aria-label="Medication search results"
-            >
+            
+            {/* Search Results Dropdown - Now inside relative container */}
+            {showDropdown && searchResults.length > 0 && (
+              <div
+                ref={dropdownRef}
+                id="medication-dropdown"
+                data-modal-id="medication-search-results"
+                className="absolute z-50 w-full top-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto"
+                role="listbox"
+                aria-label="Medication search results"
+              >
               {searchResults.map((result, index) => (
                 <button
                   key={result.id || index}
@@ -255,15 +247,23 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
                 </button>
               ))}
             </div>
-          )}
+            )}
 
-          {/* No Results Message */}
-          {showDropdown && searchResults.length === 0 && !isLoading && localValue.length >= 2 && (
-            <div className="absolute z-50 w-full mt-1 bg-white border rounded-lg shadow-lg p-4">
-              <p className="text-gray-500 text-sm text-center">
-                No medications found matching "{localValue}"
-              </p>
-            </div>
+            {/* No Results Message - Now inside relative container */}
+            {showDropdown && searchResults.length === 0 && !isLoading && localValue.length >= 2 && (
+              <div className="absolute z-50 w-full top-full mt-1 bg-white border rounded-lg shadow-lg p-4">
+                <p className="text-gray-500 text-sm text-center">
+                  No medications found matching "{localValue}"
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Error Display - Outside relative container */}
+          {error && (
+            <p id="medication-error" className="text-red-600 text-sm mt-1">
+              {error}
+            </p>
           )}
         </>
       )}
