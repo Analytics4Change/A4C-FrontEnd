@@ -1,6 +1,6 @@
 # Data-Modal-ID Implementation Summary
 
-All 16 modal-like elements in the medication entry flow now have `data-modal-id` attributes for consistent identification.
+All 15 modal-like elements in the medication entry flow now have `data-modal-id` attributes for consistent identification.
 
 ## Implementation Complete
 
@@ -31,9 +31,6 @@ Implemented via ManagedDialog component which now automatically adds data-modal-
 - ✅ **side-effects-modal** - SideEffectsSelection.tsx - Main side effects selection modal (via ManagedDialog)
 - ✅ **custom-side-effect-modal** - SideEffectsSelection.tsx - Custom side effect input modal (via ManagedDialog)
 
-### 6. Additional Modals (1)
-- ✅ **managed-dialog-demo** - ManagedDialogDemo.tsx - Demo dialog (via ManagedDialog)
-
 ## Implementation Details
 
 1. **Direct Implementation**: Added `data-modal-id` directly to elements in:
@@ -48,7 +45,6 @@ Implemented via ManagedDialog component which now automatically adds data-modal-
 
 3. **Automatic Addition**: Enhanced ManagedDialog component to automatically add `data-modal-id={id}`, which covers:
    - SideEffectsSelection.tsx (2 modals)
-   - ManagedDialogDemo.tsx (1 modal)
    - Any future ManagedDialog instances
 
 ## Benefits

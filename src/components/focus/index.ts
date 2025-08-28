@@ -20,5 +20,4 @@ export {
 export type { StepIndicatorProps } from './StepIndicator';
 
 // Demo components (usually not exported in production)
-export { ManagedDialogDemo } from './ManagedDialogDemo';
 export { StepIndicatorDemo } from './StepIndicator.demo';
