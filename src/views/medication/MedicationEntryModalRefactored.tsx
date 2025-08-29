@@ -75,6 +75,14 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
   const handleMedicationSelect = (medication: any) => {
     vm.selectMedication(medication);
     setCompletedFields(prev => new Set([...prev, 'medication']));
+    
+    // Focus the Continue button after medication selection
+    setTimeout(() => {
+      const continueButton = document.getElementById('medication-continue-button');
+      if (continueButton) {
+        continueButton.focus();
+      }
+    }, 0);
   };
 
   // Handle field completions
@@ -98,8 +106,22 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
         );
         
         if (focusableElements && focusableElements.length > 0) {
-          const firstElement = focusableElements[0] as HTMLElement;
-          const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+          // Sort elements by tabIndex to ensure proper tab order
+          const sortedElements = Array.from(focusableElements).sort((a, b) => {
+            const tabA = parseInt((a as HTMLElement).getAttribute('tabindex') || '0');
+            const tabB = parseInt((b as HTMLElement).getAttribute('tabindex') || '0');
+            // If both have same tabIndex or no tabIndex, maintain DOM order
+            if (tabA === tabB) return 0;
+            // Positive tabIndex values come first, in ascending order
+            if (tabA > 0 && tabB > 0) return tabA - tabB;
+            // Positive tabIndex before 0 or no tabIndex
+            if (tabA > 0) return -1;
+            if (tabB > 0) return 1;
+            return 0;
+          });
+          
+          const firstElement = sortedElements[0] as HTMLElement;
+          const lastElement = sortedElements[sortedElements.length - 1] as HTMLElement;
           
           // Check if we're at the boundaries
           if (e.shiftKey) {
@@ -123,17 +145,6 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  // Set initial focus to the medication search input when modal opens
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const searchInput = document.getElementById('medication-search');
-      if (searchInput) {
-        searchInput.focus();
-      }
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
 
 
   return (

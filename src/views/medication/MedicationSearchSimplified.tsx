@@ -251,7 +251,7 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
               onChange={(e) => handleSearch(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type medication name..."
-              className={`pr-10 relative z-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${error ? 'border-red-500' : ''}`}
+              className={`pr-10 relative z-50 focus:border-blue-500 focus:border-2 focus:outline-none focus-visible:border-blue-500 focus-visible:border-2 ${error ? 'border-red-500 focus:border-red-500' : ''}`}
               aria-label="Search for medication"
               aria-describedby={error ? 'medication-error' : undefined}
               aria-invalid={!!error}
@@ -260,6 +260,7 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
               aria-expanded={showDropdown}
               aria-activedescendant={showDropdown && searchResults.length > 0 ? `medication-option-${highlightedIndex}` : undefined}
               autoComplete="off"
+              autoFocus={!selectedMedication}
               tabIndex={1}
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2 z-50">

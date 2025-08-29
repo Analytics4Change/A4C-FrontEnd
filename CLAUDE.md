@@ -55,3 +55,4 @@ Since this is a fresh project, ensure to:
 - For deep research use the exa mcp server
 - For exact code syntax use the context7 mcp server
 - For UI / UX testing use the playwright mcp server
+- Focus traps should always respect tabIndex order
