@@ -33,7 +33,7 @@ if (process.env.MEMORY_PROFILE === 'true') {
       snapshotDir: './memory-reports/snapshots'
     });
     console.log('📊 Memory profiling enabled for test run');
-  } catch (error) {
+  } catch (error: any) {
     console.warn('⚠️  Memory profiler not available:', error.message);
   }
 }
@@ -206,7 +206,7 @@ afterEach(() => {
       // Reset for next test
       testStartMemory = null;
       
-    } catch (error) {
+    } catch (error: any) {
       console.warn('[SETUP] Error during memory profiling cleanup:', error.message);
     }
   }

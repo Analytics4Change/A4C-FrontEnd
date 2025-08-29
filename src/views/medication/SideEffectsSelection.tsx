@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 // Removed FocusableField - using simplified approach
-// Removed ManagedDialog import - no longer using focus management system
 import * as Dialog from '@radix-ui/react-dialog';
 
 interface SideEffectsSelectionProps {
@@ -87,9 +86,8 @@ export const SideEffectsSelection = observer(({
       <div className="space-y-2">
         <Label className="text-base font-medium">Side Effects</Label>
         
-        <ManagedDialog
-          id="side-effects-modal"
-          trigger={
+        <Dialog.Root>
+          <Dialog.Trigger asChild>
             <Button
               id="side-effects-button"
               type="button"
@@ -99,9 +97,11 @@ export const SideEffectsSelection = observer(({
               <span>{getButtonText()}</span>
               <ChevronDown size={20} />
             </Button>
-          }
-          title="Side Effects Selection"
-        >
+          </Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Overlay className="fixed inset-0 bg-black/50" />
+            <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg p-6 max-w-md w-full">
+              <Dialog.Title className="text-lg font-semibold mb-4">Side Effects Selection</Dialog.Title>
           <div className="space-y-4">
             {/* Search Input */}
             <div className="relative">
@@ -156,15 +156,17 @@ export const SideEffectsSelection = observer(({
 
             {/* Modal Actions */}
             <div className="flex justify-end gap-3">
-              <ManagedDialogClose>
+              <Dialog.Close asChild>
                 <Button variant="outline">Cancel</Button>
-              </ManagedDialogClose>
-              <ManagedDialogClose>
+              </Dialog.Close>
+              <Dialog.Close asChild>
                 <Button>Done</Button>
-              </ManagedDialogClose>
+              </Dialog.Close>
             </div>
           </div>
-        </ManagedDialog>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
 
         {/* Error Message */}
         {error && (
@@ -173,12 +175,11 @@ export const SideEffectsSelection = observer(({
       </div>
 
       {/* Nested "Other" Modal */}
-      <ManagedDialog
-        id="custom-side-effect-modal"
-        open={showOtherModal}
-        onOpenChange={setShowOtherModal}
-        title="Add Custom Side Effect"
-      >
+      <Dialog.Root open={showOtherModal} onOpenChange={setShowOtherModal}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black/50" />
+          <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg p-6 max-w-md w-full">
+            <Dialog.Title className="text-lg font-semibold mb-4">Add Custom Side Effect</Dialog.Title>
         <div className="space-y-4">
           <Input
             type="text"
@@ -208,7 +209,9 @@ export const SideEffectsSelection = observer(({
             </Button>
           </div>
         </div>
-      </ManagedDialog>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </>
   );
 });
