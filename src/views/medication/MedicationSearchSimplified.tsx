@@ -143,14 +143,8 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
     if (onFieldComplete) {
       onFieldComplete();
     }
-    // After selection, focus the clear button so user can review
-    // The clear button has tabIndex={1} when medication is selected
-    setTimeout(() => {
-      const clearButton = document.querySelector('[aria-label="Clear medication selection"]') as HTMLElement;
-      if (clearButton) {
-        clearButton.focus();
-      }
-    }, 100);
+    // After selection, focus moves naturally through tab order
+    // No need to force focus since the modal will handle the flow
   };
 
   // Scroll highlighted item into view

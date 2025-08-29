@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -31,6 +31,9 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
   
   // Track if we've initialized the flow to prevent multiple starts
   const flowInitializedRef = useRef(false);
+  
+  // State to control when dosage fields are shown (after Continue is clicked)
+  const [showDosageFields, setShowDosageFields] = useState(false);
 
   // Use the declarative focus flow - now safely inside FocusManagerProvider
   const {
@@ -67,6 +70,21 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
       startFlow();
     }
   }, []); // Empty dependency array - run only once
+
+  // Handle continue - advance to dosage form
+  const handleContinue = () => {
+    if (vm.selectedMedication) {
+      setShowDosageFields(true);
+      navigateNext();
+      // Focus the first dosage form field after navigation
+      setTimeout(() => {
+        const dosageCategoryButton = document.getElementById('dosage-category-button');
+        if (dosageCategoryButton) {
+          dosageCategoryButton.focus();
+        }
+      }, 100);
+    }
+  };
 
   // Handle save
   const handleSave = async () => {
@@ -192,7 +210,10 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
               error={vm.errors.get('medication')}
               onSearch={(query) => vm.searchMedications(query)}
               onSelect={handleMedicationSelect}
-              onClear={() => vm.clearMedication()}
+              onClear={() => {
+                vm.clearMedication();
+                setShowDosageFields(false);
+              }}
               onFieldComplete={() => handleFieldComplete('medication-search')}
               onDropdownOpen={(elementId) => {
                 setTimeout(() => {
@@ -205,8 +226,8 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
             />
           </div>
 
-          {/* Dosage Form - Show after medication is selected */}
-          {vm.selectedMedication && (
+          {/* Dosage Form - Show after Continue button is clicked */}
+          {showDosageFields && vm.selectedMedication && (
             <>
               <div data-flow-node="true">
                 <DosageForm
@@ -338,20 +359,37 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
               variant="outline"
               onClick={onClose}
               className="min-w-[100px]"
-              tabIndex={vm.selectedMedication ? 17 : 3}
+              tabIndex={3}
             >
               Cancel
             </Button>
-            <Button
-              id="medication-save-button"
-              onClick={handleSave}
-              disabled={!isFlowComplete() || vm.isLoading}
-              className="min-w-[100px]"
-              data-testid="medication-save-button"
-              tabIndex={vm.selectedMedication ? 18 : 4}
-            >
-              {vm.isLoading ? 'Saving...' : 'Save'}
-            </Button>
+            
+            {/* Two-state logic: Either in search state OR configuration state */}
+            {!showDosageFields ? (
+              /* Medication Search State - Show Continue button */
+              <Button
+                id="medication-continue-button"
+                onClick={handleContinue}
+                disabled={!vm.selectedMedication}
+                className="min-w-[100px]"
+                data-testid="medication-continue-button"
+                tabIndex={vm.selectedMedication ? 4 : -1}
+              >
+                Continue
+              </Button>
+            ) : (
+              /* Dosage Configuration State - Show Save button */
+              <Button
+                id="medication-save-button"
+                onClick={handleSave}
+                disabled={!isFlowComplete() || vm.isLoading}
+                className="min-w-[100px]"
+                data-testid="medication-save-button"
+                tabIndex={4}
+              >
+                {vm.isLoading ? 'Saving...' : 'Save'}
+              </Button>
+            )}
           </div>
         </div>
       </div>

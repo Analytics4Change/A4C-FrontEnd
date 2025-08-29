@@ -207,20 +207,6 @@ export const medicationEntryFlow: FocusFlow = {
         dependsOn: 'side-effects',
         showWhen: 'hasOtherSideEffects'
       }
-    },
-    
-    // Save Button
-    {
-      id: 'medication-save-button',
-      order: 16,
-      required: true,
-      label: 'Save',
-      description: 'Save medication entry',
-      type: 'button',
-      validateOnLeave: 'isFormValid',
-      metadata: { 
-        isSubmit: true 
-      }
     }
   ],
   
@@ -230,7 +216,7 @@ export const medicationEntryFlow: FocusFlow = {
     'side-effects': {
       condition: 'hasOtherSideEffects',
       truePath: 'other-side-effects-input',
-      falsePath: 'medication-save-button',
+      falsePath: null,
       description: 'Navigate to other side effects input if "Other" is selected'
     },
     
