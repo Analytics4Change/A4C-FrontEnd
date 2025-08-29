@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { ClientSelector } from '@/views/client/ClientSelector';
-// Use the refactored modal with declarative focus flow
+// Use the refactored modal with simplified focus
 import { MedicationEntryModal } from '@/views/medication/MedicationEntryModalRefactored';
-import { FocusManagerProvider } from '@/contexts/focus/FocusManagerContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardAction } from '@/components/ui/card';
 import { Plus, Pill } from 'lucide-react';
@@ -31,7 +30,7 @@ function App() {
   };
 
   return (
-    <FocusManagerProvider debug={process.env.NODE_ENV === 'development'}>
+    <>
       {!selectedClientId ? (
         <ClientSelector onClientSelect={handleClientSelect} />
       ) : (
@@ -136,7 +135,7 @@ function App() {
       </div>
     </div>
       )}
-    </FocusManagerProvider>
+    </>
   );
 }
 

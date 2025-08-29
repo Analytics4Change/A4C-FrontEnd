@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 // Removed FocusableField - using simplified approach
-import { ManagedDialog, ManagedDialogClose } from '@/components/focus/ManagedDialog';
+// Removed ManagedDialog import - no longer using focus management system
 import * as Dialog from '@radix-ui/react-dialog';
 
 interface SideEffectsSelectionProps {

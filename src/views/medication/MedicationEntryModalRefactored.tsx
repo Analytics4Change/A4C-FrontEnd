@@ -4,10 +4,8 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useViewModel } from '@/hooks/useViewModel';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
-import { useFocusFlowSimple } from '@/hooks/useFocusFlowSimple';
 import { MedicationEntryViewModel } from '@/viewModels/medication/MedicationEntryViewModel';
 import { DosageFormCategory } from '@/types/models/Dosage';
-import { medicationEntryFlow } from '@/config/focusFlows/medicationEntryFlow';
 // Use simplified versions without FocusableField wrappers
 import { MedicationSearch } from './MedicationSearchSimplified';
 import { DosageForm } from './DosageFormSimplified';
@@ -21,7 +19,7 @@ interface MedicationEntryModalProps {
   onSave: (medication: any) => void;
 }
 
-// Inner component that uses the focus flow hook (must be inside FocusManagerProvider)
+// Modal component with simplified focus management using tabIndex
 const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: MedicationEntryModalProps) => {
   // Use the proper hook to initialize the ViewModel with dependencies
   const vm = useViewModel(MedicationEntryViewModel);
@@ -29,53 +27,16 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
   const contentRef = useRef<HTMLDivElement>(null);
   const { scrollToCenter, scrollWhenVisible } = useAutoScroll(contentRef);
   
-  // Track if we've initialized the flow to prevent multiple starts
-  const flowInitializedRef = useRef(false);
-  
   // State to control when dosage fields are shown (after Continue is clicked)
   const [showDosageFields, setShowDosageFields] = useState(false);
-
-  // Use the declarative focus flow - now safely inside FocusManagerProvider
-  const {
-    state: flowState,
-    navigateNext,
-    navigatePrevious,
-    startFlow,
-    completeFlow,
-    markNodeComplete,
-    isFlowComplete
-  } = useFocusFlowSimple(medicationEntryFlow, {
-    autoStart: false, // Don't auto-start, we'll start manually once
-    validateOnNavigate: true,
-    onEvent: (event) => {
-      console.log('Focus flow event:', event);
-      
-      // Handle auto-scroll for dropdown/modal opens
-      if (event.type === 'node:enter' && event.data?.opensModal) {
-        setTimeout(() => {
-          const element = document.getElementById(event.nodeId || '');
-          if (element) {
-            scrollWhenVisible(element, { behavior: 'smooth' });
-          }
-        }, 100);
-      }
-    }
-  });
   
-  // Start flow only once when component mounts
-  useEffect(() => {
-    if (!flowInitializedRef.current) {
-      flowInitializedRef.current = true;
-      console.log('✅ Starting focus flow for MedicationEntryModal');
-      startFlow();
-    }
-  }, []); // Empty dependency array - run only once
+  // Track completed fields for save button
+  const [completedFields, setCompletedFields] = useState<Set<string>>(new Set());
 
   // Handle continue - advance to dosage form
   const handleContinue = () => {
     if (vm.selectedMedication) {
       setShowDosageFields(true);
-      navigateNext();
       // Focus the first dosage form field after navigation
       setTimeout(() => {
         const dosageCategoryButton = document.getElementById('dosage-category-button');
@@ -86,31 +47,39 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
     }
   };
 
+  // Check if all required fields are complete
+  const isFormComplete = () => {
+    // Check required fields based on what we know is needed
+    return vm.selectedMedication &&
+           vm.dosageFormCategory &&
+           vm.dosageFormType &&
+           vm.dosageAmount &&
+           vm.dosageUnit &&
+           vm.frequency &&
+           vm.selectedBroadCategories.length > 0 &&
+           vm.startDate;
+  };
+
   // Handle save
   const handleSave = async () => {
-    if (isFlowComplete()) {
+    if (isFormComplete()) {
       await vm.save();
       onSave(vm.selectedMedication);
       onClose();
     } else {
-      console.warn('Flow not complete, cannot save');
+      console.warn('Form not complete, cannot save');
     }
   };
 
-  // Handle medication selection - mark node as complete
+  // Handle medication selection
   const handleMedicationSelect = (medication: any) => {
     vm.selectMedication(medication);
-    markNodeComplete('medication-search');
-    // Don't auto-advance - let user review their selection
-    // User can press Tab or click to continue
+    setCompletedFields(prev => new Set([...prev, 'medication']));
   };
 
   // Handle field completions
-  const handleFieldComplete = (nodeId: string) => {
-    markNodeComplete(nodeId);
-    if (medicationEntryFlow.nodes.find(n => n.id === nodeId)?.autoAdvance) {
-      navigateNext();
-    }
+  const handleFieldComplete = (fieldId: string) => {
+    setCompletedFields(prev => new Set([...prev, fieldId]));
   };
 
   // Handle escape key to close modal
@@ -119,29 +88,12 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
       if (e.key === 'Escape') {
         onClose();
       }
-      // Global navigation shortcuts
-      if (e.ctrlKey || e.metaKey) {
-        if (e.key === 'ArrowRight') {
-          e.preventDefault();
-          navigateNext();
-        } else if (e.key === 'ArrowLeft') {
-          e.preventDefault();
-          navigatePrevious();
-        }
-      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose, navigateNext, navigatePrevious]);
+  }, [onClose]);
 
-  // Debug focus flow in development
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      // The MutationObserver in focusFlowDebug.ts will handle this automatically
-      // No need to call it manually here
-    }
-  }, []);
 
   return (
     <div 
@@ -174,25 +126,6 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
           </Button>
         </div>
 
-        {/* Flow Progress Indicator */}
-        <div className="px-8 py-2 bg-gray-50 border-b">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">
-              Step {flowState.currentIndex + 1} of {medicationEntryFlow.nodes.filter(n => n.required).length}
-            </span>
-            <span className="text-gray-900 font-medium">
-              {medicationEntryFlow.nodes.find(n => n.id === flowState.currentNodeId)?.label || 'Loading...'}
-            </span>
-          </div>
-          <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-blue-500 transition-all duration-300"
-              style={{ 
-                width: `${((flowState.completedNodes.size) / medicationEntryFlow.nodes.filter(n => n.required).length) * 100}%` 
-              }}
-            />
-          </div>
-        </div>
         
         {/* Content */}
         <div 
@@ -350,10 +283,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
         </div>
 
         {/* Footer */}
-        <div className="bg-white border-t px-8 py-6 flex justify-between items-center flex-shrink-0">
-          <div className="text-sm text-gray-600">
-            {flowState.completedNodes.size} of {medicationEntryFlow.nodes.filter(n => n.required).length} required fields complete
-          </div>
+        <div className="bg-white border-t px-8 py-6 flex justify-end items-center flex-shrink-0">
           <div className="flex gap-3">
             <Button
               variant="outline"
@@ -382,7 +312,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
               <Button
                 id="medication-save-button"
                 onClick={handleSave}
-                disabled={!isFlowComplete() || vm.isLoading}
+                disabled={!isFormComplete() || vm.isLoading}
                 className="min-w-[100px]"
                 data-testid="medication-save-button"
                 tabIndex={4}
@@ -397,5 +327,5 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
   );
 });
 
-// Export the modal component directly - FocusManagerProvider is now at App level
+// Export the modal component directly
 export const MedicationEntryModal = MedicationEntryModalContent;
