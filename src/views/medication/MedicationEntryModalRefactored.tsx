@@ -82,17 +82,58 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
     setCompletedFields(prev => new Set([...prev, fieldId]));
   };
 
-  // Handle escape key to close modal
+  // Handle escape key to close modal and implement focus trap
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
+        return;
+      }
+      
+      // Implement focus trap for the modal
+      if (e.key === 'Tab') {
+        // Get all focusable elements within the modal
+        const focusableElements = modalRef.current?.querySelectorAll(
+          'button:not([disabled]):not([tabindex="-1"]), input:not([disabled]):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])'
+        );
+        
+        if (focusableElements && focusableElements.length > 0) {
+          const firstElement = focusableElements[0] as HTMLElement;
+          const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+          
+          // Check if we're at the boundaries
+          if (e.shiftKey) {
+            // Shift+Tab: If focus is on first element, move to last
+            if (document.activeElement === firstElement) {
+              e.preventDefault();
+              lastElement.focus();
+            }
+          } else {
+            // Tab: If focus is on last element, move to first
+            if (document.activeElement === lastElement) {
+              e.preventDefault();
+              firstElement.focus();
+            }
+          }
+        }
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
+
+  // Set initial focus to the medication search input when modal opens
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const searchInput = document.getElementById('medication-search');
+      if (searchInput) {
+        searchInput.focus();
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
 
 
   return (

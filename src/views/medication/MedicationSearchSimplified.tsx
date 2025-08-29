@@ -251,7 +251,7 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
               onChange={(e) => handleSearch(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type medication name..."
-              className={`pr-10 relative z-50 ${error ? 'border-red-500' : ''}`}
+              className={`pr-10 relative z-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${error ? 'border-red-500' : ''}`}
               aria-label="Search for medication"
               aria-describedby={error ? 'medication-error' : undefined}
               aria-invalid={!!error}
