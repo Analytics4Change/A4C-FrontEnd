@@ -118,7 +118,7 @@ export class FocusErrorBoundary extends Component<
     // Initialize services
     this.errorLogger = props.errorLogger || new FocusErrorLogger({
       enabled: props.debugMode || false,
-      logLevel: props.debugMode ? 'debug' : 'error'
+      logLevel: props.debugMode ? 'DEBUG' : 'ERROR'
     });
 
     this.recoveryService = new FocusRecoveryService({

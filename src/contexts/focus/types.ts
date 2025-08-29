@@ -117,7 +117,7 @@ export interface FocusableElement {
   /** Unique identifier for the element */
   id: string;
   /** Reference to the DOM element */
-  ref: RefObject<HTMLElement>;
+  ref: RefObject<HTMLElement | null>;
   /** Type of focusable element */
   type: FocusableType;
   /** Scope this element belongs to (for modal isolation) */

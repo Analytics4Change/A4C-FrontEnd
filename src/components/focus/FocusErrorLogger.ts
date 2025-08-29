@@ -93,7 +93,7 @@ export class FocusErrorLogger {
   constructor(config: Partial<LoggerConfig> = {}) {
     this.config = {
       enabled: true,
-      logLevel: 'info',
+      logLevel: 'INFO',
       maxBufferSize: 100,
       persistLogs: false,
       sanitizeData: true,

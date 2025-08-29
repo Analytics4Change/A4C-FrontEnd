@@ -80,7 +80,7 @@ const createErrorLogger = (config: {
 }) => {
   return new FocusErrorLogger({
     enabled: config.enabled,
-    logLevel: config.debug ? 'debug' : 'error',
+    logLevel: config.debug ? 'DEBUG' : 'ERROR',
     persistLogs: true,
     remoteEndpoint: config.remoteEndpoint,
     sanitizeData: true,

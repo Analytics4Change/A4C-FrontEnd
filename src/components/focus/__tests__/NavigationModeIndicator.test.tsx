@@ -9,14 +9,14 @@ vi.mock('../NavigationModeIndicator.css', () => ({}));
 
 // Mock the useNavigationMode hook
 const mockNavigationMode = {
-  currentMode: 'keyboard' as const,
+  currentMode: 'keyboard' as 'keyboard' | 'mouse' | 'hybrid' | 'auto',
   setMode: vi.fn(),
   isKeyboardMode: true,
   isMouseMode: false,
   isHybridMode: false,
   isAutoMode: false,
-  lastInteraction: 'none' as const,
-  modeHistory: ['keyboard' as const],
+  lastInteraction: 'none' as 'none' | 'keyboard' | 'mouse',
+  modeHistory: ['keyboard'] as ('keyboard' | 'mouse' | 'hybrid' | 'auto')[],
   handleCtrlClick: vi.fn(),
   resetMode: vi.fn(),
   toggleMode: vi.fn()

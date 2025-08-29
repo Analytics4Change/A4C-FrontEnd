@@ -615,7 +615,7 @@ describe('FocusErrorLogger', () => {
   beforeEach(() => {
     logger = new FocusErrorLogger({
       enabled: true,
-      logLevel: 'debug',
+      logLevel: 'DEBUG',
       persistLogs: true
     });
   });

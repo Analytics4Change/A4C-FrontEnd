@@ -216,7 +216,7 @@ export const medicationEntryFlow: FocusFlow = {
     'side-effects': {
       condition: 'hasOtherSideEffects',
       truePath: 'other-side-effects-input',
-      falsePath: null,
+      falsePath: '',
       description: 'Navigate to other side effects input if "Other" is selected'
     },
     

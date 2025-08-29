@@ -83,7 +83,7 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
           }}
           disabled={isDisabled}
           aria-current={isToday ? 'date' : undefined}
-          aria-selected={isSelected}
+          aria-selected={isSelected || undefined}
           aria-label={`${date.toLocaleDateString('en-US', { 
             weekday: 'long', 
             year: 'numeric', 
@@ -171,7 +171,7 @@ export const CalendarPicker: React.FC<CalendarPickerProps> = ({
     
     if (targetDate && gridRef.current) {
       const day = targetDate.getDate();
-      const button = gridRef.current.querySelector(`button[aria-label*="${day}"]`) as HTMLElement;
+      const button = gridRef.current.querySelector(`button[aria-label*="${day}"]`) as HTMLButtonElement;
       if (button && !button.disabled) {
         requestAnimationFrame(() => button.focus());
       }
