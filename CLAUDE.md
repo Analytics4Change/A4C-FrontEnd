@@ -56,3 +56,12 @@ Since this is a fresh project, ensure to:
 - For exact code syntax use the context7 mcp server
 - For UI / UX testing use the playwright mcp server
 - Focus traps should always respect tabIndex order
+- Acceptible uses for setTimeout():
+```
+  - Debouncing/Throttling - Delaying API calls while user types
+  - Animations/Transitions - Coordinating with CSS transitions
+  - Polling/Intervals - Checking for updates periodically
+  - User feedback delays - Show a message for 3 seconds then hide
+  - Third-party library workarounds - When you genuinely need to wait for external code
+```
+Otherwise strongly consider using the autoFocus attribute
