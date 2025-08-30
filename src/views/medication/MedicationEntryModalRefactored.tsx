@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useViewModel } from '@/hooks/useViewModel';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
+import { useScrollToElement } from '@/hooks/useScrollToElement';
 import { MedicationEntryViewModel } from '@/viewModels/medication/MedicationEntryViewModel';
 import { DosageFormCategory } from '@/types/models/Dosage';
 // Use simplified versions without FocusableField wrappers
@@ -27,6 +28,9 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
   const contentRef = useRef<HTMLDivElement>(null);
   const { scrollToCenter, scrollWhenVisible } = useAutoScroll(contentRef);
   
+  // Use abstracted scroll timing logic
+  const handleScrollToElement = useScrollToElement(scrollWhenVisible);
+  
   // State to control when dosage fields are shown (after Continue is clicked)
   const [showDosageFields, setShowDosageFields] = useState(false);
   
@@ -37,13 +41,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
   const handleContinue = () => {
     if (vm.selectedMedication) {
       setShowDosageFields(true);
-      // Focus the first dosage form field after navigation
-      setTimeout(() => {
-        const dosageCategoryButton = document.getElementById('dosage-category-button');
-        if (dosageCategoryButton) {
-          dosageCategoryButton.focus();
-        }
-      }, 100);
+      // Focus will be handled by useEffect to avoid setTimeout
     }
   };
 
@@ -71,24 +69,42 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
     }
   };
 
+  // Track when medication is selected for focus management
+  const [shouldFocusContinue, setShouldFocusContinue] = useState(false);
+  
   // Handle medication selection
   const handleMedicationSelect = (medication: any) => {
     vm.selectMedication(medication);
     setCompletedFields(prev => new Set([...prev, 'medication']));
-    
-    // Focus the Continue button after medication selection
-    setTimeout(() => {
-      const continueButton = document.getElementById('medication-continue-button');
-      if (continueButton) {
-        continueButton.focus();
-      }
-    }, 0);
+    // Trigger focus in useEffect instead of setTimeout
+    setShouldFocusContinue(true);
   };
 
   // Handle field completions
   const handleFieldComplete = (fieldId: string) => {
     setCompletedFields(prev => new Set([...prev, fieldId]));
   };
+
+  // Focus management for Continue button after medication selection
+  useEffect(() => {
+    if (shouldFocusContinue && vm.selectedMedication && !showDosageFields) {
+      const continueButton = document.getElementById('medication-continue-button');
+      if (continueButton) {
+        continueButton.focus();
+        setShouldFocusContinue(false);
+      }
+    }
+  }, [shouldFocusContinue, vm.selectedMedication, showDosageFields]);
+
+  // Focus management for dosage category input after clicking Continue
+  useEffect(() => {
+    if (showDosageFields) {
+      const dosageCategoryInput = document.getElementById('dosage-category');
+      if (dosageCategoryInput) {
+        dosageCategoryInput.focus();
+      }
+    }
+  }, [showDosageFields]);
 
   // Handle escape key to close modal and implement focus trap
   useEffect(() => {
@@ -201,19 +217,18 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
               }}
               onFieldComplete={() => handleFieldComplete('medication-search')}
               onDropdownOpen={(elementId) => {
-                setTimeout(() => {
-                  const element = document.getElementById(elementId);
-                  if (element) {
-                    scrollWhenVisible(element, { behavior: 'smooth' });
-                  }
-                }, 100);
+                handleScrollToElement(elementId);
               }}
             />
           </div>
 
           {/* Dosage Form - Show after Continue button is clicked */}
           {showDosageFields && vm.selectedMedication && (
-            <>
+            <div 
+              className={`transition-all duration-300 ease-in-out ${
+                showDosageFields ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+              }`}
+            >
               <div data-flow-node="true">
                 <DosageForm
                   dosageFormCategory={vm.dosageFormCategory}
@@ -267,12 +282,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
                     handleFieldComplete('condition');
                   }}
                   onDropdownOpen={(elementId) => {
-                    setTimeout(() => {
-                      const element = document.getElementById(elementId);
-                      if (element) {
-                        scrollWhenVisible(element, { behavior: 'smooth' });
-                      }
-                    }, 100);
+                    handleScrollToElement(elementId);
                   }}
                 />
               </div>
@@ -321,16 +331,11 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
                   onToggleDiscontinueDateCalendar={() => vm.showDiscontinueDateCalendar = !vm.showDiscontinueDateCalendar}
                   error={vm.errors.get('discontinueDate')}
                   onCalendarOpen={(elementId) => {
-                    setTimeout(() => {
-                      const element = document.getElementById(elementId);
-                      if (element) {
-                        scrollWhenVisible(element, { behavior: 'smooth' });
-                      }
-                    }, 100);
+                    handleScrollToElement(elementId);
                   }}
                 />
               </div>
-            </>
+            </div>
           )}
         </div>
 

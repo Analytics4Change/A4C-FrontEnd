@@ -3,6 +3,8 @@ import { Check, ChevronDown, X, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { useSearchDebounce } from '@/hooks/useDebounce';
+import { TIMINGS } from '@/config/timings';
 
 interface MedicationSearchProps {
   value: string;
@@ -36,31 +38,28 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listItemRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Update local value when prop changes
   useEffect(() => {
     setLocalValue(value || '');
   }, [value]);
 
-  // Handle search with debouncing
+  // Use the search debounce hook for medication search
+  const { handleSearchChange } = useSearchDebounce(
+    (searchValue: string) => {
+      onSearch(searchValue);
+      if (onDropdownOpen) {
+        onDropdownOpen('medication-dropdown');
+      }
+    },
+    2, // minLength
+    TIMINGS.debounce.search // use centralized search timing
+  );
+
+  // Handle search input changes
   const handleSearch = (searchValue: string) => {
     setLocalValue(searchValue);
-    
-    // Clear previous timeout
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-    
-    // Debounce search
-    searchTimeoutRef.current = setTimeout(() => {
-      if (searchValue.length >= 2) {
-        onSearch(searchValue);
-        if (onDropdownOpen) {
-          onDropdownOpen('medication-dropdown');
-        }
-      }
-    }, 300);
+    handleSearchChange(searchValue);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -177,25 +176,17 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
     };
 
     if (showDropdown && searchResults.length > 0) {
-      // Add a small delay to avoid immediate triggering
-      setTimeout(() => {
+      // Use centralized timing for click-outside setup delay
+      const timeoutId = setTimeout(() => {
         document.addEventListener('mousedown', handleClickOutside);
-      }, 0);
+      }, TIMINGS.eventSetup.clickOutsideDelay);
       
       return () => {
+        clearTimeout(timeoutId);
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }
   }, [showDropdown, searchResults.length, onSearch]);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className="space-y-3">

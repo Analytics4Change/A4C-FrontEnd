@@ -3,6 +3,7 @@ import { ChevronDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AutocompleteDropdown } from '@/components/ui/autocomplete-dropdown';
+import { useDropdownBlur } from '@/hooks/useDropdownBlur';
 interface TotalAmountInputsProps {
   totalAmount: string;
   totalUnit: string;
@@ -25,6 +26,9 @@ export const TotalAmountInputs: React.FC<TotalAmountInputsProps> = ({
   const [totalUnitInput, setTotalUnitInput] = useState('');
   const [showTotalUnitDropdown, setShowTotalUnitDropdown] = useState(false);
   const totalUnitInputContainerRef = useRef<HTMLDivElement>(null);
+
+  // Dropdown blur handler using abstracted timing logic
+  const handleTotalUnitBlur = useDropdownBlur(setShowTotalUnitDropdown);
 
   const filteredTotalUnits = availableTotalUnits;
   const isTotalUnitHighlighted = (unit: string) => {
@@ -77,7 +81,7 @@ export const TotalAmountInputs: React.FC<TotalAmountInputsProps> = ({
               }
             }}
             onFocus={() => !totalUnit && setShowTotalUnitDropdown(true)}
-            onBlur={() => setTimeout(() => setShowTotalUnitDropdown(false), 200)}
+            onBlur={handleTotalUnitBlur}
             placeholder="Select total unit..."
             className={`pr-10 ${totalUnit ? 'border-blue-500 bg-blue-50' : ''} ${errors.get('totalUnit') ? 'border-red-500' : ''}`}
             disabled={!!totalUnit}

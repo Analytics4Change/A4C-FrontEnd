@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AutocompleteDropdown } from '@/components/ui/autocomplete-dropdown';
 import { dosageFormCategories } from '@/mocks/data/dosages.mock';
+import { useDropdownBlur } from '@/hooks/useDropdownBlur';
 
 interface DosageFormInputsProps {
   dosageFormCategory: string;
@@ -44,6 +45,11 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
   const categoryInputContainerRef = useRef<HTMLDivElement>(null);
   const formTypeInputContainerRef = useRef<HTMLDivElement>(null);
   const unitInputContainerRef = useRef<HTMLDivElement>(null);
+
+  // Dropdown blur handlers using abstracted timing logic
+  const handleCategoryBlur = useDropdownBlur(setShowCategoryDropdown);
+  const handleFormTypeBlur = useDropdownBlur(setShowFormTypeDropdown);
+  const handleUnitBlur = useDropdownBlur(setShowUnitDropdown);
 
   const filteredCategories = dosageFormCategories.filter(cat => 
     cat.toLowerCase().includes(categoryInput.toLowerCase())
@@ -92,7 +98,7 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
                 }
               }}
               onFocus={() => !dosageFormCategory && setShowCategoryDropdown(true)}
-              onBlur={() => setTimeout(() => setShowCategoryDropdown(false), 200)}
+              onBlur={handleCategoryBlur}
               placeholder="Select dosage form..."
               className={`pr-10 ${dosageFormCategory ? 'border-blue-500 bg-blue-50' : ''} ${errors.get('dosageFormCategory') ? 'border-red-500' : ''}`}
               disabled={!!dosageFormCategory}
@@ -164,7 +170,7 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
                 }
               }}
               onFocus={() => !dosageFormType && setShowFormTypeDropdown(true)}
-              onBlur={() => setTimeout(() => setShowFormTypeDropdown(false), 200)}
+              onBlur={handleFormTypeBlur}
               placeholder="Select type..."
               className={`pr-10 ${dosageFormType ? 'border-blue-500 bg-blue-50' : ''} ${errors.get('dosageFormType') ? 'border-red-500' : ''}`}
               disabled={!dosageFormCategory || !!dosageFormType}
@@ -263,7 +269,7 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
                 }
               }}
               onFocus={() => !dosageUnit && setShowUnitDropdown(true)}
-              onBlur={() => setTimeout(() => setShowUnitDropdown(false), 200)}
+              onBlur={handleUnitBlur}
               placeholder="Select unit..."
               className={`pr-10 ${dosageUnit ? 'border-blue-500 bg-blue-50' : ''} ${errors.get('dosageUnit') ? 'border-red-500' : ''}`}
               disabled={!dosageFormType || !!dosageUnit}

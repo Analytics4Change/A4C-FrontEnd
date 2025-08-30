@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AutocompleteDropdown } from '@/components/ui/autocomplete-dropdown';
 import { dosageFrequencies, dosageConditions } from '@/mocks/data/dosages.mock';
+import { useDropdownBlur } from '@/hooks/useDropdownBlur';
 
 interface FrequencyConditionInputsProps {
   frequency: string;
@@ -29,6 +30,10 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
 
   const frequencyInputContainerRef = useRef<HTMLDivElement>(null);
   const conditionInputContainerRef = useRef<HTMLDivElement>(null);
+
+  // Dropdown blur handlers using abstracted timing logic
+  const handleFrequencyBlur = useDropdownBlur(setShowFrequencyDropdown);
+  const handleConditionBlur = useDropdownBlur(setShowConditionDropdown);
 
   const filteredFrequencies = dosageFrequencies;
   const isFrequencyHighlighted = (freq: string) => {
@@ -63,7 +68,7 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
               }
             }}
             onFocus={() => !frequency && setShowFrequencyDropdown(true)}
-            onBlur={() => setTimeout(() => setShowFrequencyDropdown(false), 200)}
+            onBlur={handleFrequencyBlur}
             placeholder="Select frequency..."
             className={`pr-10 ${frequency ? 'border-blue-500 bg-blue-50' : ''} ${errors.get('frequency') ? 'border-red-500' : ''}`}
             disabled={!!frequency}
@@ -135,7 +140,7 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
               }
             }}
             onFocus={() => !condition && setShowConditionDropdown(true)}
-            onBlur={() => setTimeout(() => setShowConditionDropdown(false), 200)}
+            onBlur={handleConditionBlur}
             placeholder="Select condition..."
             className={`pr-10 ${condition ? 'border-blue-500 bg-blue-50' : ''}`}
             disabled={!!condition}
