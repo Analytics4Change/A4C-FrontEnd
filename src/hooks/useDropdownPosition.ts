@@ -23,11 +23,13 @@ export function useDropdownPosition(
       if (!inputRef.current) return;
       
       const rect = inputRef.current.getBoundingClientRect();
-      setPosition({
-        top: rect.bottom + window.scrollY,
-        left: rect.left + window.scrollX,
+      const newPosition = {
+        top: rect.bottom,
+        left: rect.left,
         width: rect.width
-      });
+      };
+      
+      setPosition(newPosition);
     };
 
     // Initial position calculation

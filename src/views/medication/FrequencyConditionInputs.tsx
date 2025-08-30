@@ -2,9 +2,11 @@ import React, { useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AutocompleteDropdown } from '@/components/ui/autocomplete-dropdown';
+import { AutocompleteDropdown, SelectionMethod } from '@/components/ui/autocomplete-dropdown';
 import { dosageFrequencies, dosageConditions } from '@/mocks/data/dosages.mock';
 import { useDropdownBlur } from '@/hooks/useDropdownBlur';
+import { filterStringItems, isItemHighlighted } from '@/utils/dropdown-filter';
+import { focusByTabIndex } from '@/utils/focus-management';
 
 interface FrequencyConditionInputsProps {
   frequency: string;
@@ -28,24 +30,21 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
   const [showFrequencyDropdown, setShowFrequencyDropdown] = useState(false);
   const [showConditionDropdown, setShowConditionDropdown] = useState(false);
 
-  const frequencyInputContainerRef = useRef<HTMLDivElement>(null);
-  const conditionInputContainerRef = useRef<HTMLDivElement>(null);
+  const frequencyInputRef = useRef<HTMLInputElement>(null);
+  const conditionInputRef = useRef<HTMLInputElement>(null);
 
   // Dropdown blur handlers using abstracted timing logic
   const handleFrequencyBlur = useDropdownBlur(setShowFrequencyDropdown);
   const handleConditionBlur = useDropdownBlur(setShowConditionDropdown);
 
-  const filteredFrequencies = dosageFrequencies;
-  const isFrequencyHighlighted = (freq: string) => {
-    if (!frequencyInput) return false;
-    return freq.toLowerCase().startsWith(frequencyInput.toLowerCase());
-  };
+  // Use generic filtering utilities
+  const filteredFrequencies = filterStringItems(dosageFrequencies, frequencyInput, 'contains');
+  const isFrequencyHighlighted = (freq: string) => 
+    isItemHighlighted(freq, frequencyInput, 'startsWith');
 
-  const filteredConditions = dosageConditions;
-  const isConditionHighlighted = (cond: string) => {
-    if (!conditionInput) return false;
-    return cond.toLowerCase().startsWith(conditionInput.toLowerCase());
-  };
+  const filteredConditions = filterStringItems(dosageConditions, conditionInput, 'contains');
+  const isConditionHighlighted = (cond: string) => 
+    isItemHighlighted(cond, conditionInput, 'startsWith');
 
   return (
     <div className="grid grid-cols-2 gap-6">
@@ -54,8 +53,9 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
         <Label htmlFor="dosage-frequency" className="text-base font-medium">
           Frequency
         </Label>
-        <div ref={frequencyInputContainerRef} id="frequency-container" className="relative mt-2">
+        <div id="frequency-container" className="relative mt-2">
           <Input
+            ref={frequencyInputRef}
             id="dosage-frequency"
             data-testid="dosage-frequency-input"
             type="text"
@@ -82,7 +82,7 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
             onClick={() => {
               if (!frequency) {
                 setShowFrequencyDropdown(true);
-                frequencyInputContainerRef.current?.querySelector('input')?.focus();
+                frequencyInputRef.current?.focus();
                 onDropdownOpen?.('frequency-container');
               }
             }}
@@ -97,11 +97,18 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
         <AutocompleteDropdown
           isOpen={showFrequencyDropdown && !frequency}
           items={filteredFrequencies}
-          inputRef={frequencyInputContainerRef}
-          onSelect={(freq) => {
+          inputRef={frequencyInputRef}
+          onSelect={(freq, method) => {
             onFrequencyChange(freq);
             setFrequencyInput(freq);
             setShowFrequencyDropdown(false);
+            
+            // Focus management based on selection method
+            if (method === 'keyboard') {
+              // Move to Condition input (tabIndex 15)
+              setTimeout(() => focusByTabIndex(15), 50);
+            }
+            // For mouse selection, focus stays on current input
           }}
           getItemKey={(freq) => freq}
           isItemHighlighted={isFrequencyHighlighted}
@@ -126,8 +133,9 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
         <Label htmlFor="dosage-condition" className="text-base font-medium">
           Condition
         </Label>
-        <div ref={conditionInputContainerRef} id="condition-container" className="relative mt-2">
+        <div id="condition-container" className="relative mt-2">
           <Input
+            ref={conditionInputRef}
             id="dosage-condition"
             data-testid="dosage-condition-input"
             type="text"
@@ -153,7 +161,7 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
             onClick={() => {
               if (!condition) {
                 setShowConditionDropdown(true);
-                conditionInputContainerRef.current?.querySelector('input')?.focus();
+                conditionInputRef.current?.focus();
                 onDropdownOpen?.('condition-container');
               }
             }}
@@ -168,11 +176,18 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
         <AutocompleteDropdown
           isOpen={showConditionDropdown && !condition}
           items={filteredConditions}
-          inputRef={conditionInputContainerRef}
-          onSelect={(cond) => {
+          inputRef={conditionInputRef}
+          onSelect={(cond, method) => {
             onConditionChange(cond);
             setConditionInput(cond);
             setShowConditionDropdown(false);
+            
+            // Focus management based on selection method
+            if (method === 'keyboard') {
+              // Move to Broad Categories button (tabIndex 17)
+              setTimeout(() => focusByTabIndex(17), 50);
+            }
+            // For mouse selection, focus stays on current input
           }}
           getItemKey={(cond) => cond}
           isItemHighlighted={isConditionHighlighted}

@@ -78,7 +78,8 @@
       "Bash(echo:*)",
       "Bash(echo \"performance-verification: $?\")",
       "WebSearch",
-      "Bash(npm run typecheck:*)"
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run test:e2e:*)"
     ],
     "deny": [],
     "additionalDirectories": [

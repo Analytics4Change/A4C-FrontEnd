@@ -222,7 +222,7 @@ export const MedicationSearch: React.FC<MedicationSearchProps> = ({
               size="sm"
               onClick={onClear}
               aria-label="Clear medication selection"
-              tabIndex={1}
+              tabIndex={2}
             >
               <X size={16} />
             </Button>

@@ -18,13 +18,17 @@ test.describe('Medication Form Tab Order', () => {
     const addMedicationButton = page.locator('button:has-text("Add Medication")').first();
     if (await addMedicationButton.isVisible()) {
       await addMedicationButton.click();
+      
+      // Wait for medication type dropdown and click Prescribed Medication
+      await page.waitForSelector('[data-testid="prescribed-medication-button"]', { state: 'visible' });
+      await page.click('[data-testid="prescribed-medication-button"]');
     }
     
     // Wait for medication modal to be visible
-    await page.waitForSelector('[data-testid="medication-entry-modal"]', { state: 'visible' });
+    await page.waitForSelector('[data-modal-id="add-new-prescribed-medication"]', { state: 'visible' });
     
-    // Type in medication search
-    const medicationInput = page.locator('#medication-search');
+    // Type in medication search - use input element specifically
+    const medicationInput = page.locator('input#medication-search');
     await medicationInput.fill('Lorazepam');
     
     // Wait for search results
@@ -151,13 +155,17 @@ test.describe('Medication Form Tab Order', () => {
     const addMedicationButton = page.locator('button:has-text("Add Medication")').first();
     if (await addMedicationButton.isVisible()) {
       await addMedicationButton.click();
+      
+      // Wait for medication type dropdown and click Prescribed Medication
+      await page.waitForSelector('[data-testid="prescribed-medication-button"]', { state: 'visible' });
+      await page.click('[data-testid="prescribed-medication-button"]');
     }
     
     // Wait for modal
-    await page.waitForSelector('[data-testid="medication-entry-modal"]', { state: 'visible' });
+    await page.waitForSelector('[data-modal-id="add-new-prescribed-medication"]', { state: 'visible' });
     
-    // Select a medication
-    const medicationInput = page.locator('#medication-search');
+    // Select a medication - use input element specifically
+    const medicationInput = page.locator('input#medication-search');
     await medicationInput.fill('Lorazepam');
     await page.waitForTimeout(1000);
     

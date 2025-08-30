@@ -166,8 +166,8 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
   return (
     <div 
       className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-40"
-      data-testid="medication-entry-modal"
-      data-modal-id="medication-entry"
+      data-testid="add-new-prescribed-medication-modal"
+      data-modal-id="add-new-prescribed-medication"
       role="dialog"
       aria-modal="true"
       aria-labelledby="medication-modal-title"
@@ -188,7 +188,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
             className="rounded-full min-w-[44px] min-h-[44px]"
             data-testid="medication-modal-close"
             aria-label="Close medication modal"
-            tabIndex={2}
+            tabIndex={showDosageFields ? 23 : 3}
           >
             <X size={24} />
           </Button>
@@ -346,7 +346,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
               variant="outline"
               onClick={onClose}
               className="min-w-[100px]"
-              tabIndex={3}
+              tabIndex={showDosageFields ? 24 : 4}
             >
               Cancel
             </Button>
@@ -360,7 +360,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
                 disabled={!vm.selectedMedication}
                 className="min-w-[100px]"
                 data-testid="medication-continue-button"
-                tabIndex={vm.selectedMedication ? 4 : -1}
+                tabIndex={vm.selectedMedication ? 5 : -1}
               >
                 Continue
               </Button>
@@ -372,7 +372,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
                 disabled={!isFormComplete() || vm.isLoading}
                 className="min-w-[100px]"
                 data-testid="medication-save-button"
-                tabIndex={4}
+                tabIndex={25}
               >
                 {vm.isLoading ? 'Saving...' : 'Save'}
               </Button>

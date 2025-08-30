@@ -24,7 +24,7 @@ The `data-modal-id` attribute serves as a crucial testing identifier pattern thr
 
 ```typescript
 // Component implementation pattern
-<div data-modal-id="medication-entry">
+<div data-modal-id="add-new-prescribed-medication">
   <div data-modal-id="medication-search-results">
     {/* Modal content */}
   </div>
@@ -50,7 +50,7 @@ The pattern is implemented in key components throughout the application:
 ```typescript
 // src/views/medication/MedicationEntryModalRefactored.tsx
 <div
-  data-modal-id="medication-entry"
+  data-modal-id="add-new-prescribed-medication"
   className="modal-container"
 >
   {/* Modal content */}
@@ -163,7 +163,7 @@ test('Modal identification and interaction', async ({ page }) => {
   await helper.openMedicationModal();
   
   // Test primary modal
-  await expect(page.locator('[data-modal-id="medication-entry"]')).toBeVisible();
+  await expect(page.locator('[data-modal-id="add-new-prescribed-medication"]')).toBeVisible();
   
   // Test nested modal interactions
   await helper.searchMedication('Aspirin');
@@ -183,7 +183,7 @@ test('Cross-browser modal functionality', async ({ page, browserName }) => {
   await helper.openMedicationModal();
   
   // Browser-specific modal behavior
-  const modal = page.locator('[data-modal-id="medication-entry"]');
+  const modal = page.locator('[data-modal-id="add-new-prescribed-medication"]');
   await expect(modal).toBeVisible();
   
   if (browserName === 'webkit') {
@@ -227,7 +227,7 @@ test('Basic modal interaction flow', async ({ page }) => {
   
   // Modal opening
   await helper.openMedicationModal();
-  await expect(page.locator('[data-modal-id="medication-entry"]')).toBeVisible();
+  await expect(page.locator('[data-modal-id="add-new-prescribed-medication"]')).toBeVisible();
   
   // Form interaction
   await helper.searchMedication('Lorazepam');
@@ -250,7 +250,7 @@ test('Modal accessibility compliance', async ({ page }) => {
   await helper.openMedicationModal();
   
   // ARIA compliance checks
-  const modal = page.locator('[data-modal-id="medication-entry"]');
+  const modal = page.locator('[data-modal-id="add-new-prescribed-medication"]');
   await expect(modal).toHaveAttribute('role', 'dialog');
   await expect(modal).toHaveAttribute('aria-modal', 'true');
   

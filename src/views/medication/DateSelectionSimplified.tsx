@@ -72,6 +72,7 @@ export const DateSelection: React.FC<DateSelectionProps> = ({
             className="cursor-pointer"
             aria-label="Start date"
             aria-describedby="start-date-format"
+            tabIndex={19}
           />
         </div>
         <span id="start-date-format" className="text-xs text-gray-500">
@@ -98,6 +99,7 @@ export const DateSelection: React.FC<DateSelectionProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={onToggleStartDateCalendar}
+                tabIndex={20}
               >
                 Cancel
               </Button>
@@ -126,6 +128,7 @@ export const DateSelection: React.FC<DateSelectionProps> = ({
             aria-label="Discontinue date"
             aria-describedby={error ? 'discontinue-date-error' : 'discontinue-date-format'}
             aria-invalid={!!error}
+            tabIndex={21}
           />
         </div>
         
@@ -161,6 +164,7 @@ export const DateSelection: React.FC<DateSelectionProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={onToggleDiscontinueDateCalendar}
+                tabIndex={22}
               >
                 Cancel
               </Button>

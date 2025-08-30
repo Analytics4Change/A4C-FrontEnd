@@ -78,7 +78,7 @@ function App() {
     if (showMedicationTypeSelection) {
       const handleClickOutside = (e: MouseEvent) => {
         const target = e.target as HTMLElement;
-        if (!target.closest('[data-testid="medication-type-dropdown"]')) {
+        if (!target.closest('[data-testid="select-medication-type-dropdown"]')) {
           setShowMedicationTypeSelection(false);
         }
       };
@@ -128,7 +128,8 @@ function App() {
                   role="menu"
                   aria-labelledby="add-medication-button"
                   aria-orientation="vertical"
-                  data-testid="medication-type-dropdown"
+                  data-testid="select-medication-type-dropdown"
+                  data-modal-id="select-medication-type"
                   onKeyDown={handleKeyDown}
                 >
                   <Card className="shadow-lg border">

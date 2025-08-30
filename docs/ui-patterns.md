@@ -33,7 +33,7 @@ Medication Entry Modal (Primary Focus Container)
 
 ```mermaid
 graph TD
-    A[Main Application] --> B["Medication Entry Modal<br/>(data-modal-id='medication-entry')"]
+    A[Main Application] --> B["Medication Entry Modal<br/>(data-modal-id='add-new-prescribed-medication')"]
     
     B --> C[Medication Search Section]
     B --> D[Dosage Form Section]
@@ -350,7 +350,7 @@ The application maintains **WCAG 2.1 AA** compliance through:
   aria-modal="true"
   aria-labelledby="modal-title"
   aria-describedby="modal-description"
-  data-modal-id="medication-entry"
+  data-modal-id="add-new-prescribed-medication"
 >
   <h2 id="modal-title">Add New Prescribed Medication</h2>
   <p id="modal-description">

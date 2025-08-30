@@ -38,13 +38,13 @@ test.describe('Medication Entry Flow', () => {
     await page.click('[data-testid="add-medication-button"]');
     
     // Wait for medication type selection modal
-    await page.waitForSelector('[data-testid="medication-type-modal"]', { timeout: 5000 });
+    await page.waitForSelector('[data-modal-id="select-medication-type"]', { timeout: 5000 });
     
     // Click Prescribed Medication
     await page.click('[data-testid="prescribed-medication-button"]');
     
     // Wait for medication entry modal to appear
-    await page.waitForSelector('[data-testid="medication-entry-modal"]', { timeout: 5000 });
+    await page.waitForSelector('[data-modal-id="add-new-prescribed-medication"]', { timeout: 5000 });
     
     // Verify modal opened without errors
     await expect(page.getByText('Add New Prescribed Medication')).toBeVisible();

@@ -2,9 +2,11 @@ import React, { useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AutocompleteDropdown } from '@/components/ui/autocomplete-dropdown';
+import { AutocompleteDropdown, SelectionMethod } from '@/components/ui/autocomplete-dropdown';
 import { dosageFormCategories } from '@/mocks/data/dosages.mock';
 import { useDropdownBlur } from '@/hooks/useDropdownBlur';
+import { filterStringItems, isItemHighlighted } from '@/utils/dropdown-filter';
+import { focusByTabIndex } from '@/utils/focus-management';
 
 interface DosageFormInputsProps {
   dosageFormCategory: string;
@@ -42,38 +44,29 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
   const [showFormTypeDropdown, setShowFormTypeDropdown] = useState(false);
   const [showUnitDropdown, setShowUnitDropdown] = useState(false);
 
-  const categoryInputContainerRef = useRef<HTMLDivElement>(null);
-  const formTypeInputContainerRef = useRef<HTMLDivElement>(null);
-  const unitInputContainerRef = useRef<HTMLDivElement>(null);
+  const categoryInputRef = useRef<HTMLInputElement>(null);
+  const formTypeInputRef = useRef<HTMLInputElement>(null);
+  const unitInputRef = useRef<HTMLInputElement>(null);
 
   // Dropdown blur handlers using abstracted timing logic
   const handleCategoryBlur = useDropdownBlur(setShowCategoryDropdown);
   const handleFormTypeBlur = useDropdownBlur(setShowFormTypeDropdown);
   const handleUnitBlur = useDropdownBlur(setShowUnitDropdown);
 
-  const filteredCategories = dosageFormCategories.filter(cat => 
-    cat.toLowerCase().includes(categoryInput.toLowerCase())
-  );
+  // Use generic filtering utilities
+  const filteredCategories = filterStringItems(dosageFormCategories, categoryInput, 'contains');
+  const filteredFormTypes = filterStringItems(availableFormTypes, formTypeInput, 'contains');
+  const filteredUnits = filterStringItems(availableUnits, unitInput, 'contains');
   
-  const isCategoryHighlighted = (category: string) => {
-    if (!categoryInput) return false;
-    return category.toLowerCase().startsWith(categoryInput.toLowerCase());
-  };
-
-  const filteredFormTypes = availableFormTypes.filter(type =>
-    type.toLowerCase().includes(formTypeInput.toLowerCase())
-  );
+  // Highlighting functions using the utility
+  const isCategoryHighlighted = (category: string) => 
+    isItemHighlighted(category, categoryInput, 'startsWith');
   
-  const isFormTypeHighlighted = (formType: string) => {
-    if (!formTypeInput) return false;
-    return formType.toLowerCase().startsWith(formTypeInput.toLowerCase());
-  };
-
-  const filteredUnits = availableUnits;
-  const isUnitHighlighted = (unit: string) => {
-    if (!unitInput) return false;
-    return unit.toLowerCase().startsWith(unitInput.toLowerCase());
-  };
+  const isFormTypeHighlighted = (formType: string) => 
+    isItemHighlighted(formType, formTypeInput, 'startsWith');
+  
+  const isUnitHighlighted = (unit: string) => 
+    isItemHighlighted(unit, unitInput, 'startsWith');
 
   return (
     <>
@@ -84,8 +77,9 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
           <Label htmlFor="dosage-category" className="text-base font-medium">
             Dosage Form
           </Label>
-          <div ref={categoryInputContainerRef} id="dosage-category-container" className="relative mt-2">
+          <div id="dosage-category-container" className="relative mt-2">
             <Input
+              ref={categoryInputRef}
               id="dosage-category"
               data-testid="dosage-category-input"
               type="text"
@@ -112,7 +106,7 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
               onClick={() => {
                 if (!dosageFormCategory) {
                   setShowCategoryDropdown(true);
-                  categoryInputContainerRef.current?.querySelector('input')?.focus();
+                  categoryInputRef.current?.focus();
                   onDropdownOpen?.('dosage-category-container');
                 }
               }}
@@ -127,11 +121,18 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
           <AutocompleteDropdown
             isOpen={showCategoryDropdown && !dosageFormCategory}
             items={filteredCategories}
-            inputRef={categoryInputContainerRef}
-            onSelect={(category) => {
+            inputRef={categoryInputRef}
+            onSelect={(category, method) => {
               onCategoryChange(category);
               setCategoryInput(category);
               setShowCategoryDropdown(false);
+              
+              // Focus management based on selection method
+              if (method === 'keyboard') {
+                // Move to Form Type input (tabIndex 5)
+                setTimeout(() => focusByTabIndex(5), 50);
+              }
+              // For mouse selection, focus stays on current input
             }}
             getItemKey={(category) => category}
             isItemHighlighted={isCategoryHighlighted}
@@ -156,8 +157,9 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
           <Label htmlFor="form-type" className="text-base font-medium">
             Type
           </Label>
-          <div ref={formTypeInputContainerRef} id="form-type-container" className="relative mt-2">
+          <div id="form-type-container" className="relative mt-2">
             <Input
+              ref={formTypeInputRef}
               id="form-type"
               data-testid="form-type-input"
               type="text"
@@ -184,7 +186,7 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
               onClick={() => {
                 if (dosageFormCategory && !dosageFormType) {
                   setShowFormTypeDropdown(true);
-                  formTypeInputContainerRef.current?.querySelector('input')?.focus();
+                  formTypeInputRef.current?.focus();
                   onDropdownOpen?.('form-type-container');
                 }
               }}
@@ -199,11 +201,18 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
           <AutocompleteDropdown
             isOpen={showFormTypeDropdown && !!dosageFormCategory && !dosageFormType}
             items={filteredFormTypes}
-            inputRef={formTypeInputContainerRef}
-            onSelect={(formType) => {
+            inputRef={formTypeInputRef}
+            onSelect={(formType, method) => {
               onFormTypeChange(formType);
               setFormTypeInput(formType);
               setShowFormTypeDropdown(false);
+              
+              // Focus management based on selection method
+              if (method === 'keyboard') {
+                // Move to Dosage Amount input (tabIndex 7)
+                setTimeout(() => focusByTabIndex(7), 50);
+              }
+              // For mouse selection, focus stays on current input
             }}
             getItemKey={(formType) => formType}
             isItemHighlighted={isFormTypeHighlighted}
@@ -255,8 +264,9 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
           <Label htmlFor="dosage-unit" className="text-base font-medium">
             Unit
           </Label>
-          <div ref={unitInputContainerRef} id="dosage-unit-container" className="relative mt-2">
+          <div id="dosage-unit-container" className="relative mt-2">
             <Input
+              ref={unitInputRef}
               id="dosage-unit"
               data-testid="dosage-unit-input"
               type="text"
@@ -283,7 +293,7 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
               onClick={() => {
                 if (dosageFormType && !dosageUnit) {
                   setShowUnitDropdown(true);
-                  unitInputContainerRef.current?.querySelector('input')?.focus();
+                  unitInputRef.current?.focus();
                   onDropdownOpen?.('dosage-unit-container');
                 }
               }}
@@ -298,11 +308,18 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
           <AutocompleteDropdown
             isOpen={showUnitDropdown && !!dosageFormType && !dosageUnit}
             items={filteredUnits}
-            inputRef={unitInputContainerRef}
-            onSelect={(unit) => {
+            inputRef={unitInputRef}
+            onSelect={(unit, method) => {
               onUnitChange(unit);
               setUnitInput(unit);
               setShowUnitDropdown(false);
+              
+              // Focus management based on selection method
+              if (method === 'keyboard') {
+                // Move to Total Amount input (tabIndex 10)
+                setTimeout(() => focusByTabIndex(10), 50);
+              }
+              // For mouse selection, focus stays on current input
             }}
             getItemKey={(unit) => unit}
             isItemHighlighted={(unit) => isUnitHighlighted(unit)}

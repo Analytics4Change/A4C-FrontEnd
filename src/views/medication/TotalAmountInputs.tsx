@@ -2,8 +2,10 @@ import React, { useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AutocompleteDropdown } from '@/components/ui/autocomplete-dropdown';
+import { AutocompleteDropdown, SelectionMethod } from '@/components/ui/autocomplete-dropdown';
 import { useDropdownBlur } from '@/hooks/useDropdownBlur';
+import { filterStringItems, isItemHighlighted } from '@/utils/dropdown-filter';
+import { focusByTabIndex } from '@/utils/focus-management';
 interface TotalAmountInputsProps {
   totalAmount: string;
   totalUnit: string;
@@ -25,16 +27,15 @@ export const TotalAmountInputs: React.FC<TotalAmountInputsProps> = ({
 }) => {
   const [totalUnitInput, setTotalUnitInput] = useState('');
   const [showTotalUnitDropdown, setShowTotalUnitDropdown] = useState(false);
-  const totalUnitInputContainerRef = useRef<HTMLDivElement>(null);
+  const totalUnitInputRef = useRef<HTMLInputElement>(null);
 
   // Dropdown blur handler using abstracted timing logic
   const handleTotalUnitBlur = useDropdownBlur(setShowTotalUnitDropdown);
 
-  const filteredTotalUnits = availableTotalUnits;
-  const isTotalUnitHighlighted = (unit: string) => {
-    if (!totalUnitInput) return false;
-    return unit.toLowerCase().startsWith(totalUnitInput.toLowerCase());
-  };
+  // Use generic filtering utilities
+  const filteredTotalUnits = filterStringItems(availableTotalUnits, totalUnitInput, 'contains');
+  const isTotalUnitHighlighted = (unit: string) => 
+    isItemHighlighted(unit, totalUnitInput, 'startsWith');
 
   return (
     <div className="grid grid-cols-2 gap-6">
@@ -67,8 +68,9 @@ export const TotalAmountInputs: React.FC<TotalAmountInputsProps> = ({
         <Label htmlFor="total-unit" className="text-base font-medium">
           Total Unit
         </Label>
-        <div ref={totalUnitInputContainerRef} id="total-unit-container" className="relative mt-2">
+        <div id="total-unit-container" className="relative mt-2">
           <Input
+            ref={totalUnitInputRef}
             id="total-unit"
             data-testid="total-unit-input"
             type="text"
@@ -95,7 +97,7 @@ export const TotalAmountInputs: React.FC<TotalAmountInputsProps> = ({
             onClick={() => {
               if (!totalUnit) {
                 setShowTotalUnitDropdown(true);
-                totalUnitInputContainerRef.current?.querySelector('input')?.focus();
+                totalUnitInputRef.current?.focus();
                 onDropdownOpen?.('total-unit-container');
               }
             }}
@@ -110,11 +112,18 @@ export const TotalAmountInputs: React.FC<TotalAmountInputsProps> = ({
         <AutocompleteDropdown
           isOpen={showTotalUnitDropdown && !totalUnit}
           items={filteredTotalUnits}
-          inputRef={totalUnitInputContainerRef}
-          onSelect={(unit) => {
+          inputRef={totalUnitInputRef}
+          onSelect={(unit, method) => {
             onTotalUnitChange(unit);
             setTotalUnitInput(unit);
             setShowTotalUnitDropdown(false);
+            
+            // Focus management based on selection method
+            if (method === 'keyboard') {
+              // Move to Frequency input (tabIndex 13)
+              setTimeout(() => focusByTabIndex(13), 50);
+            }
+            // For mouse selection, focus stays on current input
           }}
           getItemKey={(unit) => unit}
           isItemHighlighted={(unit) => isTotalUnitHighlighted(unit)}

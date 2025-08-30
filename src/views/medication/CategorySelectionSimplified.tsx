@@ -58,6 +58,7 @@ export const CategorySelection: React.FC<CategorySelectionProps> = ({
           aria-expanded={showBroadCategories}
           aria-controls="broad-categories-list"
           aria-label={`Select medication categories. ${selectedBroadCategories.length} selected`}
+          tabIndex={17}
         >
           <span className="flex items-center gap-2">
             {selectedBroadCategories.length > 0 ? (
@@ -110,6 +111,7 @@ export const CategorySelection: React.FC<CategorySelectionProps> = ({
           aria-expanded={showSpecificCategories}
           aria-controls="specific-categories-list"
           aria-label={`Select usage categories. ${selectedSpecificCategories.length} selected`}
+          tabIndex={18}
         >
           <span className="flex items-center gap-2">
             {selectedSpecificCategories.length > 0 ? (
