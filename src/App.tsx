@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ClientSelector } from '@/views/client/ClientSelector';
 // Use the refactored modal with simplified focus
 import { MedicationEntryModal } from '@/views/medication/MedicationEntryModalRefactored';
@@ -13,13 +13,19 @@ function App() {
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [showMedicationModal, setShowMedicationModal] = useState(false);
   const [showMedicationTypeSelection, setShowMedicationTypeSelection] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(0);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleClientSelect = (clientId: string) => {
     setSelectedClientId(clientId);
   };
 
-  const handleAddMedication = () => {
-    setShowMedicationTypeSelection(true);
+  const handleAddMedication = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowMedicationTypeSelection(!showMedicationTypeSelection);
+    if (!showMedicationTypeSelection) {
+      setFocusedIndex(0); // Reset to first item when opening
+    }
   };
 
   const handleMedicationType = (type: string) => {
@@ -27,7 +33,60 @@ function App() {
       setShowMedicationModal(true);
       setShowMedicationTypeSelection(false);
     }
+    setShowMedicationTypeSelection(false);
   };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    const options = ['Prescribed Medication', 'Over-the-Counter', 'Supplement'];
+    
+    switch(e.key) {
+      case 'Escape':
+        e.preventDefault();
+        setShowMedicationTypeSelection(false);
+        document.getElementById('add-medication-button')?.focus();
+        break;
+        
+      case 'Tab':
+        e.preventDefault();
+        if (e.shiftKey) {
+          setFocusedIndex(prev => prev > 0 ? prev - 1 : 2);
+        } else {
+          setFocusedIndex(prev => prev < 2 ? prev + 1 : 0);
+        }
+        break;
+        
+      case 'ArrowDown':
+        e.preventDefault();
+        setFocusedIndex(prev => prev < 2 ? prev + 1 : 0);
+        break;
+        
+      case 'ArrowUp':
+        e.preventDefault();
+        setFocusedIndex(prev => prev > 0 ? prev - 1 : 2);
+        break;
+        
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        handleMedicationType(options[focusedIndex]);
+        break;
+    }
+  };
+
+  // Click outside handler
+  useEffect(() => {
+    if (showMedicationTypeSelection) {
+      const handleClickOutside = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        if (!target.closest('[data-testid="medication-type-dropdown"]')) {
+          setShowMedicationTypeSelection(false);
+        }
+      };
+      
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showMedicationTypeSelection]);
 
   return (
     <>
@@ -47,15 +106,101 @@ function App() {
               <Pill className="h-5 w-5" />
               Current Medications
             </CardTitle>
-            <CardAction>
+            <CardAction className="relative">
               <Button 
+                id="add-medication-button"
                 onClick={handleAddMedication}
                 data-testid="add-medication-button"
                 aria-label="Add new medication"
+                aria-expanded={showMedicationTypeSelection}
+                aria-haspopup="menu"
+                aria-controls="medication-type-menu"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Medication
               </Button>
+              
+              {showMedicationTypeSelection && (
+                <div 
+                  ref={dropdownRef}
+                  id="medication-type-menu"
+                  className="absolute top-full mt-2 right-0 z-50 min-w-[240px]"
+                  role="menu"
+                  aria-labelledby="add-medication-button"
+                  aria-orientation="vertical"
+                  data-testid="medication-type-dropdown"
+                  onKeyDown={handleKeyDown}
+                >
+                  <Card className="shadow-lg border">
+                    <CardContent className="p-1">
+                      <Button
+                        id="menu-item-prescribed"
+                        role="menuitem"
+                        variant="ghost"
+                        className={`w-full justify-start ${
+                          focusedIndex === 0 ? 'ring-2 ring-blue-500 ring-offset-1' : ''
+                        }`}
+                        onClick={() => handleMedicationType('Prescribed Medication')}
+                        data-testid="prescribed-medication-button"
+                        tabIndex={focusedIndex === 0 ? 0 : -1}
+                        ref={focusedIndex === 0 ? (el) => el?.focus() : undefined}
+                        aria-selected={focusedIndex === 0}
+                        aria-disabled="false"
+                        aria-label="Add prescribed medication"
+                      >
+                        <Pill className="h-4 w-4 mr-2" />
+                        Prescribed Medication
+                      </Button>
+                      
+                      <Button
+                        id="menu-item-otc"
+                        role="menuitem"
+                        variant="ghost"
+                        className={`w-full justify-start ${
+                          focusedIndex === 1 ? 'ring-2 ring-blue-500 ring-offset-1' : ''
+                        }`}
+                        onClick={() => handleMedicationType('Over-the-Counter')}
+                        data-testid="otc-medication-button"
+                        tabIndex={focusedIndex === 1 ? 0 : -1}
+                        ref={focusedIndex === 1 ? (el) => el?.focus() : undefined}
+                        aria-selected={focusedIndex === 1}
+                        aria-disabled="false"
+                        aria-label="Add over-the-counter medication"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Over-the-Counter Medication
+                      </Button>
+                      
+                      <Button
+                        id="menu-item-supplement"
+                        role="menuitem"
+                        variant="ghost"
+                        className={`w-full justify-start ${
+                          focusedIndex === 2 ? 'ring-2 ring-blue-500 ring-offset-1' : ''
+                        }`}
+                        onClick={() => handleMedicationType('Supplement')}
+                        data-testid="supplement-button"
+                        tabIndex={focusedIndex === 2 ? 0 : -1}
+                        ref={focusedIndex === 2 ? (el) => el?.focus() : undefined}
+                        aria-selected={focusedIndex === 2}
+                        aria-disabled="false"
+                        aria-label="Add dietary supplement"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Dietary Supplement
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+              
+              {/* Screen reader announcements */}
+              <div className="sr-only" aria-live="polite" aria-atomic="true">
+                {showMedicationTypeSelection && 
+                  `Medication type menu open. ${focusedIndex === 0 ? 'Prescribed Medication' : 
+                    focusedIndex === 1 ? 'Over-the-Counter Medication' : 
+                    'Dietary Supplement'} selected. Use arrow keys to navigate.`}
+              </div>
             </CardAction>
           </CardHeader>
           <CardContent>
@@ -65,62 +210,6 @@ function App() {
           </CardContent>
         </Card>
 
-        {showMedicationTypeSelection && (
-          <div 
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-40"
-            data-testid="medication-type-modal"
-            data-modal-id="medication-type-selection"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="medication-type-title"
-          >
-            <Card className="max-w-md w-full m-4">
-              <CardHeader>
-                <CardTitle id="medication-type-title">Select Medication Type</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start min-h-[44px]"
-                  onClick={() => handleMedicationType('Prescribed Medication')}
-                  data-testid="prescribed-medication-button"
-                  aria-label="Add prescribed medication"
-                >
-                  <Pill className="h-4 w-4 mr-2" />
-                  Prescribed Medication
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start min-h-[44px]"
-                  onClick={() => handleMedicationType('Over-the-Counter')}
-                  data-testid="otc-medication-button"
-                  aria-label="Add over-the-counter medication"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Over-the-Counter Medication
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start min-h-[44px]"
-                  onClick={() => handleMedicationType('Supplement')}
-                  data-testid="supplement-button"
-                  aria-label="Add supplement"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Dietary Supplement
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full"
-                  onClick={() => setShowMedicationTypeSelection(false)}
-                  data-testid="cancel-button"
-                >
-                  Cancel
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        )}
 
         {showMedicationModal && (
           <MedicationEntryModal 
