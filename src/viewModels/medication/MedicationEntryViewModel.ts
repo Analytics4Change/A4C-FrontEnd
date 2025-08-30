@@ -1,4 +1,4 @@
-import { makeAutoObservable, reaction, runInAction } from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 import { IMedicationApi } from '@/services/api/interfaces/IMedicationApi';
 import { 
   Medication, 
@@ -14,6 +14,7 @@ import {
   getUnitsForDosageForm,
   getCategoryForDosageForm 
 } from '@/mocks/data/dosageFormHierarchy.mock';
+import { MedicationEntryValidation } from './MedicationEntryValidation';
 
 export class MedicationEntryViewModel {
   medicationName = '';
@@ -48,13 +49,16 @@ export class MedicationEntryViewModel {
   searchResults: Medication[] = [];
   selectedBroadCategories: string[] = [];
   selectedSpecificCategories: string[] = [];
+  
+  private validation: MedicationEntryValidation;
 
   constructor(
     private medicationApi: IMedicationApi,
     private validator: DosageValidator
   ) {
     makeAutoObservable(this);
-    this.setupReactions();
+    this.validation = new MedicationEntryValidation(this);
+    this.validation.setupReactions();
   }
 
   get isValidAmount(): boolean {
@@ -109,7 +113,7 @@ export class MedicationEntryViewModel {
         this.showMedicationDropdown = this.searchResults.length > 0;
       });
     } catch (error) {
-      this.handleError('Failed to search medications', error);
+      this.validation.handleError('Failed to search medications', error);
     } finally {
       runInAction(() => {
         this.isLoading = false;
@@ -128,7 +132,7 @@ export class MedicationEntryViewModel {
         this.selectedSpecificCategories = [medication.categories.specific];
       }
     });
-    this.clearError('medication');
+    this.validation.clearError('medication');
   }
 
   clearMedication() {
@@ -159,7 +163,7 @@ export class MedicationEntryViewModel {
       this.dosageUnit = '';
       this.totalUnit = '';
     });
-    this.clearError('dosageFormCategory');
+    this.validation.clearError('dosageFormCategory');
   }
 
   setDosageForm(form: string) {
@@ -178,7 +182,7 @@ export class MedicationEntryViewModel {
       this.dosageFormType = '';
       this.dosageUnit = '';
     });
-    this.clearError('dosageForm');
+    this.validation.clearError('dosageForm');
   }
 
   setDosageFormType(formType: string) {
@@ -190,14 +194,14 @@ export class MedicationEntryViewModel {
       // Reset unit when form type changes
       this.dosageUnit = '';
     });
-    this.clearError('dosageFormType');
+    this.validation.clearError('dosageFormType');
   }
 
   updateDosageAmount(value: string) {
     runInAction(() => {
       this.dosageAmount = value;
     });
-    this.validateDosageAmount();
+    this.validation.validateDosageAmount();
   }
 
   setDosageUnit(unit: string) {
@@ -205,21 +209,21 @@ export class MedicationEntryViewModel {
       this.dosageUnit = unit;
       this.showUnitDropdown = false;
     });
-    this.clearError('dosageUnit');
+    this.validation.clearError('dosageUnit');
   }
 
   updateTotalAmount(value: string) {
     runInAction(() => {
       this.totalAmount = value;
     });
-    this.validateTotalAmount();
+    this.validation.validateTotalAmount();
   }
 
   setTotalUnit(unit: string) {
     runInAction(() => {
       this.totalUnit = unit;
     });
-    this.clearError('totalUnit');
+    this.validation.clearError('totalUnit');
   }
 
   setFrequency(freq: string) {
@@ -227,7 +231,7 @@ export class MedicationEntryViewModel {
       this.frequency = freq;
       this.showFrequencyDropdown = false;
     });
-    this.clearError('frequency');
+    this.validation.clearError('frequency');
   }
 
   setCondition(cond: string) {
@@ -235,7 +239,7 @@ export class MedicationEntryViewModel {
       this.condition = cond;
       this.showConditionDropdown = false;
     });
-    this.clearError('condition');
+    this.validation.clearError('condition');
   }
 
   setStartDate(date: Date | null) {
@@ -243,7 +247,7 @@ export class MedicationEntryViewModel {
       this.startDate = date;
       this.showStartDateCalendar = false;
     });
-    this.clearError('startDate');
+    this.validation.clearError('startDate');
   }
 
   setDiscontinueDate(date: Date | null) {
@@ -251,7 +255,7 @@ export class MedicationEntryViewModel {
       this.discontinueDate = date;
       this.showDiscontinueDateCalendar = false;
     });
-    this.clearError('discontinueDate');
+    this.validation.clearError('discontinueDate');
   }
 
   toggleBroadCategory(category: string) {
@@ -274,7 +278,7 @@ export class MedicationEntryViewModel {
 
   async save() {
     // Validate all required fields
-    if (!this.validateRequiredFields()) {
+    if (!this.validation.validateRequiredFields()) {
       return;
     }
     
@@ -301,73 +305,12 @@ export class MedicationEntryViewModel {
       await this.medicationApi.saveMedication(dosageInfo);
       this.reset();
     } catch (error) {
-      this.handleError('Failed to save medication', error);
+      this.validation.handleError('Failed to save medication', error);
     } finally {
       runInAction(() => {
         this.isLoading = false;
       });
     }
-  }
-  
-  private validateRequiredFields(): boolean {
-    let isValid = true;
-    
-    if (!this.selectedMedication) {
-      this.setError('medication', 'Please select a medication');
-      isValid = false;
-    }
-    
-    if (!this.dosageFormCategory) {
-      this.setError('dosageFormCategory', 'Please select a dosage form category');
-      isValid = false;
-    }
-    
-    if (!this.dosageFormType) {
-      this.setError('dosageFormType', 'Please select a dosage form type');
-      isValid = false;
-    }
-    
-    if (!this.dosageAmount) {
-      this.setError('dosageAmount', 'Please enter the dosage amount');
-      isValid = false;
-    } else {
-      this.validateDosageAmount();
-      if (this.errors.has('dosageAmount')) {
-        isValid = false;
-      }
-    }
-    
-    if (!this.dosageUnit) {
-      this.setError('dosageUnit', 'Please select a unit');
-      isValid = false;
-    }
-    
-    if (!this.totalAmount) {
-      this.setError('totalAmount', 'Please enter the total amount');
-      isValid = false;
-    } else {
-      this.validateTotalAmount();
-      if (this.errors.has('totalAmount')) {
-        isValid = false;
-      }
-    }
-    
-    if (!this.totalUnit) {
-      this.setError('totalUnit', 'Please select a total unit');
-      isValid = false;
-    }
-    
-    if (!this.frequency) {
-      this.setError('frequency', 'Please select frequency');
-      isValid = false;
-    }
-    
-    if (!this.condition) {
-      this.setError('condition', 'Please select when to take');
-      isValid = false;
-    }
-    
-    return isValid;
   }
 
   reset() {
@@ -396,104 +339,5 @@ export class MedicationEntryViewModel {
     this.showUnitDropdown = false;
     this.showFrequencyDropdown = false;
     this.showConditionDropdown = false;
-  }
-
-  private setupReactions() {
-    reaction(
-      () => this.dosageAmount,
-      () => this.validateDosageAmount()
-    );
-
-    reaction(
-      () => this.totalAmount,
-      () => this.validateTotalAmount()
-    );
-
-    reaction(
-      () => this.dosageFormCategory,
-      () => {
-        // Reset form type and unit when category changes
-        this.dosageFormType = '';
-    this.dosageForm = '';
-    this.dosageUnit = '';
-    this.totalUnit = '';
-      }
-    );
-
-    reaction(
-      () => this.dosageFormType,
-      () => {
-        // Reset unit when form type changes
-        this.dosageUnit = '';
-        // Keep dosageForm in sync
-        this.dosageForm = this.dosageFormType;
-      }
-    );
-
-    reaction(
-      () => [this.startDate, this.discontinueDate],
-      () => this.validateDates()
-    );
-  }
-
-  private validateDosageAmount() {
-    if (!this.dosageAmount) {
-      this.clearError('dosageAmount');
-      return;
-    }
-    
-    const numValue = parseFloat(this.dosageAmount);
-    
-    if (isNaN(numValue)) {
-      this.setError('dosageAmount', 'Please enter a valid number');
-    } else if (numValue <= 0) {
-      this.setError('dosageAmount', 'Amount must be greater than 0');
-    } else if (numValue > 9999) {
-      this.setError('dosageAmount', 'Amount cannot exceed 9999');
-    } else {
-      this.clearError('dosageAmount');
-    }
-  }
-
-  private validateTotalAmount() {
-    if (!this.totalAmount) {
-      this.clearError('totalAmount');
-      return;
-    }
-    
-    const numValue = parseFloat(this.totalAmount);
-    
-    if (isNaN(numValue)) {
-      this.setError('totalAmount', 'Please enter a valid number');
-    } else if (numValue <= 0) {
-      this.setError('totalAmount', 'Amount must be greater than 0');
-    } else if (numValue > 9999) {
-      this.setError('totalAmount', 'Amount cannot exceed 9999');
-    } else {
-      this.clearError('totalAmount');
-    }
-  }
-
-  private validateDates() {
-    if (this.startDate && this.discontinueDate) {
-      if (this.discontinueDate < this.startDate) {
-        this.setError('discontinueDate', 'Discontinue date must be after start date');
-      } else {
-        this.clearError('discontinueDate');
-      }
-    }
-  }
-
-  private setError(field: string, message: string) {
-    this.errors.set(field, message);
-  }
-
-  private clearError(field: string) {
-    this.errors.delete(field);
-  }
-
-  private handleError(message: string, error: any) {
-    console.error(message, error);
-    this.setError('general', message);
   }
 }

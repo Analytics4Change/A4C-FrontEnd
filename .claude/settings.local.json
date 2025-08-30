@@ -77,7 +77,8 @@
       "Bash(oomctl:*)",
       "Bash(echo:*)",
       "Bash(echo \"performance-verification: $?\")",
-      "WebSearch"
+      "WebSearch",
+      "Bash(npm run typecheck:*)"
     ],
     "deny": [],
     "additionalDirectories": [
