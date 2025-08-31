@@ -4,8 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AutocompleteDropdown, SelectionMethod } from '@/components/ui/autocomplete-dropdown';
 import { useDropdownBlur } from '@/hooks/useDropdownBlur';
+import { useFocusAdvancement } from '@/hooks/useFocusAdvancement';
 import { filterStringItems, isItemHighlighted } from '@/utils/dropdown-filter';
-import { focusByTabIndex } from '@/utils/focus-management';
 interface TotalAmountInputsProps {
   totalAmount: string;
   totalUnit: string;
@@ -31,6 +31,12 @@ export const TotalAmountInputs: React.FC<TotalAmountInputsProps> = ({
 
   // Dropdown blur handler using abstracted timing logic
   const handleTotalUnitBlur = useDropdownBlur(setShowTotalUnitDropdown);
+
+  // Focus advancement hook for keyboard navigation
+  const totalUnitFocusAdvancement = useFocusAdvancement({
+    targetTabIndex: 13, // Move to Frequency input
+    enabled: true
+  });
 
   // Use generic filtering utilities
   const filteredTotalUnits = filterStringItems(availableTotalUnits, totalUnitInput, 'contains');
@@ -86,7 +92,7 @@ export const TotalAmountInputs: React.FC<TotalAmountInputsProps> = ({
             onBlur={handleTotalUnitBlur}
             placeholder="Select total unit..."
             className={`pr-10 ${totalUnit ? 'border-blue-500 bg-blue-50' : ''} ${errors.get('totalUnit') ? 'border-red-500' : ''}`}
-            disabled={!!totalUnit}
+            readOnly={!!totalUnit}
             aria-label="Total unit"
             aria-describedby={errors.get('totalUnit') ? 'total-unit-error' : undefined}
             tabIndex={11}
@@ -103,7 +109,7 @@ export const TotalAmountInputs: React.FC<TotalAmountInputsProps> = ({
             }}
             aria-label="Open total unit dropdown"
             disabled={!!totalUnit}
-            tabIndex={12}
+            tabIndex={totalUnit ? -1 : 12}
           >
             <ChevronDown className="text-gray-400" size={20} />
           </button>
@@ -118,12 +124,8 @@ export const TotalAmountInputs: React.FC<TotalAmountInputsProps> = ({
             setTotalUnitInput(unit);
             setShowTotalUnitDropdown(false);
             
-            // Focus management based on selection method
-            if (method === 'keyboard') {
-              // Move to Frequency input (tabIndex 13)
-              setTimeout(() => focusByTabIndex(13), 50);
-            }
-            // For mouse selection, focus stays on current input
+            // Use hook for focus advancement
+            totalUnitFocusAdvancement.handleSelection(unit, method);
           }}
           getItemKey={(unit) => unit}
           isItemHighlighted={(unit) => isTotalUnitHighlighted(unit)}

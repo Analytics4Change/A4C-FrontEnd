@@ -5,8 +5,8 @@ import { Label } from '@/components/ui/label';
 import { AutocompleteDropdown, SelectionMethod } from '@/components/ui/autocomplete-dropdown';
 import { dosageFormCategories } from '@/mocks/data/dosages.mock';
 import { useDropdownBlur } from '@/hooks/useDropdownBlur';
+import { useFocusAdvancement } from '@/hooks/useFocusAdvancement';
 import { filterStringItems, isItemHighlighted } from '@/utils/dropdown-filter';
-import { focusByTabIndex } from '@/utils/focus-management';
 
 interface DosageFormInputsProps {
   dosageFormCategory: string;
@@ -53,6 +53,22 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
   const handleFormTypeBlur = useDropdownBlur(setShowFormTypeDropdown);
   const handleUnitBlur = useDropdownBlur(setShowUnitDropdown);
 
+  // Focus advancement hooks for keyboard navigation
+  const categoryFocusAdvancement = useFocusAdvancement({
+    targetTabIndex: 5, // Move to Form Type input
+    enabled: true
+  });
+
+  const formTypeFocusAdvancement = useFocusAdvancement({
+    targetTabIndex: 7, // Move to Dosage Amount input
+    enabled: true
+  });
+
+  const unitFocusAdvancement = useFocusAdvancement({
+    targetTabIndex: 10, // Move to Total Amount input
+    enabled: true
+  });
+
   // Use generic filtering utilities
   const filteredCategories = filterStringItems(dosageFormCategories, categoryInput, 'contains');
   const filteredFormTypes = filterStringItems(availableFormTypes, formTypeInput, 'contains');
@@ -95,7 +111,7 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
               onBlur={handleCategoryBlur}
               placeholder="Select dosage form..."
               className={`pr-10 ${dosageFormCategory ? 'border-blue-500 bg-blue-50' : ''} ${errors.get('dosageFormCategory') ? 'border-red-500' : ''}`}
-              disabled={!!dosageFormCategory}
+              readOnly={!!dosageFormCategory}
               aria-label="Dosage form category"
               aria-describedby={errors.get('dosageFormCategory') ? 'dosage-category-error' : undefined}
               tabIndex={3}
@@ -112,7 +128,7 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
               }}
               aria-label="Open dosage form dropdown"
               disabled={!!dosageFormCategory}
-              tabIndex={4}
+              tabIndex={dosageFormCategory ? -1 : 4}
             >
               <ChevronDown className="text-gray-400" size={20} />
             </button>
@@ -127,12 +143,8 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
               setCategoryInput(category);
               setShowCategoryDropdown(false);
               
-              // Focus management based on selection method
-              if (method === 'keyboard') {
-                // Move to Form Type input (tabIndex 5)
-                setTimeout(() => focusByTabIndex(5), 50);
-              }
-              // For mouse selection, focus stays on current input
+              // Use hook for focus advancement
+              categoryFocusAdvancement.handleSelection(category, method);
             }}
             getItemKey={(category) => category}
             isItemHighlighted={isCategoryHighlighted}
@@ -175,7 +187,8 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
               onBlur={handleFormTypeBlur}
               placeholder="Select type..."
               className={`pr-10 ${dosageFormType ? 'border-blue-500 bg-blue-50' : ''} ${errors.get('dosageFormType') ? 'border-red-500' : ''}`}
-              disabled={!dosageFormCategory || !!dosageFormType}
+              readOnly={!!dosageFormType}
+              disabled={!dosageFormCategory}
               aria-label="Dosage form type"
               aria-describedby={errors.get('dosageFormType') ? 'form-type-error' : undefined}
               tabIndex={5}
@@ -192,7 +205,7 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
               }}
               aria-label="Open form type dropdown"
               disabled={!dosageFormCategory || !!dosageFormType}
-              tabIndex={6}
+              tabIndex={dosageFormType ? -1 : 6}
             >
               <ChevronDown className="text-gray-400" size={20} />
             </button>
@@ -207,12 +220,8 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
               setFormTypeInput(formType);
               setShowFormTypeDropdown(false);
               
-              // Focus management based on selection method
-              if (method === 'keyboard') {
-                // Move to Dosage Amount input (tabIndex 7)
-                setTimeout(() => focusByTabIndex(7), 50);
-              }
-              // For mouse selection, focus stays on current input
+              // Use hook for focus advancement
+              formTypeFocusAdvancement.handleSelection(formType, method);
             }}
             getItemKey={(formType) => formType}
             isItemHighlighted={isFormTypeHighlighted}
@@ -282,7 +291,8 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
               onBlur={handleUnitBlur}
               placeholder="Select unit..."
               className={`pr-10 ${dosageUnit ? 'border-blue-500 bg-blue-50' : ''} ${errors.get('dosageUnit') ? 'border-red-500' : ''}`}
-              disabled={!dosageFormType || !!dosageUnit}
+              readOnly={!!dosageUnit}
+              disabled={!dosageFormType}
               aria-label="Dosage unit"
               aria-describedby={errors.get('dosageUnit') ? 'dosage-unit-error' : undefined}
               tabIndex={8}
@@ -299,7 +309,7 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
               }}
               aria-label="Open unit dropdown"
               disabled={!dosageFormType || !!dosageUnit}
-              tabIndex={9}
+              tabIndex={dosageUnit ? -1 : 9}
             >
               <ChevronDown className="text-gray-400" size={20} />
             </button>
@@ -314,12 +324,8 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
               setUnitInput(unit);
               setShowUnitDropdown(false);
               
-              // Focus management based on selection method
-              if (method === 'keyboard') {
-                // Move to Total Amount input (tabIndex 10)
-                setTimeout(() => focusByTabIndex(10), 50);
-              }
-              // For mouse selection, focus stays on current input
+              // Use hook for focus advancement
+              unitFocusAdvancement.handleSelection(unit, method);
             }}
             getItemKey={(unit) => unit}
             isItemHighlighted={(unit) => isUnitHighlighted(unit)}

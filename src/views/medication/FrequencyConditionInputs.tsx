@@ -5,8 +5,8 @@ import { Label } from '@/components/ui/label';
 import { AutocompleteDropdown, SelectionMethod } from '@/components/ui/autocomplete-dropdown';
 import { dosageFrequencies, dosageConditions } from '@/mocks/data/dosages.mock';
 import { useDropdownBlur } from '@/hooks/useDropdownBlur';
+import { useFocusAdvancement } from '@/hooks/useFocusAdvancement';
 import { filterStringItems, isItemHighlighted } from '@/utils/dropdown-filter';
-import { focusByTabIndex } from '@/utils/focus-management';
 
 interface FrequencyConditionInputsProps {
   frequency: string;
@@ -36,6 +36,17 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
   // Dropdown blur handlers using abstracted timing logic
   const handleFrequencyBlur = useDropdownBlur(setShowFrequencyDropdown);
   const handleConditionBlur = useDropdownBlur(setShowConditionDropdown);
+
+  // Focus advancement hooks for keyboard navigation
+  const frequencyFocusAdvancement = useFocusAdvancement({
+    targetTabIndex: 15, // Move to Condition input
+    enabled: true
+  });
+
+  const conditionFocusAdvancement = useFocusAdvancement({
+    targetTabIndex: 17, // Move to Therapeutic Classes button
+    enabled: true
+  });
 
   // Use generic filtering utilities
   const filteredFrequencies = filterStringItems(dosageFrequencies, frequencyInput, 'contains');
@@ -71,7 +82,7 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
             onBlur={handleFrequencyBlur}
             placeholder="Select frequency..."
             className={`pr-10 ${frequency ? 'border-blue-500 bg-blue-50' : ''} ${errors.get('frequency') ? 'border-red-500' : ''}`}
-            disabled={!!frequency}
+            readOnly={!!frequency}
             aria-label="Dosage frequency"
             aria-describedby={errors.get('frequency') ? 'frequency-error' : undefined}
             tabIndex={13}
@@ -88,7 +99,7 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
             }}
             aria-label="Open frequency dropdown"
             disabled={!!frequency}
-            tabIndex={14}
+            tabIndex={frequency ? -1 : 14}
           >
             <ChevronDown className="text-gray-400" size={20} />
           </button>
@@ -103,12 +114,8 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
             setFrequencyInput(freq);
             setShowFrequencyDropdown(false);
             
-            // Focus management based on selection method
-            if (method === 'keyboard') {
-              // Move to Condition input (tabIndex 15)
-              setTimeout(() => focusByTabIndex(15), 50);
-            }
-            // For mouse selection, focus stays on current input
+            // Use hook for focus advancement
+            frequencyFocusAdvancement.handleSelection(freq, method);
           }}
           getItemKey={(freq) => freq}
           isItemHighlighted={isFrequencyHighlighted}
@@ -151,7 +158,7 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
             onBlur={handleConditionBlur}
             placeholder="Select condition..."
             className={`pr-10 ${condition ? 'border-blue-500 bg-blue-50' : ''}`}
-            disabled={!!condition}
+            readOnly={!!condition}
             aria-label="Dosage condition"
             tabIndex={15}
           />
@@ -167,7 +174,7 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
             }}
             aria-label="Open condition dropdown"
             disabled={!!condition}
-            tabIndex={16}
+            tabIndex={condition ? -1 : 16}
           >
             <ChevronDown className="text-gray-400" size={20} />
           </button>
@@ -182,12 +189,8 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
             setConditionInput(cond);
             setShowConditionDropdown(false);
             
-            // Focus management based on selection method
-            if (method === 'keyboard') {
-              // Move to Therapeutic Classes button (tabIndex 17)
-              setTimeout(() => focusByTabIndex(17), 50);
-            }
-            // For mouse selection, focus stays on current input
+            // Use hook for focus advancement
+            conditionFocusAdvancement.handleSelection(cond, method);
           }}
           getItemKey={(cond) => cond}
           isItemHighlighted={isConditionHighlighted}

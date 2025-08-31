@@ -125,7 +125,11 @@ export function AutocompleteDropdown<T>({
                 ? "highlighted-item bg-blue-50 text-blue-700 font-medium border-l-4 border-l-blue-500" 
                 : "hover:bg-gray-50"
             )}
-            onClick={() => onSelect(item, 'mouse')}
+            onMouseDown={(e) => {
+              // Prevent the blur event from firing
+              e.preventDefault();
+              onSelect(item, 'mouse');
+            }}
             onMouseEnter={() => setHighlightedIndex(index)}
             role="option"
             aria-selected={isHighlighted}

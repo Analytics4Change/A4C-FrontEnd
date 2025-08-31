@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useViewModel } from '@/hooks/useViewModel';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { useScrollToElement } from '@/hooks/useScrollToElement';
+import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import { MedicationEntryViewModel } from '@/viewModels/medication/MedicationEntryViewModel';
 import { DosageFormCategory } from '@/types/models/Dosage';
 // Use simplified versions without FocusableField wrappers
@@ -106,60 +107,14 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
     }
   }, [showDosageFields]);
 
-  // Handle escape key to close modal and implement focus trap
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-        return;
-      }
-      
-      // Implement focus trap for the modal
-      if (e.key === 'Tab') {
-        // Get all focusable elements within the modal
-        const focusableElements = modalRef.current?.querySelectorAll(
-          'button:not([disabled]):not([tabindex="-1"]), input:not([disabled]):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])'
-        );
-        
-        if (focusableElements && focusableElements.length > 0) {
-          // Sort elements by tabIndex to ensure proper tab order
-          const sortedElements = Array.from(focusableElements).sort((a, b) => {
-            const tabA = parseInt((a as HTMLElement).getAttribute('tabindex') || '0');
-            const tabB = parseInt((b as HTMLElement).getAttribute('tabindex') || '0');
-            // If both have same tabIndex or no tabIndex, maintain DOM order
-            if (tabA === tabB) return 0;
-            // Positive tabIndex values come first, in ascending order
-            if (tabA > 0 && tabB > 0) return tabA - tabB;
-            // Positive tabIndex before 0 or no tabIndex
-            if (tabA > 0) return -1;
-            if (tabB > 0) return 1;
-            return 0;
-          });
-          
-          const firstElement = sortedElements[0] as HTMLElement;
-          const lastElement = sortedElements[sortedElements.length - 1] as HTMLElement;
-          
-          // Check if we're at the boundaries
-          if (e.shiftKey) {
-            // Shift+Tab: If focus is on first element, move to last
-            if (document.activeElement === firstElement) {
-              e.preventDefault();
-              lastElement.focus();
-            }
-          } else {
-            // Tab: If focus is on last element, move to first
-            if (document.activeElement === lastElement) {
-              e.preventDefault();
-              firstElement.focus();
-            }
-          }
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  // Use keyboard navigation hook for focus trap and escape handling
+  useKeyboardNavigation({
+    containerRef: modalRef as React.RefObject<HTMLElement>,
+    enabled: true,
+    trapFocus: true,
+    restoreFocus: false, // We don't need to restore focus on unmount
+    onEscape: onClose
+  });
 
 
 

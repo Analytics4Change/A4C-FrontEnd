@@ -152,3 +152,95 @@ export function focusByTabIndex(
   
   return false;
 }
+
+/**
+ * Get all focusable elements in order, respecting tabIndex
+ * @param container - Container to search within
+ * @param options - Filtering options
+ * @returns Array of focusable elements sorted by tabIndex
+ */
+export function getAllFocusableElements(
+  container: HTMLElement | Document = document,
+  options: {
+    includeSelectors?: string[];
+    excludeSelectors?: string[];
+  } = {}
+): HTMLElement[] {
+  const defaultSelectors = [
+    'a[href]',
+    'button:not([disabled])',
+    'input:not([disabled]):not([type="hidden"])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])'
+  ];
+  
+  const selectors = options.includeSelectors?.length 
+    ? options.includeSelectors 
+    : defaultSelectors;
+    
+  const elements = Array.from(
+    container.querySelectorAll<HTMLElement>(selectors.join(', '))
+  );
+  
+  // Filter out excluded selectors
+  const filtered = options.excludeSelectors?.length
+    ? elements.filter(el => !options.excludeSelectors!.some(sel => el.matches(sel)))
+    : elements;
+  
+  // Filter out invisible elements
+  const visible = filtered.filter(el => {
+    const rect = el.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
+  });
+  
+  // Sort by tabIndex order
+  return sortByTabIndex(visible);
+}
+
+/**
+ * Sort elements by tabIndex order
+ * @param elements - Array of HTML elements to sort
+ * @returns Sorted array of elements
+ */
+export function sortByTabIndex(elements: HTMLElement[]): HTMLElement[] {
+  return elements.sort((a, b) => {
+    const tabIndexA = parseInt(a.getAttribute('tabindex') || '0');
+    const tabIndexB = parseInt(b.getAttribute('tabindex') || '0');
+    
+    // Both have positive tabIndex
+    if (tabIndexA > 0 && tabIndexB > 0) {
+      return tabIndexA - tabIndexB;
+    }
+    
+    // Only A has positive tabIndex
+    if (tabIndexA > 0) return -1;
+    
+    // Only B has positive tabIndex  
+    if (tabIndexB > 0) return 1;
+    
+    // Both have 0 or no tabIndex, use DOM order
+    return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+  });
+}
+
+/**
+ * Find the previous focusable element
+ * @param current - Current focused element
+ * @param container - Container to search within
+ * @returns Previous focusable element or null
+ */
+export function findPreviousFocusableElement(
+  current: HTMLElement,
+  container: HTMLElement | Document = document
+): HTMLElement | null {
+  const elements = getAllFocusableElements(container);
+  const currentIndex = elements.indexOf(current);
+  
+  if (currentIndex > 0) {
+    return elements[currentIndex - 1];
+  }
+  
+  // Wrap to last element
+  return elements[elements.length - 1] || null;
+}
