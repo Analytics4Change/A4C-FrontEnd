@@ -184,7 +184,7 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
             
             // Focus management based on selection method
             if (method === 'keyboard') {
-              // Move to Broad Categories button (tabIndex 17)
+              // Move to Therapeutic Classes button (tabIndex 17)
               setTimeout(() => focusByTabIndex(17), 50);
             }
             // For mouse selection, focus stays on current input

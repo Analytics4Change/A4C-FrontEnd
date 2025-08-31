@@ -47,8 +47,8 @@ export class MedicationEntryViewModel {
   errors: Map<string, string> = new Map();
   
   searchResults: Medication[] = [];
-  selectedBroadCategories: string[] = [];
-  selectedSpecificCategories: string[] = [];
+  selectedTherapeuticClasses: string[] = [];
+  selectedRegimenCategories: string[] = [];
   
   private validation: MedicationEntryValidation;
 
@@ -94,8 +94,8 @@ export class MedicationEntryViewModel {
   }
 
   get categoriesCompleted(): boolean {
-    return this.selectedBroadCategories.length > 0 && 
-           this.selectedSpecificCategories.length > 0;
+    return this.selectedTherapeuticClasses.length > 0 && 
+           this.selectedRegimenCategories.length > 0;
   }
 
   async searchMedications(query: string) {
@@ -128,8 +128,8 @@ export class MedicationEntryViewModel {
       this.showMedicationDropdown = false;
       
       if (medication.categories) {
-        this.selectedBroadCategories = [medication.categories.broad];
-        this.selectedSpecificCategories = [medication.categories.specific];
+        this.selectedTherapeuticClasses = [medication.categories.broad];
+        this.selectedRegimenCategories = [medication.categories.specific];
       }
     });
     this.validation.clearError('medication');
@@ -148,8 +148,8 @@ export class MedicationEntryViewModel {
       this.dosageUnit = '';
       this.totalAmount = '';
       this.totalUnit = '';
-      this.selectedBroadCategories = [];
-      this.selectedSpecificCategories = [];
+      this.selectedTherapeuticClasses = [];
+      this.selectedRegimenCategories = [];
     });
   }
 
@@ -258,21 +258,21 @@ export class MedicationEntryViewModel {
     this.validation.clearError('discontinueDate');
   }
 
-  toggleBroadCategory(category: string) {
-    const index = this.selectedBroadCategories.indexOf(category);
+  toggleTherapeuticClass(category: string) {
+    const index = this.selectedTherapeuticClasses.indexOf(category);
     if (index > -1) {
-      this.selectedBroadCategories.splice(index, 1);
+      this.selectedTherapeuticClasses.splice(index, 1);
     } else {
-      this.selectedBroadCategories.push(category);
+      this.selectedTherapeuticClasses.push(category);
     }
   }
 
-  toggleSpecificCategory(category: string) {
-    const index = this.selectedSpecificCategories.indexOf(category);
+  toggleRegimenCategory(category: string) {
+    const index = this.selectedRegimenCategories.indexOf(category);
     if (index > -1) {
-      this.selectedSpecificCategories.splice(index, 1);
+      this.selectedRegimenCategories.splice(index, 1);
     } else {
-      this.selectedSpecificCategories.push(category);
+      this.selectedRegimenCategories.push(category);
     }
   }
 
@@ -330,8 +330,8 @@ export class MedicationEntryViewModel {
     this.notes = '';
     this.errors.clear();
     this.searchResults = [];
-    this.selectedBroadCategories = [];
-    this.selectedSpecificCategories = [];
+    this.selectedTherapeuticClasses = [];
+    this.selectedRegimenCategories = [];
     this.showMedicationDropdown = false;
     this.showFormCategoryDropdown = false;
     this.showFormTypeDropdown = false;

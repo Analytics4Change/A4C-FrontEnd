@@ -54,7 +54,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
            vm.dosageAmount &&
            vm.dosageUnit &&
            vm.frequency &&
-           vm.selectedBroadCategories.length > 0 &&
+           vm.selectedTherapeuticClasses.length > 0 &&
            vm.startDate;
   };
 
@@ -288,20 +288,20 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
               </div>
 
               {/* Category Selection */}
-              <div id="broad-categories-button" data-flow-node="true">
+              <div id="therapeutic-classes-button" data-flow-node="true">
                 <CategorySelection
-                  selectedBroadCategories={vm.selectedBroadCategories}
-                  selectedSpecificCategories={vm.selectedSpecificCategories}
-                  onToggleBroadCategory={(cat) => {
-                    vm.toggleBroadCategory(cat);
-                    if (vm.selectedBroadCategories.length > 0) {
-                      handleFieldComplete('broad-categories-button');
+                  selectedTherapeuticClasses={vm.selectedTherapeuticClasses}
+                  selectedRegimenCategories={vm.selectedRegimenCategories}
+                  onToggleTherapeuticClass={(cat) => {
+                    vm.toggleTherapeuticClass(cat);
+                    if (vm.selectedTherapeuticClasses.length > 0) {
+                      handleFieldComplete('therapeutic-classes-button');
                     }
                   }}
-                  onToggleSpecificCategory={(cat) => {
-                    vm.toggleSpecificCategory(cat);
-                    if (vm.selectedSpecificCategories.length > 0) {
-                      handleFieldComplete('specific-categories-button');
+                  onToggleRegimenCategory={(cat) => {
+                    vm.toggleRegimenCategory(cat);
+                    if (vm.selectedRegimenCategories.length > 0) {
+                      handleFieldComplete('regimen-categories-button');
                     }
                   }}
                   categoriesCompleted={vm.categoriesCompleted}

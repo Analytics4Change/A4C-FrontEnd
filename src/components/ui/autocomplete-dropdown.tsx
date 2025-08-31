@@ -45,18 +45,19 @@ export function AutocompleteDropdown<T>({
   useEffect(() => {
     if (!isOpen || items.length === 0) return;
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      switch (e.key) {
+    const handleKeyDown = (e: Event) => {
+      const keyEvent = e as KeyboardEvent;
+      switch (keyEvent.key) {
         case 'ArrowDown':
-          e.preventDefault();
+          keyEvent.preventDefault();
           setHighlightedIndex(prev => (prev + 1) % items.length);
           break;
         case 'ArrowUp':
-          e.preventDefault();
+          keyEvent.preventDefault();
           setHighlightedIndex(prev => prev <= 0 ? items.length - 1 : prev - 1);
           break;
         case 'Enter':
-          e.preventDefault();
+          keyEvent.preventDefault();
           // Auto-select if only one item or if an item is highlighted
           if (items.length === 1) {
             onSelect(items[0], 'keyboard');
@@ -65,7 +66,7 @@ export function AutocompleteDropdown<T>({
           }
           break;
         case 'Escape':
-          e.preventDefault();
+          keyEvent.preventDefault();
           // Let the parent component handle closing
           inputRef.current?.blur();
           break;
