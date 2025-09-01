@@ -1,14 +1,16 @@
 import React from 'react';
-import { ChevronDown, ChevronUp, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { observer } from 'mobx-react-lite';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Check } from 'lucide-react';
+import { MultiSelectDropdown } from '@/components/ui/MultiSelectDropdown';
 
 interface CategorySelectionProps {
   selectedTherapeuticClasses: string[];
   selectedRegimenCategories: string[];
-  onToggleTherapeuticClass: (category: string) => void;
-  onToggleRegimenCategory: (category: string) => void;
+  onTherapeuticClassesChange?: (classes: string[]) => void;
+  onRegimenCategoriesChange?: (categories: string[]) => void;
+  onToggleTherapeuticClass?: (category: string) => void;
+  onToggleRegimenCategory?: (category: string) => void;
   categoriesCompleted: boolean;
 }
 
@@ -33,122 +35,86 @@ const regimenCategories = [
   'Maintenance Therapy'
 ];
 
-export const CategorySelection: React.FC<CategorySelectionProps> = ({
+/**
+ * Simplified CategorySelection using unified MultiSelectDropdown
+ * - Cleaner implementation with less complexity
+ * - Full keyboard and mouse support
+ * - WCAG and ARIA compliant
+ */
+export const CategorySelection: React.FC<CategorySelectionProps> = observer(({
   selectedTherapeuticClasses,
   selectedRegimenCategories,
+  onTherapeuticClassesChange,
+  onRegimenCategoriesChange,
   onToggleTherapeuticClass,
   onToggleRegimenCategory,
   categoriesCompleted
 }) => {
-  const [showTherapeuticClasses, setShowTherapeuticClasses] = React.useState(false);
-  const [showRegimenCategories, setShowRegimenCategories] = React.useState(false);
+  // Debug: Log every render
+  console.log('[CategorySelection] Rendering with:', {
+    therapeutic: selectedTherapeuticClasses.slice(),
+    regimen: selectedRegimenCategories.slice()
+  });
+  // Handle therapeutic classes changes
+  const handleTherapeuticClassesChange = (selected: string[]) => {
+    console.log('[CategorySelection] handleTherapeuticClassesChange called with:', selected);
+    if (onTherapeuticClassesChange) {
+      // Use setter method if available
+      console.log('[CategorySelection] Calling onTherapeuticClassesChange');
+      onTherapeuticClassesChange(selected);
+    } else if (onToggleTherapeuticClass) {
+      // Fall back to toggle method
+      const added = selected.filter(s => !selectedTherapeuticClasses.includes(s));
+      const removed = selectedTherapeuticClasses.filter(s => !selected.includes(s));
+      
+      added.forEach(item => onToggleTherapeuticClass(item));
+      removed.forEach(item => onToggleTherapeuticClass(item));
+    }
+  };
+
+  // Handle regimen categories changes
+  const handleRegimenCategoriesChange = (selected: string[]) => {
+    if (onRegimenCategoriesChange) {
+      // Use setter method if available
+      onRegimenCategoriesChange(selected);
+    } else if (onToggleRegimenCategory) {
+      // Fall back to toggle method
+      const added = selected.filter(s => !selectedRegimenCategories.includes(s));
+      const removed = selectedRegimenCategories.filter(s => !selected.includes(s));
+      
+      added.forEach(item => onToggleRegimenCategory(item));
+      removed.forEach(item => onToggleRegimenCategory(item));
+    }
+  };
 
   return (
     <div className="space-y-6">
       {/* Therapeutic Classes */}
       <div className="space-y-3">
         <Label className="text-sm font-medium">Therapeutic Classes</Label>
-        
-        <Button
-          id="therapeutic-classes-button"
-          type="button"
-          variant="outline"
-          className="w-full justify-between min-h-[44px]"
-          onClick={() => setShowTherapeuticClasses(!showTherapeuticClasses)}
-          aria-expanded={showTherapeuticClasses}
-          aria-controls="therapeutic-classes-list"
-          aria-label={`Select therapeutic classes. ${selectedTherapeuticClasses.length} selected`}
-          tabIndex={17}
-        >
-          <span className="flex items-center gap-2">
-            {selectedTherapeuticClasses.length > 0 ? (
-              <>
-                <Check size={16} className="text-green-600" />
-                <span>{selectedTherapeuticClasses.length} classes selected</span>
-              </>
-            ) : (
-              <span className="text-gray-600">Select classes...</span>
-            )}
-          </span>
-          {showTherapeuticClasses ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        </Button>
-
-        {showTherapeuticClasses && (
-          <div 
-            id="therapeutic-classes-list"
-            data-modal-id="therapeutic-classes-list"
-            className="bg-white border rounded-lg p-4 space-y-3"
-            role="group"
-            aria-label="Therapeutic classes"
-          >
-            {therapeuticClasses.map((category) => (
-              <label 
-                key={category} 
-                className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded"
-              >
-                <Checkbox
-                  checked={selectedTherapeuticClasses.includes(category)}
-                  onCheckedChange={() => onToggleTherapeuticClass(category)}
-                  aria-label={category}
-                />
-                <span className="text-sm">{category}</span>
-              </label>
-            ))}
-          </div>
-        )}
+        <MultiSelectDropdown
+          id="therapeutic-classes"
+          label="Therapeutic Classes"
+          options={therapeuticClasses}
+          selected={selectedTherapeuticClasses}
+          onChange={handleTherapeuticClassesChange}
+          placeholder="Select therapeutic classes..."
+          buttonTabIndex={17}
+        />
       </div>
 
       {/* Regimen Categories */}
       <div className="space-y-3">
         <Label className="text-sm font-medium">Regimen Categories</Label>
-        
-        <Button
-          id="regimen-categories-button"
-          type="button"
-          variant="outline"
-          className="w-full justify-between min-h-[44px]"
-          onClick={() => setShowRegimenCategories(!showRegimenCategories)}
-          aria-expanded={showRegimenCategories}
-          aria-controls="regimen-categories-list"
-          aria-label={`Select regimen categories. ${selectedRegimenCategories.length} selected`}
-          tabIndex={18}
-        >
-          <span className="flex items-center gap-2">
-            {selectedRegimenCategories.length > 0 ? (
-              <>
-                <Check size={16} className="text-green-600" />
-                <span>{selectedRegimenCategories.length} regimen types selected</span>
-              </>
-            ) : (
-              <span className="text-gray-600">Select regimen types...</span>
-            )}
-          </span>
-          {showRegimenCategories ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        </Button>
-
-        {showRegimenCategories && (
-          <div 
-            id="regimen-categories-list"
-            data-modal-id="regimen-categories-list"
-            className="bg-white border rounded-lg p-4 space-y-3"
-            role="group"
-            aria-label="Regimen categories"
-          >
-            {regimenCategories.map((category) => (
-              <label 
-                key={category} 
-                className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded"
-              >
-                <Checkbox
-                  checked={selectedRegimenCategories.includes(category)}
-                  onCheckedChange={() => onToggleRegimenCategory(category)}
-                  aria-label={category}
-                />
-                <span className="text-sm">{category}</span>
-              </label>
-            ))}
-          </div>
-        )}
+        <MultiSelectDropdown
+          id="regimen-categories"
+          label="Regimen Categories"
+          options={regimenCategories}
+          selected={selectedRegimenCategories}
+          onChange={handleRegimenCategoriesChange}
+          placeholder="Select regimen categories..."
+          buttonTabIndex={18}
+        />
       </div>
 
       {/* Completion Indicator */}
@@ -160,4 +126,4 @@ export const CategorySelection: React.FC<CategorySelectionProps> = ({
       )}
     </div>
   );
-};
+});

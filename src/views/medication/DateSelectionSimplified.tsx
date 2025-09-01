@@ -2,20 +2,13 @@ import React from 'react';
 import { AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 
 interface DateSelectionProps {
   startDate: string;
   discontinueDate: string;
   onStartDateChange: (date: string) => void;
   onDiscontinueDateChange: (date: string) => void;
-  showStartDateCalendar: boolean;
-  showDiscontinueDateCalendar: boolean;
-  onToggleStartDateCalendar: () => void;
-  onToggleDiscontinueDateCalendar: () => void;
   error?: string;
-  onCalendarOpen?: (elementId: string) => void;
 }
 
 export const DateSelection: React.FC<DateSelectionProps> = ({
@@ -23,25 +16,8 @@ export const DateSelection: React.FC<DateSelectionProps> = ({
   discontinueDate,
   onStartDateChange,
   onDiscontinueDateChange,
-  showStartDateCalendar,
-  showDiscontinueDateCalendar,
-  onToggleStartDateCalendar,
-  onToggleDiscontinueDateCalendar,
-  error,
-  onCalendarOpen
+  error
 }) => {
-  const handleDateSelect = (date: Date | null, isStartDate: boolean) => {
-    if (date) {
-      const formattedDate = date.toISOString().split('T')[0];
-      if (isStartDate) {
-        onStartDateChange(formattedDate);
-        onToggleStartDateCalendar();
-      } else {
-        onDiscontinueDateChange(formattedDate);
-        onToggleDiscontinueDateCalendar();
-      }
-    }
-  };
 
   const handleStartDateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onStartDateChange(e.target.value);
@@ -63,10 +39,11 @@ export const DateSelection: React.FC<DateSelectionProps> = ({
             type="date"
             value={startDate}
             onChange={handleStartDateInputChange}
-            onClick={() => {
-              onToggleStartDateCalendar();
-              if (!showStartDateCalendar && onCalendarOpen) {
-                onCalendarOpen('start-date-calendar');
+            onKeyDown={(e) => {
+              if (e.key === ' ') {
+                e.preventDefault();
+                // Trigger native date picker
+                (e.currentTarget as HTMLInputElement).showPicker?.();
               }
             }}
             className="cursor-pointer"
@@ -76,36 +53,8 @@ export const DateSelection: React.FC<DateSelectionProps> = ({
           />
         </div>
         <span id="start-date-format" className="text-xs text-gray-500">
-          YYYY-MM-DD
+          Type date or press Space to open picker
         </span>
-        
-        {showStartDateCalendar && (
-          <div 
-            id="start-date-calendar"
-            data-modal-id="start-date-calendar"
-            className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg z-50 p-4 border"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Start date calendar"
-          >
-            <div className="mb-2 font-medium text-sm">Select Start Date</div>
-            <CalendarComponent
-              selected={startDate ? new Date(startDate) : undefined}
-              onSelect={(date: Date | undefined) => handleDateSelect(date || null, true)}
-              mode="single"
-            />
-            <div className="mt-2 flex justify-end">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onToggleStartDateCalendar}
-                tabIndex={20}
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="space-y-2 relative">
@@ -118,10 +67,11 @@ export const DateSelection: React.FC<DateSelectionProps> = ({
             type="date"
             value={discontinueDate}
             onChange={handleDiscontinueDateInputChange}
-            onClick={() => {
-              onToggleDiscontinueDateCalendar();
-              if (!showDiscontinueDateCalendar && onCalendarOpen) {
-                onCalendarOpen('discontinue-date-calendar');
+            onKeyDown={(e) => {
+              if (e.key === ' ') {
+                e.preventDefault();
+                // Trigger native date picker
+                (e.currentTarget as HTMLInputElement).showPicker?.();
               }
             }}
             className={`cursor-pointer ${error ? 'border-red-500' : ''}`}
@@ -139,37 +89,8 @@ export const DateSelection: React.FC<DateSelectionProps> = ({
           </div>
         ) : (
           <span id="discontinue-date-format" className="text-xs text-gray-500">
-            YYYY-MM-DD
+            Type date or press Space to open picker
           </span>
-        )}
-        
-        {showDiscontinueDateCalendar && (
-          <div 
-            id="discontinue-date-calendar"
-            data-modal-id="discontinue-date-calendar"
-            className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg z-50 p-4 border"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Discontinue date calendar"
-          >
-            <div className="mb-2 font-medium text-sm">Select Discontinue Date</div>
-            <CalendarComponent
-              selected={discontinueDate ? new Date(discontinueDate) : undefined}
-              onSelect={(date: Date | undefined) => handleDateSelect(date || null, false)}
-              fromDate={startDate ? new Date(startDate) : undefined}
-              mode="single"
-            />
-            <div className="mt-2 flex justify-end">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onToggleDiscontinueDateCalendar}
-                tabIndex={22}
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
         )}
       </div>
     </div>

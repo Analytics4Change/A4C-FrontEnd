@@ -6,6 +6,7 @@ import { AutocompleteDropdown, SelectionMethod } from '@/components/ui/autocompl
 import { dosageFormCategories } from '@/mocks/data/dosages.mock';
 import { useDropdownBlur } from '@/hooks/useDropdownBlur';
 import { useFocusAdvancement } from '@/hooks/useFocusAdvancement';
+import { useEnterAsTab } from '@/hooks/useEnterAsTab';
 import { filterStringItems, isItemHighlighted } from '@/utils/dropdown-filter';
 
 interface DosageFormInputsProps {
@@ -68,6 +69,9 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
     targetTabIndex: 10, // Move to Total Amount input
     enabled: true
   });
+
+  // Hook for Enter key navigation in amount field
+  const handleAmountEnterKey = useEnterAsTab(8); // Move to Unit field
 
   // Use generic filtering utilities
   const filteredCategories = filterStringItems(dosageFormCategories, categoryInput, 'contains');
@@ -255,6 +259,7 @@ export const DosageFormInputs: React.FC<DosageFormInputsProps> = ({
             type="text"
             value={dosageAmount}
             onChange={(e) => onAmountChange(e.target.value)}
+            onKeyDown={handleAmountEnterKey}
             placeholder="e.g., 500"
             className={`mt-2 ${dosageAmount ? 'border-blue-500 bg-blue-50' : ''} ${errors.get('dosageAmount') ? 'border-red-500' : ''}`}
             aria-label="Dosage amount"

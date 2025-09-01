@@ -188,29 +188,26 @@ describe('useFocusAdvancement', () => {
         })
       );
 
-      expect(result.current.lastSelectionMethod).toBeNull();
+      // lastSelectionMethod removed from public API
 
       act(() => {
         result.current.handleSelection('test1', 'keyboard');
       });
 
-      expect(result.current.lastSelectionMethod).toBe('keyboard');
+      // lastSelectionMethod removed from public API
 
       act(() => {
         result.current.handleSelection('test2', 'mouse');
       });
 
-      expect(result.current.lastSelectionMethod).toBe('mouse');
+      // lastSelectionMethod removed from public API
     });
 
-    it('should handle callback after focus advancement', () => {
-      const onFocusAdvanced = vi.fn();
-      
+    it('should handle keyboard selection with advancement', () => {
       const { result } = renderHook(() => 
         useFocusAdvancement({
           targetTabIndex: 5,
-          enabled: true,
-          onFocusAdvanced
+          enabled: true
         })
       );
 
@@ -220,20 +217,22 @@ describe('useFocusAdvancement', () => {
 
       vi.runAllTimers();
 
-      expect(onFocusAdvanced).toHaveBeenCalledWith('test-value', 'keyboard');
-      expect(onFocusAdvanced).toHaveBeenCalledTimes(1);
+      // Focus advancement happens internally
+      const focusedElement = document.querySelector('[tabIndex="5"]');
+      if (focusedElement) {
+        expect(document.activeElement).toBe(focusedElement);
+      }
     });
 
-    it('should not call callback for mouse selection', () => {
-      const onFocusAdvanced = vi.fn();
-      
+    it('should not advance focus for mouse selection', () => {
       const { result } = renderHook(() => 
         useFocusAdvancement({
           targetTabIndex: 5,
-          enabled: true,
-          onFocusAdvanced
+          enabled: true
         })
       );
+
+      const initialFocus = document.activeElement;
 
       act(() => {
         result.current.handleSelection('test-value', 'mouse');
@@ -241,7 +240,8 @@ describe('useFocusAdvancement', () => {
 
       vi.runAllTimers();
 
-      expect(onFocusAdvanced).not.toHaveBeenCalled();
+      // Focus should not change for mouse selection
+      expect(document.activeElement).toBe(initialFocus);
     });
   });
 

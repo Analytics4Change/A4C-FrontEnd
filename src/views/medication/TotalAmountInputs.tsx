@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { AutocompleteDropdown, SelectionMethod } from '@/components/ui/autocomplete-dropdown';
 import { useDropdownBlur } from '@/hooks/useDropdownBlur';
 import { useFocusAdvancement } from '@/hooks/useFocusAdvancement';
+import { useEnterAsTab } from '@/hooks/useEnterAsTab';
 import { filterStringItems, isItemHighlighted } from '@/utils/dropdown-filter';
 interface TotalAmountInputsProps {
   totalAmount: string;
@@ -38,6 +39,9 @@ export const TotalAmountInputs: React.FC<TotalAmountInputsProps> = ({
     enabled: true
   });
 
+  // Hook for Enter key navigation in total amount field
+  const handleTotalAmountEnterKey = useEnterAsTab(11); // Move to Total Unit field
+
   // Use generic filtering utilities
   const filteredTotalUnits = filterStringItems(availableTotalUnits, totalUnitInput, 'contains');
   const isTotalUnitHighlighted = (unit: string) => 
@@ -56,6 +60,7 @@ export const TotalAmountInputs: React.FC<TotalAmountInputsProps> = ({
           type="text"
           value={totalAmount}
           onChange={(e) => onTotalAmountChange(e.target.value)}
+          onKeyDown={handleTotalAmountEnterKey}
           placeholder="e.g., 30"
           className={`mt-2 ${totalAmount ? 'border-blue-500 bg-blue-50' : ''} ${errors.get('totalAmount') ? 'border-red-500' : ''}`}
           aria-label="Total amount in bottle or package"

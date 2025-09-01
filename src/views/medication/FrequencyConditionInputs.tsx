@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -47,6 +47,7 @@ export const FrequencyConditionInputs: React.FC<FrequencyConditionInputsProps> =
     targetTabIndex: 17, // Move to Therapeutic Classes button
     enabled: true
   });
+
 
   // Use generic filtering utilities
   const filteredFrequencies = filterStringItems(dosageFrequencies, frequencyInput, 'contains');

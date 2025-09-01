@@ -10,6 +10,10 @@ import './index.css';
 // Development utilities removed - using simplified components
 
 function App() {
+  // Clean mount effect
+  useEffect(() => {
+    // App initialization
+  }, []);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [showMedicationModal, setShowMedicationModal] = useState(false);
   const [showMedicationTypeSelection, setShowMedicationTypeSelection] = useState(false);

@@ -287,21 +287,47 @@ export class MedicationEntryViewModel {
   }
 
   toggleTherapeuticClass(category: string) {
-    const index = this.selectedTherapeuticClasses.indexOf(category);
-    if (index > -1) {
-      this.selectedTherapeuticClasses.splice(index, 1);
-    } else {
-      this.selectedTherapeuticClasses.push(category);
-    }
+    console.log('[MedicationEntryViewModel] toggleTherapeuticClass called with:', category);
+    console.log('[MedicationEntryViewModel] Current selected:', [...this.selectedTherapeuticClasses]);
+    runInAction(() => {
+      const index = this.selectedTherapeuticClasses.indexOf(category);
+      if (index > -1) {
+        // Use replace to trigger MobX reactivity
+        this.selectedTherapeuticClasses = this.selectedTherapeuticClasses.filter(c => c !== category);
+        console.log('[MedicationEntryViewModel] Removed, new selected:', [...this.selectedTherapeuticClasses]);
+      } else {
+        // Create new array to trigger MobX reactivity
+        this.selectedTherapeuticClasses = [...this.selectedTherapeuticClasses, category];
+        console.log('[MedicationEntryViewModel] Added, new selected:', [...this.selectedTherapeuticClasses]);
+      }
+    });
   }
 
   toggleRegimenCategory(category: string) {
     const index = this.selectedRegimenCategories.indexOf(category);
     if (index > -1) {
-      this.selectedRegimenCategories.splice(index, 1);
+      // Use replace to trigger MobX reactivity
+      this.selectedRegimenCategories = this.selectedRegimenCategories.filter(c => c !== category);
     } else {
-      this.selectedRegimenCategories.push(category);
+      // Create new array to trigger MobX reactivity
+      this.selectedRegimenCategories = [...this.selectedRegimenCategories, category];
     }
+  }
+
+  // Setter methods for multi-select dropdowns
+  setTherapeuticClasses(classes: string[]) {
+    console.log('[MedicationEntryViewModel] setTherapeuticClasses called with:', classes);
+    console.log('[MedicationEntryViewModel] Before update:', this.selectedTherapeuticClasses.slice());
+    runInAction(() => {
+      this.selectedTherapeuticClasses = classes;
+      console.log('[MedicationEntryViewModel] After update:', this.selectedTherapeuticClasses.slice());
+    });
+  }
+
+  setRegimenCategories(categories: string[]) {
+    runInAction(() => {
+      this.selectedRegimenCategories = categories;
+    });
   }
 
   async save() {

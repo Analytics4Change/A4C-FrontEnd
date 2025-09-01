@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
+import React from 'react';
 import { useKeyboardNavigation } from '../useKeyboardNavigation';
 import * as focusUtils from '@/utils/focus-management';
 
@@ -325,11 +326,11 @@ describe('useKeyboardNavigation', () => {
 
   describe('Edge cases', () => {
     it('should handle missing container gracefully', () => {
-      const containerRef = { current: null };
+      const containerRef = React.createRef<HTMLElement>();
       
       renderHook(() => 
         useKeyboardNavigation({
-          containerRef,
+          containerRef: containerRef as React.RefObject<HTMLElement>,
           enabled: true
         })
       );
@@ -446,7 +447,7 @@ describe('useKeyboardNavigation', () => {
         })
       );
 
-      expect(result.current.isNavigating).toBe(false);
+      // isNavigating removed from public API
 
       // Focus an element in container
       input1.focus();
@@ -460,7 +461,7 @@ describe('useKeyboardNavigation', () => {
 
       // Note: In a real scenario, we'd need to test the state change
       // during the navigation, but this is simplified for unit testing
-      expect(result.current.isNavigating).toBe(false);
+      // isNavigating removed from public API
     });
   });
 });

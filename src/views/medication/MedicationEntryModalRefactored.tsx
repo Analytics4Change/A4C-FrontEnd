@@ -11,8 +11,9 @@ import { DosageFormCategory } from '@/types/models/Dosage';
 // Use editable versions with click-to-edit functionality
 import { MedicationSearch } from './MedicationSearchWithSearchableDropdown';
 import { DosageFormEditable } from './DosageFormEditable';
-import { CategorySelectionEnhanced } from './CategorySelectionEnhanced';
+import { CategorySelection } from './CategorySelectionSimplified';
 import { DateSelection } from './DateSelectionSimplified';
+import { MobXDebugger } from '@/components/debug/MobXDebugger';
 // Using editable components for flexible field editing and keyboard navigation
 
 interface MedicationEntryModalProps {
@@ -124,14 +125,18 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
 
 
   return (
-    <div 
-      className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-40"
-      data-testid="add-new-prescribed-medication-modal"
-      data-modal-id="add-new-prescribed-medication"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="medication-modal-title"
-    >
+    <>
+      {/* MobX Debug Monitor */}
+      <MobXDebugger viewModel={vm} show={true} />
+      
+      <div 
+        className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-40"
+        data-testid="add-new-prescribed-medication-modal"
+        data-modal-id="add-new-prescribed-medication"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="medication-modal-title"
+      >
       <div 
         ref={modalRef}
         className="bg-white rounded-3xl max-w-4xl w-full m-4 max-h-[90vh] overflow-hidden flex flex-col"
@@ -248,19 +253,19 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
               </div>
 
               {/* Category Selection */}
-              <div id="therapeutic-classes-button" data-flow-node="true">
-                <CategorySelectionEnhanced
+              <div data-flow-node="true">
+                <CategorySelection
                   selectedTherapeuticClasses={vm.selectedTherapeuticClasses}
                   selectedRegimenCategories={vm.selectedRegimenCategories}
-                  onToggleTherapeuticClass={(cat) => {
-                    vm.toggleTherapeuticClass(cat);
-                    if (vm.selectedTherapeuticClasses.length > 0) {
+                  onTherapeuticClassesChange={(classes) => {
+                    vm.setTherapeuticClasses(classes);
+                    if (classes.length > 0) {
                       handleFieldComplete('therapeutic-classes-button');
                     }
                   }}
-                  onToggleRegimenCategory={(cat) => {
-                    vm.toggleRegimenCategory(cat);
-                    if (vm.selectedRegimenCategories.length > 0) {
+                  onRegimenCategoriesChange={(categories) => {
+                    vm.setRegimenCategories(categories);
+                    if (categories.length > 0) {
                       handleFieldComplete('regimen-categories-button');
                     }
                   }}
@@ -334,6 +339,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
         </div>
       </div>
     </div>
+    </>
   );
 });
 
