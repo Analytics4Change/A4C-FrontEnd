@@ -8,12 +8,12 @@ import { useScrollToElement } from '@/hooks/useScrollToElement';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import { MedicationEntryViewModel } from '@/viewModels/medication/MedicationEntryViewModel';
 import { DosageFormCategory } from '@/types/models/Dosage';
-// Use simplified versions without FocusableField wrappers
-import { MedicationSearch } from './MedicationSearchSimplified';
-import { DosageForm } from './DosageFormSimplified';
-import { CategorySelection } from './CategorySelectionSimplified';
+// Use editable versions with click-to-edit functionality
+import { MedicationSearch } from './MedicationSearchWithSearchableDropdown';
+import { DosageFormEditable } from './DosageFormEditable';
+import { CategorySelectionEnhanced } from './CategorySelectionEnhanced';
 import { DateSelection } from './DateSelectionSimplified';
-// Using simplified components for clean focus management
+// Using editable components for flexible field editing and keyboard navigation
 
 interface MedicationEntryModalProps {
   clientId: string;
@@ -113,7 +113,12 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
     enabled: true,
     trapFocus: true,
     restoreFocus: false, // We don't need to restore focus on unmount
-    onEscape: onClose
+    onEscape: onClose,
+    checkEscapeCondition: () => {
+      // Only close modal if no sub-contexts are open
+      const openContexts = modalRef.current?.querySelectorAll('[data-focus-context="open"]');
+      return !openContexts || openContexts.length === 0;
+    }
   });
 
 
@@ -185,7 +190,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
               }`}
             >
               <div data-flow-node="true">
-                <DosageForm
+                <DosageFormEditable
                   dosageFormCategory={vm.dosageFormCategory}
                   dosageFormType={vm.dosageFormType}
                   dosageForm={vm.dosageForm}
@@ -244,7 +249,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
 
               {/* Category Selection */}
               <div id="therapeutic-classes-button" data-flow-node="true">
-                <CategorySelection
+                <CategorySelectionEnhanced
                   selectedTherapeuticClasses={vm.selectedTherapeuticClasses}
                   selectedRegimenCategories={vm.selectedRegimenCategories}
                   onToggleTherapeuticClass={(cat) => {
@@ -280,14 +285,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
                       handleFieldComplete('discontinue-date');
                     }
                   }}
-                  showStartDateCalendar={vm.showStartDateCalendar}
-                  showDiscontinueDateCalendar={vm.showDiscontinueDateCalendar}
-                  onToggleStartDateCalendar={() => vm.showStartDateCalendar = !vm.showStartDateCalendar}
-                  onToggleDiscontinueDateCalendar={() => vm.showDiscontinueDateCalendar = !vm.showDiscontinueDateCalendar}
                   error={vm.errors.get('discontinueDate')}
-                  onCalendarOpen={(elementId) => {
-                    handleScrollToElement(elementId);
-                  }}
                 />
               </div>
             </div>

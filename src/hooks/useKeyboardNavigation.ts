@@ -26,6 +26,7 @@ export interface UseKeyboardNavigationOptions {
   // Callbacks
   onNavigate?: (element: HTMLElement, direction: 'forward' | 'backward') => void;
   onEscape?: () => void;
+  checkEscapeCondition?: () => boolean; // Only call onEscape if this returns true
 }
 
 /**
@@ -80,7 +81,8 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions): Us
     includeSelectors = [],
     excludeSelectors = [],
     onNavigate,
-    onEscape
+    onEscape,
+    checkEscapeCondition
   } = options;
 
   const [currentFocusIndex, setCurrentFocusIndex] = useState(-1);
@@ -257,8 +259,30 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions): Us
       return;
     }
     
+    // Skip if event has already been handled (e.g., by a dropdown)
+    if (event.defaultPrevented) {
+      console.log('[useKeyboardNavigation] Skipping key handling - event already prevented');
+      return;
+    }
+    
     switch (event.key) {
       case 'Tab':
+        // Check if the event target is controlling or inside a dropdown
+        const target = event.target as HTMLElement;
+        
+        // Check if target is inside an open dropdown
+        const inDropdown = target?.closest('[data-focus-context="open"]');
+        
+        // Check if target is an input controlling an open dropdown
+        const isDropdownController = target?.getAttribute('aria-controls') && 
+                                     target?.getAttribute('aria-expanded') === 'true';
+        
+        if (inDropdown || isDropdownController) {
+          console.log('[useKeyboardNavigation] Tab in dropdown context - skipping modal handler');
+          return;
+        }
+        
+        console.log(`[useKeyboardNavigation] Handling Tab: trapFocus=${trapFocus}, allowTab=${allowTabNavigation}`);
         if (allowTabNavigation && (trapFocus || wrapAround)) {
           // Only prevent default if we're trapping or wrapping
           const isFirstElement = currentFocusIndex === 0;
@@ -299,9 +323,25 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions): Us
         break;
         
       case 'Escape':
+        // Check if the event target is in a dropdown context
+        const escapeTarget = event.target as HTMLElement;
+        const inDropdownContext = escapeTarget?.closest('[data-focus-context="open"]') ||
+                                  (escapeTarget?.getAttribute('aria-controls') && 
+                                   escapeTarget?.getAttribute('aria-expanded') === 'true');
+        
+        if (inDropdownContext) {
+          console.log('[useKeyboardNavigation] Escape in dropdown context - skipping modal handler');
+          return;
+        }
+        
         if (onEscape) {
-          event.preventDefault();
-          onEscape();
+          // Check if we should handle escape based on condition
+          const shouldHandleEscape = checkEscapeCondition ? checkEscapeCondition() : true;
+          if (shouldHandleEscape) {
+            event.preventDefault();
+            event.stopPropagation();
+            onEscape();
+          }
         }
         break;
         
@@ -332,7 +372,8 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions): Us
     focusPrevious,
     focusFirst,
     focusLast,
-    onEscape
+    onEscape,
+    checkEscapeCondition
   ]);
 
   // Attach keyboard listener

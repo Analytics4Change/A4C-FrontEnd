@@ -41,8 +41,6 @@ export class MedicationEntryViewModel {
   showUnitDropdown = false;
   showFrequencyDropdown = false;
   showConditionDropdown = false;
-  showStartDateCalendar = false;
-  showDiscontinueDateCalendar = false;
   
   errors: Map<string, string> = new Map();
   
@@ -101,16 +99,28 @@ export class MedicationEntryViewModel {
   async searchMedications(query: string) {
     runInAction(() => {
       this.medicationName = query;
+      // If query is empty, immediately close dropdown
+      if (!query) {
+        this.searchResults = [];
+        this.showMedicationDropdown = false;
+        this.isLoading = false;
+        console.log(`[MedicationEntryViewModel] Empty query - closing dropdown`);
+        return;
+      }
       this.isLoading = true;
     });
     
+    // Don't make API call if query is empty
+    if (!query) return;
+    
     try {
-      // Always fetch all medications - filtering is done visually via highlighting
-      // Pass empty string to get all medications
-      const results = await this.medicationApi.searchMedications('');
+      // Pass the actual query to get filtered results
+      const results = await this.medicationApi.searchMedications(query);
+      console.log(`[MedicationEntryViewModel] Search for "${query}" returned ${results.length} results`);
       runInAction(() => {
         this.searchResults = results;
         this.showMedicationDropdown = this.searchResults.length > 0;
+        console.log(`[MedicationEntryViewModel] showMedicationDropdown = ${this.showMedicationDropdown}`);
       });
     } catch (error) {
       this.validation.handleError('Failed to search medications', error);
@@ -137,10 +147,13 @@ export class MedicationEntryViewModel {
 
   clearMedication() {
     runInAction(() => {
+      // Clear medication selection
       this.selectedMedication = null;
       this.medicationName = '';
       this.searchResults = [];
       this.showMedicationDropdown = false;
+      
+      // Cascade clear ALL form fields (complete reset)
       this.dosageFormCategory = '';
       this.dosageFormType = '';
       this.dosageForm = '';
@@ -148,8 +161,25 @@ export class MedicationEntryViewModel {
       this.dosageUnit = '';
       this.totalAmount = '';
       this.totalUnit = '';
+      this.frequency = '';
+      this.condition = '';
+      this.startDate = null;
+      this.discontinueDate = null;
+      this.prescribingDoctor = '';
+      this.notes = '';
       this.selectedTherapeuticClasses = [];
       this.selectedRegimenCategories = [];
+      
+      // Clear all dropdowns
+      this.showFormCategoryDropdown = false;
+      this.showFormTypeDropdown = false;
+      this.showFormDropdown = false;
+      this.showUnitDropdown = false;
+      this.showFrequencyDropdown = false;
+      this.showConditionDropdown = false;
+      
+      // Clear errors
+      this.errors.clear();
     });
   }
 
@@ -245,7 +275,6 @@ export class MedicationEntryViewModel {
   setStartDate(date: Date | null) {
     runInAction(() => {
       this.startDate = date;
-      this.showStartDateCalendar = false;
     });
     this.validation.clearError('startDate');
   }
@@ -253,7 +282,6 @@ export class MedicationEntryViewModel {
   setDiscontinueDate(date: Date | null) {
     runInAction(() => {
       this.discontinueDate = date;
-      this.showDiscontinueDateCalendar = false;
     });
     this.validation.clearError('discontinueDate');
   }
