@@ -90,6 +90,42 @@ export const mockMedicationDatabase: Medication[] = [
       requiresMonitoring: true
     },
     activeIngredients: ['Sertraline hydrochloride']
+  },
+  {
+    id: '6',
+    name: 'Pravastatin',
+    genericName: 'Pravastatin',
+    brandNames: ['Pravachol'],
+    categories: {
+      broad: 'Cardiovascular',
+      specific: 'Cholesterol Management',
+      therapeutic: 'Statin'
+    },
+    flags: {
+      isPsychotropic: false,
+      isControlled: false,
+      isNarcotic: false,
+      requiresMonitoring: true
+    },
+    activeIngredients: ['Pravastatin sodium']
+  },
+  {
+    id: '7',
+    name: 'Alprazolam',
+    genericName: 'Alprazolam',
+    brandNames: ['Xanax'],
+    categories: {
+      broad: 'Mental Health',
+      specific: 'Anxiety',
+      therapeutic: 'Benzodiazepine'
+    },
+    flags: {
+      isPsychotropic: true,
+      isControlled: true,
+      isNarcotic: false,
+      requiresMonitoring: true
+    },
+    activeIngredients: ['Alprazolam']
   }
 ];
 

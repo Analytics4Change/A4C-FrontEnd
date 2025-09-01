@@ -63,6 +63,13 @@ export function AutocompleteDropdown<T>({
             onSelect(items[0], 'keyboard');
           } else if (highlightedIndex >= 0 && highlightedIndex < items.length) {
             onSelect(items[highlightedIndex], 'keyboard');
+          } else {
+            // If no item is highlighted via keyboard navigation (highlightedIndex is -1),
+            // check if there's a visually highlighted item (via isItemHighlighted)
+            const visuallyHighlightedItem = items.find(item => isItemHighlighted?.(item));
+            if (visuallyHighlightedItem) {
+              onSelect(visuallyHighlightedItem, 'keyboard');
+            }
           }
           break;
         case 'Escape':
@@ -72,6 +79,7 @@ export function AutocompleteDropdown<T>({
           break;
         case 'Tab':
           // Allow tab to move focus naturally, which will trigger blur
+          // The blur handler will auto-select if there's an exact match
           break;
       }
     };
@@ -83,6 +91,52 @@ export function AutocompleteDropdown<T>({
       return () => inputElement.removeEventListener('keydown', handleKeyDown);
     }
   }, [isOpen, items, highlightedIndex, onSelect, inputRef]);
+
+  // Auto-select exact match on blur (Tab key behavior)
+  useEffect(() => {
+    if (!inputRef.current) return;
+
+    const handleBlur = (e: Event) => {
+      // Only auto-select if dropdown is open and we have items
+      if (!isOpen || items.length === 0) return;
+
+      // Get the current input value
+      const inputElement = e.target as HTMLInputElement;
+      const inputValue = inputElement.value?.trim();
+      
+      if (!inputValue) return;
+
+      // Check for exact match (case-insensitive)
+      const exactMatch = items.find(item => {
+        // Convert item to string for comparison
+        const itemString = typeof item === 'string' 
+          ? item 
+          : (item as any).toString?.() || '';
+        return itemString.toLowerCase() === inputValue.toLowerCase();
+      });
+
+      if (exactMatch) {
+        // Auto-select the exact match
+        // Use a small delay to ensure blur handlers in parent components run after selection
+        setTimeout(() => {
+          onSelect(exactMatch, 'keyboard');
+        }, 0);
+      } else if (items.length === 1) {
+        // If only one item matches the filter and user typed something, select it
+        // This handles cases like typing "m" when only "mg" is available
+        setTimeout(() => {
+          onSelect(items[0], 'keyboard');
+        }, 0);
+      }
+    };
+
+    const inputElement = inputRef.current;
+    inputElement.addEventListener('blur', handleBlur);
+    
+    return () => {
+      inputElement.removeEventListener('blur', handleBlur);
+    };
+  }, [isOpen, items, onSelect, inputRef]);
 
   // Auto-scroll to highlighted item
   useEffect(() => {
