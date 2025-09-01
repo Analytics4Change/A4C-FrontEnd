@@ -46,17 +46,32 @@ npm run lint       # Run ESLint
 ### Form Infrastructure
 - Complex multi-step forms with validation
 - Accessible form controls with ARIA labels
-- Keyboard navigation support with tabIndex management
+- **Keyboard Navigation Standards**:
+  - Full keyboard support required for all interactive elements
+  - Tab/Shift+Tab for field navigation
+  - Arrow keys for option selection in dropdowns
+  - Space key to toggle checkboxes and radio buttons
+  - Enter key to submit forms or accept selections
+  - Escape key to cancel operations or close dropdowns
 - Focus trapping in modals
+- **Multi-Select Dropdown Pattern**:
+  - Use unified `MultiSelectDropdown` component for consistency
+  - Maintains focus context for keyboard navigation
+  - Supports WCAG 2.1 Level AA compliance
+  - Handles both keyboard and mouse interactions seamlessly
 
 ## Project Structure
 
 ```
 src/
 ├── components/       # Reusable UI components
-│   └── ui/          # Base UI components (button, input, etc.)
+│   ├── ui/          # Base UI components (button, input, etc.)
+│   │   └── MultiSelectDropdown.tsx  # Unified multi-select component
+│   └── debug/       # Debug utilities (dev only)
+│       └── MobXDebugger.tsx  # MobX state visualization
 ├── config/          # Application configuration
-│   └── timings.ts   # Centralized timing configuration
+│   ├── timings.ts   # Centralized timing configuration
+│   └── mobx.config.ts  # MobX debugging configuration
 ├── contexts/        # React contexts
 ├── hooks/           # Custom React hooks
 ├── mocks/           # Mock data for development
@@ -77,11 +92,22 @@ src/
 - **MVVM Pattern**: ViewModels (MobX) handle business logic, Views (React) handle presentation
 - **Composition over Inheritance**: Use component composition for complex UIs
 - **Interface-based Services**: All services implement interfaces for easy mocking/testing
+- **Unified Component Pattern**: Create single, reusable components for similar functionality (e.g., MultiSelectDropdown for all multi-select needs)
 
-### State Management
+### State Management with MobX
 - Use MobX ViewModels for complex state logic
 - Keep component state minimal and UI-focused
-- Use `observer` HOC from mobx-react-lite for reactive components
+- **CRITICAL**: Always wrap components with `observer` HOC from mobx-react-lite for reactive components
+- **Array Reactivity Rules**:
+  - Never spread observable arrays in props: `<Component items={[...observableArray]} />` ❌
+  - Pass observable arrays directly: `<Component items={observableArray} />` ✅
+  - Use immutable updates in ViewModels: `this.array = [...this.array, item]` instead of `this.array.push(item)`
+  - Always use `runInAction` for multiple state updates
+- **Debugging MobX**: When reactivity issues occur, check:
+  1. Component is wrapped with `observer`
+  2. No array spreading breaking the observable chain
+  3. State mutations are using replacement, not mutation
+  4. Parent components in render chain are also wrapped with `observer`
 
 ### TypeScript Guidelines
 - Strict mode is enabled - avoid `any` types
@@ -232,3 +258,80 @@ const timeoutId = setTimeout(() => {
 - Use centralized timing configuration that sets to 0ms in test environment
 - Tests should run instantly without fake timers when properly abstracted
 - This eliminates flaky tests and improves test execution speed
+
+## Testing Patterns
+
+### E2E Testing with Playwright
+- **Keyboard Navigation Tests**: Always test full keyboard flow for forms
+- **Multi-Select Testing**: Verify Space key toggles, Enter accepts, Escape cancels
+- **Focus Management**: Ensure focus moves predictably through Tab order
+- **Accessibility**: Test ARIA attributes and screen reader compatibility
+
+### Debugging MobX Reactivity Issues
+When components don't re-render despite state changes:
+
+1. **Enable MobX debugging** in `/src/config/mobx.config.ts`
+2. **Add diagnostic logging** to track state changes:
+   ```typescript
+   console.log('[Component] Rendering with:', observableArray.slice());
+   ```
+3. **Use MobXDebugger component** in development to visualize state
+4. **Check for array spreading** that breaks observable chain
+5. **Verify observer wrapping** on all components in render hierarchy
+
+### Common Pitfalls and Solutions
+
+#### ❌ Problem: Array spreading breaks reactivity
+```typescript
+// BAD - Creates new non-observable array
+<CategorySelection 
+  selectedClasses={[...vm.selectedTherapeuticClasses]} 
+/>
+```
+
+#### ✅ Solution: Pass observable directly
+```typescript
+// GOOD - Maintains observable chain
+<CategorySelection 
+  selectedClasses={vm.selectedTherapeuticClasses} 
+/>
+```
+
+#### ❌ Problem: Direct array mutation doesn't trigger updates
+```typescript
+// BAD - MobX might not detect the change
+this.selectedItems.push(newItem);
+```
+
+#### ✅ Solution: Use immutable updates
+```typescript
+// GOOD - Creates new array reference
+runInAction(() => {
+  this.selectedItems = [...this.selectedItems, newItem];
+});
+```
+
+## Component Patterns
+
+### Unified Multi-Select Dropdown
+The `MultiSelectDropdown` component is the standard for all multi-select needs:
+
+```typescript
+import { MultiSelectDropdown } from '@/components/ui/MultiSelectDropdown';
+
+<MultiSelectDropdown
+  id="unique-id"
+  label="Selection Label"
+  options={['Option 1', 'Option 2']}
+  selected={observableSelectedArray}  // Pass observable directly!
+  onChange={(newSelection) => vm.setSelection(newSelection)}
+  placeholder="Select items..."
+  buttonTabIndex={17}
+/>
+```
+
+Key features:
+- Full keyboard navigation (Tab, Arrows, Space, Enter, Escape)
+- WCAG 2.1 Level AA compliant
+- MobX observable compatible
+- Consistent UX across the application
