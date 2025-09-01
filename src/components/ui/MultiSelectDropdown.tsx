@@ -200,6 +200,7 @@ export const MultiSelectDropdown = observer(({
         <div
           id={`${id}-listbox`}
           role="listbox"
+          data-focus-context="open"
           aria-multiselectable="true"
           aria-label={label}
           className="absolute z-50 mt-1 w-full bg-white border rounded-lg shadow-lg overflow-auto"

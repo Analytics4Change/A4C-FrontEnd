@@ -74,6 +74,7 @@ export function AutocompleteDropdown<T>({
           break;
         case 'Escape':
           keyEvent.preventDefault();
+          keyEvent.stopPropagation(); // Prevent bubbling to modal
           // Let the parent component handle closing
           inputRef.current?.blur();
           break;
@@ -155,6 +156,7 @@ export function AutocompleteDropdown<T>({
       <div
         ref={dropdownRef}
         data-testid={testId}
+        data-focus-context="open"
         {...(modalId && { 'data-modal-id': modalId })}
         className={cn(
           "fixed bg-white border border-gray-200 rounded-lg shadow-2xl max-h-60 overflow-y-auto z-[10000]",
