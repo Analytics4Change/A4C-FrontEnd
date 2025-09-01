@@ -7,6 +7,16 @@ node_modules/
 /coverage
 test-results/
 playwright-report/
+test-results.json
+test-results.xml
+user_unit_test_run*.txt
+test-batch-*.txt
+test-exclusions.txt
+test-*.log
+safe-test-*.json
+safe-test-*.log
+test-metrics.json
+test-validation/
 
 # Production builds
 /build
@@ -40,6 +50,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+*.log
 
 # Memory Reports - Generated Content
 memory-reports/*.json
@@ -72,7 +83,10 @@ memory-reports/snapshots/*.heapsnapshot
 .parcel-cache/
 .next/
 .nuxt/
+.vite/
 
 # Debug
 debug.log
 debug.txt
+memory-pressure.log
+pressure-*.log
