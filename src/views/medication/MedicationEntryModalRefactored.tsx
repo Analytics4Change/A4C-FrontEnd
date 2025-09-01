@@ -127,7 +127,7 @@ const MedicationEntryModalContent = observer(({ clientId, onClose, onSave }: Med
   return (
     <>
       {/* MobX Debug Monitor */}
-      <MobXDebugger viewModel={vm} show={true} />
+      <MobXDebugger viewModel={vm} />
       
       <div 
         className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-40"

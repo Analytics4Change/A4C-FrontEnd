@@ -5,6 +5,7 @@ import { MedicationEntryModal } from '@/views/medication/MedicationEntryModalRef
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardAction } from '@/components/ui/card';
 import { Plus, Pill } from 'lucide-react';
+import { DebugControlPanel } from '@/components/debug/DebugControlPanel';
 import './index.css';
 
 // Development utilities removed - using simplified components
@@ -94,6 +95,9 @@ function App() {
 
   return (
     <>
+      {/* Debug Control Panel */}
+      <DebugControlPanel />
+      
       {!selectedClientId ? (
         <ClientSelector onClientSelect={handleClientSelect} />
       ) : (

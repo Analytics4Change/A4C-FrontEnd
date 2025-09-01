@@ -121,6 +121,116 @@ src/
 - For exact code syntax use the context7 mcp server
 - For UI / UX testing use the playwright mcp server
 
+## Logging and Diagnostics
+
+### Configuration-Driven Logging System
+The application uses a zero-overhead logging system that can be configured per environment:
+
+#### Logger Usage
+```typescript
+import { Logger } from '@/utils/logger';
+
+// Get a category-specific logger
+const log = Logger.getLogger('viewmodel');
+
+// Use appropriate log levels
+log.debug('Detailed debug information', { data });
+log.info('Important information');
+log.warn('Warning message');
+log.error('Error occurred', error);
+```
+
+#### Configuration (`/src/config/logging.config.ts`)
+- **Development**: Full logging with all categories enabled
+- **Test**: Minimal logging (errors only) for fast test execution
+- **Production**: Disabled by default, console methods removed during build
+
+#### Log Categories
+- `main` - Application startup and lifecycle
+- `mobx` - MobX state management and reactions
+- `viewmodel` - ViewModel business logic
+- `navigation` - Focus and keyboard navigation
+- `component` - Component lifecycle and rendering
+- `api` - API calls and responses
+- `validation` - Form validation logic
+- `diagnostics` - Debug tool controls
+
+#### Output Targets
+- `console` - Standard console output (preserves E2E test compatibility)
+- `memory` - In-memory buffer for debugging
+- `remote` - Placeholder for remote logging services
+- `none` - No output (complete silence)
+
+### Debug Diagnostics System
+The application includes a comprehensive diagnostics system for development:
+
+#### Debug Control Panel
+- **Activation**: Press `Ctrl+Shift+D` to toggle the control panel
+- **Features**:
+  - Toggle individual debug monitors
+  - Adjust position (4 corners)
+  - Control opacity (30-100%)
+  - Change font size (small/medium/large)
+  - Persistent settings via localStorage
+
+#### Available Debug Monitors
+
+##### MobX State Monitor
+- **Keyboard Shortcut**: `Ctrl+Shift+M`
+- **Purpose**: Visualize MobX observable state in real-time
+- **Shows**:
+  - Component render count
+  - Selected arrays and their contents
+  - Last update timestamp
+- **Usage**: Automatically appears when enabled via control panel
+
+##### Performance Monitor
+- **Keyboard Shortcut**: `Ctrl+Shift+P`
+- **Purpose**: Track rendering performance and optimization opportunities
+- **Metrics**: FPS, render time, memory usage
+
+##### Log Overlay
+- **Purpose**: Display console logs directly in the UI
+- **Features**: Filter by category, search, clear buffer
+
+##### Network Monitor
+- **Purpose**: Track API calls and responses
+- **Shows**: Request timing, payload size, status codes
+
+#### Environment Variables for Initial State
+```bash
+# Enable specific monitors on startup
+VITE_DEBUG_MOBX=true
+VITE_DEBUG_PERFORMANCE=true
+VITE_DEBUG_LOGS=true
+```
+
+#### DiagnosticsContext Usage
+```typescript
+import { useDiagnostics } from '@/contexts/DiagnosticsContext';
+
+const MyComponent = () => {
+  const { config, toggleMobXMonitor } = useDiagnostics();
+  
+  // Check if monitor is enabled
+  if (config.enableMobXMonitor) {
+    // Show debug information
+  }
+};
+```
+
+### Production Build Optimization
+- All `console.*` statements automatically removed via Vite's esbuild
+- Debug components tree-shaken when not imported
+- Logger checks `import.meta.env.PROD` at initialization
+- Zero runtime overhead when diagnostics disabled
+
+### Testing Considerations
+- Logger uses actual console methods to maintain E2E test compatibility
+- All timing delays set to 0ms in test environment
+- Debug monitors automatically disabled in tests
+- Use `Logger.clearBuffer()` in test setup for clean state
+
 ## Code Organization Guidelines
 
 ### File Size Standards

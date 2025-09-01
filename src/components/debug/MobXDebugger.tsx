@@ -1,38 +1,55 @@
 import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 import { MedicationEntryViewModel } from '@/viewModels/medication/MedicationEntryViewModel';
+import { useDiagnostics } from '@/contexts/DiagnosticsContext';
 
 interface MobXDebuggerProps {
   viewModel: MedicationEntryViewModel;
-  show?: boolean;
 }
 
 /**
  * Debug component to monitor MobX state changes
  * Shows current state and render count
+ * Visibility controlled by DiagnosticsContext
  */
-export const MobXDebugger: React.FC<MobXDebuggerProps> = observer(({ viewModel, show = true }) => {
+export const MobXDebugger: React.FC<MobXDebuggerProps> = observer(({ viewModel }) => {
   const renderCount = useRef(0);
+  const { config } = useDiagnostics();
   
   useEffect(() => {
     renderCount.current++;
   });
   
-  if (!show || !import.meta.env.DEV) {
+  // Check if should display based on context
+  if (!import.meta.env.DEV || !config.enableMobXMonitor) {
     return null;
+  }
+  
+  // Calculate position based on config
+  const positionStyles: React.CSSProperties = {
+    ...(config.position === 'top-left' && { top: 10, left: 10 }),
+    ...(config.position === 'top-right' && { top: 10, right: 10 }),
+    ...(config.position === 'bottom-left' && { bottom: 10, left: 10 }),
+    ...(config.position === 'bottom-right' && { bottom: 10, right: 10 }),
+  };
+  
+  // Offset if control panel is in same position
+  if (config.showControlPanel && !config.controlPanelMinimized) {
+    if (config.position === 'bottom-right') {
+      positionStyles.bottom = 320; // Move above control panel
+    }
   }
   
   return (
     <div 
       style={{
         position: 'fixed',
-        bottom: 10,
-        right: 10,
-        background: 'rgba(0, 0, 0, 0.9)',
+        ...positionStyles,
+        background: `rgba(0, 0, 0, ${config.opacity})`,
         color: '#00ff00',
         padding: '10px',
         borderRadius: '5px',
-        fontSize: '12px',
+        fontSize: config.fontSize === 'small' ? '11px' : config.fontSize === 'medium' ? '12px' : '14px',
         fontFamily: 'monospace',
         maxWidth: '400px',
         zIndex: 9999,

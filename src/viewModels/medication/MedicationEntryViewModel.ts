@@ -15,6 +15,9 @@ import {
   getCategoryForDosageForm 
 } from '@/mocks/data/dosageFormHierarchy.mock';
 import { MedicationEntryValidation } from './MedicationEntryValidation';
+import { Logger } from '@/utils/logger';
+
+const log = Logger.getLogger('viewmodel');
 
 export class MedicationEntryViewModel {
   medicationName = '';
@@ -104,7 +107,7 @@ export class MedicationEntryViewModel {
         this.searchResults = [];
         this.showMedicationDropdown = false;
         this.isLoading = false;
-        console.log(`[MedicationEntryViewModel] Empty query - closing dropdown`);
+        log.debug('Empty query - closing dropdown');
         return;
       }
       this.isLoading = true;
@@ -116,11 +119,11 @@ export class MedicationEntryViewModel {
     try {
       // Pass the actual query to get filtered results
       const results = await this.medicationApi.searchMedications(query);
-      console.log(`[MedicationEntryViewModel] Search for "${query}" returned ${results.length} results`);
+      log.debug(`Search for "${query}" returned ${results.length} results`);
       runInAction(() => {
         this.searchResults = results;
         this.showMedicationDropdown = this.searchResults.length > 0;
-        console.log(`[MedicationEntryViewModel] showMedicationDropdown = ${this.showMedicationDropdown}`);
+        log.debug(`showMedicationDropdown = ${this.showMedicationDropdown}`);
       });
     } catch (error) {
       this.validation.handleError('Failed to search medications', error);
@@ -287,18 +290,18 @@ export class MedicationEntryViewModel {
   }
 
   toggleTherapeuticClass(category: string) {
-    console.log('[MedicationEntryViewModel] toggleTherapeuticClass called with:', category);
-    console.log('[MedicationEntryViewModel] Current selected:', [...this.selectedTherapeuticClasses]);
+    log.debug('toggleTherapeuticClass called with:', category);
+    log.debug('Current selected:', [...this.selectedTherapeuticClasses]);
     runInAction(() => {
       const index = this.selectedTherapeuticClasses.indexOf(category);
       if (index > -1) {
         // Use replace to trigger MobX reactivity
         this.selectedTherapeuticClasses = this.selectedTherapeuticClasses.filter(c => c !== category);
-        console.log('[MedicationEntryViewModel] Removed, new selected:', [...this.selectedTherapeuticClasses]);
+        log.debug('Removed, new selected:', [...this.selectedTherapeuticClasses]);
       } else {
         // Create new array to trigger MobX reactivity
         this.selectedTherapeuticClasses = [...this.selectedTherapeuticClasses, category];
-        console.log('[MedicationEntryViewModel] Added, new selected:', [...this.selectedTherapeuticClasses]);
+        log.debug('Added, new selected:', [...this.selectedTherapeuticClasses]);
       }
     });
   }
@@ -316,11 +319,11 @@ export class MedicationEntryViewModel {
 
   // Setter methods for multi-select dropdowns
   setTherapeuticClasses(classes: string[]) {
-    console.log('[MedicationEntryViewModel] setTherapeuticClasses called with:', classes);
-    console.log('[MedicationEntryViewModel] Before update:', this.selectedTherapeuticClasses.slice());
+    log.debug('setTherapeuticClasses called with:', classes);
+    log.debug('Before update:', this.selectedTherapeuticClasses.slice());
     runInAction(() => {
       this.selectedTherapeuticClasses = classes;
-      console.log('[MedicationEntryViewModel] After update:', this.selectedTherapeuticClasses.slice());
+      log.debug('After update:', this.selectedTherapeuticClasses.slice());
     });
   }
 

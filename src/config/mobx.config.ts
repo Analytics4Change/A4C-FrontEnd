@@ -1,13 +1,16 @@
 import { configure } from 'mobx';
+import { Logger } from '@/utils/logger';
 
 /**
  * MobX Configuration
  * Debugging MobX reactivity issues with MultiSelectDropdown
  */
 
+const log = Logger.getLogger('mobx');
+
 // Enable detailed logging in development
 if (import.meta.env.DEV) {
-  console.log('[MobX Config] Initializing MobX configuration for debugging');
+  log.debug('Initializing MobX configuration for debugging');
 }
 
 configure({
@@ -31,5 +34,5 @@ configure({
 
 // Log when configuration is applied
 if (import.meta.env.DEV) {
-  console.log('[MobX Config] Configuration applied successfully');
+  log.debug('Configuration applied successfully');
 }
