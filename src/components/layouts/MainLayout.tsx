@@ -55,14 +55,21 @@ export const MainLayout: React.FC = () => {
         transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 transition-transform duration-200 ease-in-out
         flex flex-col
-        glass-sidebar
+        glass-sidebar glass-sidebar-borders
       `}
       style={{
         background: 'rgba(255, 255, 255, 0.75)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderRight: '1px solid rgba(255, 255, 255, 0.3)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)'
+        borderRight: '1px solid',
+        borderImage: 'linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.5) 100%) 1',
+        boxShadow: `
+          0 0 0 1px rgba(255, 255, 255, 0.18) inset,
+          2px 0 4px rgba(0, 0, 0, 0.04),
+          4px 0 8px rgba(0, 0, 0, 0.04),
+          8px 0 16px rgba(0, 0, 0, 0.04),
+          0 0 24px rgba(59, 130, 246, 0.03)
+        `.trim()
       }}>
         {/* Logo */}
         <div className="p-6 border-b border-gray-200/30">
@@ -87,10 +94,10 @@ export const MainLayout: React.FC = () => {
                 to={item.to}
                 className={({ isActive }) => `
                   flex items-center gap-3 px-4 py-3 rounded-xl
-                  transition-all duration-200
+                  transition-all duration-300 group
                   ${isActive 
-                    ? 'bg-gradient-to-r from-blue-500/20 to-blue-600/20 text-blue-700 shadow-md backdrop-blur-md border border-blue-300/30' 
-                    : 'text-gray-700 hover:bg-white/40 hover:backdrop-blur-md hover:shadow-sm'
+                    ? 'glass-nav-active' 
+                    : 'glass-nav-inactive'
                   }
                 `}
                 onClick={() => setSidebarOpen(false)}
@@ -103,7 +110,10 @@ export const MainLayout: React.FC = () => {
         </nav>
 
         {/* User Section */}
-        <div className="p-4 border-t border-gray-200/30">
+        <div className="p-4" style={{
+          borderTop: '1px solid',
+          borderImage: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%) 1'
+        }}>
           <div className="flex items-center justify-between mb-3">
             <div>
               <p className="text-sm font-medium text-gray-800">{user?.name}</p>
@@ -113,8 +123,24 @@ export const MainLayout: React.FC = () => {
           <Button
             variant="ghost"
             size="sm"
-            className="w-full justify-start text-gray-700 hover:text-gray-900 hover:bg-white/40 hover:backdrop-blur-md rounded-lg transition-all duration-200"
+            className="w-full justify-start text-gray-700 hover:text-gray-900 rounded-lg transition-all duration-300"
             onClick={handleLogout}
+            style={{
+              background: 'rgba(255, 255, 255, 0.3)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 71, 87, 0.1)';
+              e.currentTarget.style.borderColor = 'rgba(255, 71, 87, 0.3)';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 71, 87, 0.15) inset';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           >
             <LogOut className="mr-2" size={16} />
             Logout
