@@ -20,6 +20,11 @@ export class MedicationManagementValidation {
     );
 
     reaction(
+      () => this.vm.pharmacyPhone,
+      () => this.validatePharmacyPhone()
+    );
+
+    reaction(
       () => this.vm.dosageForm,
       () => {
         // Reset dosage route and dosage unit when form changes
@@ -149,6 +154,29 @@ export class MedicationManagementValidation {
       } else {
         this.clearError('discontinueDate');
       }
+    }
+  }
+
+  validatePharmacyPhone() {
+    if (!this.vm.pharmacyPhone) {
+      this.clearError('pharmacyPhone');
+      return;
+    }
+    
+    // Basic validation: allow digits, spaces, hyphens, parentheses, plus, and dots
+    const basicPhoneRegex = /^[\d\s\-\(\)\+\.]+$/;
+    
+    // More strict US phone format (optional)
+    const usPhoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+    
+    if (!basicPhoneRegex.test(this.vm.pharmacyPhone)) {
+      this.setError('pharmacyPhone', 'Please enter a valid phone number');
+    } else if (this.vm.pharmacyPhone.replace(/\D/g, '').length < 10) {
+      this.setError('pharmacyPhone', 'Phone number must have at least 10 digits');
+    } else if (this.vm.pharmacyPhone.replace(/\D/g, '').length > 15) {
+      this.setError('pharmacyPhone', 'Phone number is too long');
+    } else {
+      this.clearError('pharmacyPhone');
     }
   }
 

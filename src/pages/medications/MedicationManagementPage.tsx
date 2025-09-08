@@ -9,6 +9,7 @@ import { MedicationManagementViewModel } from '@/viewModels/medication/Medicatio
 import { MedicationSearchModal } from '@/components/medication/MedicationSearchModal';
 import { DosageFormEditable } from '@/views/medication/DosageFormEditable';
 import { InventoryQuantityInputs } from '@/views/medication/InventoryQuantityInputs';
+import { PharmacyInformationInputs } from '@/views/medication/PharmacyInformationInputs';
 import { TherapeuticClassSelection } from '@/views/medication/TherapeuticClassSelection';
 import { DateSelection } from '@/views/medication/DateSelectionSimplified';
 import { DosageForm } from '@/types/models/Dosage';
@@ -317,6 +318,22 @@ export const MedicationManagementPage = observer(() => {
                 />
               </div>
 
+              {/* Pharmacy Information */}
+              <div className="bg-white p-6 rounded-lg border">
+                <h2 className="text-lg font-semibold mb-4">Pharmacy Information</h2>
+                <PharmacyInformationInputs
+                  prescriberName={vm.prescriberName}
+                  pharmacyName={vm.pharmacyName}
+                  pharmacyPhone={vm.pharmacyPhone}
+                  rxNumber={vm.rxNumber}
+                  errors={vm.errors}
+                  onPrescriberNameChange={(value) => vm.setPrescriberName(value)}
+                  onPharmacyNameChange={(value) => vm.setPharmacyName(value)}
+                  onPharmacyPhoneChange={(value) => vm.setPharmacyPhone(value)}
+                  onRxNumberChange={(value) => vm.setRxNumber(value)}
+                />
+              </div>
+
               {/* Inventory Management */}
               <div className="bg-white p-6 rounded-lg border">
                 <h2 className="text-lg font-semibold mb-4">Inventory Management</h2>
@@ -336,7 +353,7 @@ export const MedicationManagementPage = observer(() => {
                 <Button
                   variant="outline"
                   onClick={handleBack}
-                  tabIndex={17}
+                  tabIndex={21}
                   aria-label="Cancel and go back"
                 >
                   Cancel
@@ -344,7 +361,7 @@ export const MedicationManagementPage = observer(() => {
                 <Button
                   onClick={handleSave}
                   disabled={!isFormComplete() || vm.isLoading}
-                  tabIndex={18}
+                  tabIndex={22}
                   aria-label="Save medication"
                 >
                   {vm.isLoading ? 'Saving...' : 'Save Medication'}

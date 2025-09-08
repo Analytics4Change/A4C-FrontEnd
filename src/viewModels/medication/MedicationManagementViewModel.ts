@@ -34,6 +34,12 @@ export class MedicationManagementViewModel {
   prescribingDoctor = '';
   notes = '';
   
+  // Pharmacy information
+  prescriberName = '';
+  pharmacyName = '';
+  pharmacyPhone = '';
+  rxNumber = '';
+  
   isLoading = false;
   showMedicationDropdown = false;
   showDosageFormDropdown = false;
@@ -164,6 +170,10 @@ export class MedicationManagementViewModel {
       this.discontinueDate = null;
       this.prescribingDoctor = '';
       this.notes = '';
+      this.prescriberName = '';
+      this.pharmacyName = '';
+      this.pharmacyPhone = '';
+      this.rxNumber = '';
       this.selectedTherapeuticClasses = [];
       
       // Clear all dropdowns
@@ -302,6 +312,32 @@ export class MedicationManagementViewModel {
     });
   }
 
+  // Pharmacy information setters
+  setPrescriberName(value: string) {
+    runInAction(() => {
+      this.prescriberName = value;
+    });
+  }
+
+  setPharmacyName(value: string) {
+    runInAction(() => {
+      this.pharmacyName = value;
+    });
+  }
+
+  setPharmacyPhone(value: string) {
+    runInAction(() => {
+      this.pharmacyPhone = value;
+    });
+    this.validation.validatePharmacyPhone();
+  }
+
+  setRxNumber(value: string) {
+    runInAction(() => {
+      this.rxNumber = value;
+    });
+  }
+
 
   async save() {
     // Validate all required fields
@@ -355,6 +391,10 @@ export class MedicationManagementViewModel {
     this.discontinueDate = null;
     this.prescribingDoctor = '';
     this.notes = '';
+    this.prescriberName = '';
+    this.pharmacyName = '';
+    this.pharmacyPhone = '';
+    this.rxNumber = '';
     this.errors.clear();
     this.searchResults = [];
     this.selectedTherapeuticClasses = [];
