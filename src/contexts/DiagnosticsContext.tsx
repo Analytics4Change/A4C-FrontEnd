@@ -122,14 +122,34 @@ export const DiagnosticsProvider: React.FC<{ children: ReactNode }> = ({ childre
     if (!import.meta.env.DEV) return;
     
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl+Shift+D to toggle control panel
-      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+      // Alt+D to toggle control panel (changed from Ctrl+Shift+D which conflicts with Firefox bookmarks)
+      if (e.altKey && e.key === 'd') {
         e.preventDefault();
-        setConfig(prev => ({
-          ...prev,
-          showControlPanel: !prev.showControlPanel
-        }));
-        log.info('Toggled control panel via keyboard shortcut');
+        setConfig(prev => {
+          const newState = !prev.showControlPanel;
+          log.info(`Debug Control Panel: ${newState ? 'OPENED' : 'CLOSED'}`);
+          console.log(`🐛 Debug Control Panel is now ${newState ? 'VISIBLE' : 'HIDDEN'}`);
+          return {
+            ...prev,
+            showControlPanel: newState,
+            controlPanelMinimized: false // Always expand when toggling visibility
+          };
+        });
+      }
+      
+      // Also support Ctrl+Alt+D as alternative
+      if (e.ctrlKey && e.altKey && e.key === 'd') {
+        e.preventDefault();
+        setConfig(prev => {
+          const newState = !prev.showControlPanel;
+          log.info(`Debug Control Panel: ${newState ? 'OPENED' : 'CLOSED'}`);
+          console.log(`🐛 Debug Control Panel is now ${newState ? 'VISIBLE' : 'HIDDEN'}`);
+          return {
+            ...prev,
+            showControlPanel: newState,
+            controlPanelMinimized: false // Always expand when toggling visibility
+          };
+        });
       }
       
       // Ctrl+Shift+M to toggle MobX monitor

@@ -3,10 +3,9 @@ import { IMedicationApi } from '@/services/api/interfaces/IMedicationApi';
 import { 
   Medication, 
   DosageInfo, 
-  DosageForm, 
-  DosageUnit, 
-  DosageFormCategory,
-  DosageFormType 
+  DosageForm,  // Now refers to broad categories (Solid, Liquid, etc.)
+  DosageRoute, // Specific routes (Tablet, Capsule, etc.)
+  DosageUnit 
 } from '@/types/models';
 import { DosageValidator } from '@/services/validation/DosageValidator';
 import { 
@@ -14,21 +13,20 @@ import {
   getUnitsForDosageForm,
   getCategoryForDosageForm 
 } from '@/mocks/data/dosageFormHierarchy.mock';
-import { MedicationEntryValidation } from './MedicationEntryValidation';
+import { MedicationManagementValidation } from './MedicationManagementValidation';
 import { Logger } from '@/utils/logger';
 
 const log = Logger.getLogger('viewmodel');
 
-export class MedicationEntryViewModel {
+export class MedicationManagementViewModel {
   medicationName = '';
   selectedMedication: Medication | null = null;
-  dosageFormCategory: DosageFormCategory | '' = '';
-  dosageFormType = '';  // New field for specific form type (Tablet, Capsule, etc.)
-  dosageForm = '';  // Keep for backward compatibility, will store the final form type
+  dosageForm: DosageForm | '' = '';  // Broad category (Solid, Liquid, etc.)
+  dosageRoute = '';  // Specific route (Tablet, Capsule, etc.)
   dosageAmount = '';
   dosageUnit = '';
-  totalAmount = '';
-  totalUnit = '';
+  inventoryQuantity = '';
+  inventoryUnit = '';
   frequency = '';
   condition = '';
   startDate: Date | null = null;
@@ -38,10 +36,10 @@ export class MedicationEntryViewModel {
   
   isLoading = false;
   showMedicationDropdown = false;
-  showFormCategoryDropdown = false;
-  showFormTypeDropdown = false;
+  showDosageFormDropdown = false;
+  showDosageRouteDropdown = false;
   showFormDropdown = false;
-  showUnitDropdown = false;
+  showDosageUnitDropdown = false;
   showFrequencyDropdown = false;
   showConditionDropdown = false;
   
@@ -49,16 +47,19 @@ export class MedicationEntryViewModel {
   
   searchResults: Medication[] = [];
   selectedTherapeuticClasses: string[] = [];
-  selectedRegimenCategories: string[] = [];
   
-  private validation: MedicationEntryValidation;
+  // Auxiliary medication information
+  isControlled: boolean | null = null;
+  isPsychotropic: boolean | null = null;
+  
+  private validation: MedicationManagementValidation;
 
   constructor(
     private medicationApi: IMedicationApi,
     private validator: DosageValidator
   ) {
     makeAutoObservable(this);
-    this.validation = new MedicationEntryValidation(this);
+    this.validation = new MedicationManagementValidation(this);
     this.validation.setupReactions();
   }
 
@@ -66,37 +67,32 @@ export class MedicationEntryViewModel {
     return this.validator.isValidDosageAmount(this.dosageAmount);
   }
 
-  get availableFormTypes(): string[] {
-    if (!this.dosageFormCategory) return [];
-    const formTypes = getDosageFormsByCategory(this.dosageFormCategory);
-    return formTypes.map(ft => ft.name);
+  get availableDosageRoutes(): string[] {
+    if (!this.dosageForm) return [];
+    const dosageRoutes = getDosageFormsByCategory(this.dosageForm);
+    return dosageRoutes.map(dr => dr.name);
   }
 
-  get availableUnits(): DosageUnit[] {
-    // Units depend on the specific form type, not the category
-    if (!this.dosageFormType) return [];
-    // Use the new helper function to get units for the selected form type
-    return getUnitsForDosageForm(this.dosageFormType) as DosageUnit[];
+  get availableDosageUnits(): DosageUnit[] {
+    // Units depend on the specific dosage route, not the category
+    if (!this.dosageRoute) return [];
+    // Use the helper function to get units for the selected dosage route
+    return getUnitsForDosageForm(this.dosageRoute) as DosageUnit[];
   }
 
   get canSave(): boolean {
     return !!(
       this.selectedMedication &&
-      this.dosageFormCategory &&
-      this.dosageFormType &&  // Check form type instead of dosageForm
+      this.dosageForm &&
+      this.dosageRoute &&
       this.isValidAmount &&
       this.dosageUnit &&
-      this.totalAmount &&
-      this.totalUnit &&
+      this.inventoryQuantity &&
+      this.inventoryUnit &&
       this.frequency &&
       this.condition &&
       this.errors.size === 0
     );
-  }
-
-  get categoriesCompleted(): boolean {
-    return this.selectedTherapeuticClasses.length > 0 && 
-           this.selectedRegimenCategories.length > 0;
   }
 
   async searchMedications(query: string) {
@@ -142,7 +138,6 @@ export class MedicationEntryViewModel {
       
       if (medication.categories) {
         this.selectedTherapeuticClasses = [medication.categories.broad];
-        this.selectedRegimenCategories = [medication.categories.specific];
       }
     });
     this.validation.clearError('medication');
@@ -157,13 +152,12 @@ export class MedicationEntryViewModel {
       this.showMedicationDropdown = false;
       
       // Cascade clear ALL form fields (complete reset)
-      this.dosageFormCategory = '';
-      this.dosageFormType = '';
       this.dosageForm = '';
+      this.dosageRoute = '';
       this.dosageAmount = '';
       this.dosageUnit = '';
-      this.totalAmount = '';
-      this.totalUnit = '';
+      this.inventoryQuantity = '';
+      this.inventoryUnit = '';
       this.frequency = '';
       this.condition = '';
       this.startDate = null;
@@ -171,13 +165,12 @@ export class MedicationEntryViewModel {
       this.prescribingDoctor = '';
       this.notes = '';
       this.selectedTherapeuticClasses = [];
-      this.selectedRegimenCategories = [];
       
       // Clear all dropdowns
-      this.showFormCategoryDropdown = false;
-      this.showFormTypeDropdown = false;
+      this.showDosageFormDropdown = false;
+      this.showDosageRouteDropdown = false;
       this.showFormDropdown = false;
-      this.showUnitDropdown = false;
+      this.showDosageUnitDropdown = false;
       this.showFrequencyDropdown = false;
       this.showConditionDropdown = false;
       
@@ -186,48 +179,28 @@ export class MedicationEntryViewModel {
     });
   }
 
-  setDosageFormCategory(category: DosageFormCategory) {
+  setDosageForm(form: DosageForm) {
     runInAction(() => {
-      this.dosageFormCategory = category;
-      this.showFormCategoryDropdown = false;
-      // Reset form type and unit when category changes
-      this.dosageFormType = '';
-      this.dosageForm = '';
-      this.dosageUnit = '';
-      this.totalUnit = '';
-    });
-    this.validation.clearError('dosageFormCategory');
-  }
-
-  setDosageForm(form: string) {
-    runInAction(() => {
-      // This is now used for setting the category (backward compatibility)
       this.dosageForm = form;
-      this.showFormDropdown = false;
-      // Auto-set category if not already set
-      if (!this.dosageFormCategory) {
-        const category = getCategoryForDosageForm(form);
-        if (category) {
-          this.dosageFormCategory = category;
-        }
-      }
-      // Reset form type and unit when changing
-      this.dosageFormType = '';
+      this.showDosageFormDropdown = false;
+      // Reset dosage route and unit when form changes
+      this.dosageRoute = '';
       this.dosageUnit = '';
+      this.inventoryUnit = '';
     });
     this.validation.clearError('dosageForm');
   }
 
-  setDosageFormType(formType: string) {
+
+  setDosageRoute(dosageRoute: string) {
     runInAction(() => {
-      // Set the specific form type (Tablet, Capsule, etc.)
-      this.dosageFormType = formType;
-      this.dosageForm = formType;  // Keep dosageForm in sync for backward compatibility
-      this.showFormTypeDropdown = false;
-      // Reset unit when form type changes
+      // Set the specific dosage route (Tablet, Capsule, etc.)
+      this.dosageRoute = dosageRoute;
+      this.showDosageRouteDropdown = false;
+      // Reset unit when dosage route changes
       this.dosageUnit = '';
     });
-    this.validation.clearError('dosageFormType');
+    this.validation.clearError('dosageRoute');
   }
 
   updateDosageAmount(value: string) {
@@ -237,26 +210,26 @@ export class MedicationEntryViewModel {
     this.validation.validateDosageAmount();
   }
 
-  setDosageUnit(unit: string) {
+  setDosageUnit(dosageUnit: string) {
     runInAction(() => {
-      this.dosageUnit = unit;
-      this.showUnitDropdown = false;
+      this.dosageUnit = dosageUnit;
+      this.showDosageUnitDropdown = false;
     });
     this.validation.clearError('dosageUnit');
   }
 
-  updateTotalAmount(value: string) {
+  updateInventoryQuantity(value: string) {
     runInAction(() => {
-      this.totalAmount = value;
+      this.inventoryQuantity = value;
     });
-    this.validation.validateTotalAmount();
+    this.validation.validateInventoryQuantity();
   }
 
-  setTotalUnit(unit: string) {
+  setInventoryUnit(inventoryUnit: string) {
     runInAction(() => {
-      this.totalUnit = unit;
+      this.inventoryUnit = inventoryUnit;
     });
-    this.validation.clearError('totalUnit');
+    this.validation.clearError('inventoryUnit');
   }
 
   setFrequency(freq: string) {
@@ -306,16 +279,6 @@ export class MedicationEntryViewModel {
     });
   }
 
-  toggleRegimenCategory(category: string) {
-    const index = this.selectedRegimenCategories.indexOf(category);
-    if (index > -1) {
-      // Use replace to trigger MobX reactivity
-      this.selectedRegimenCategories = this.selectedRegimenCategories.filter(c => c !== category);
-    } else {
-      // Create new array to trigger MobX reactivity
-      this.selectedRegimenCategories = [...this.selectedRegimenCategories, category];
-    }
-  }
 
   // Setter methods for multi-select dropdowns
   setTherapeuticClasses(classes: string[]) {
@@ -327,11 +290,18 @@ export class MedicationEntryViewModel {
     });
   }
 
-  setRegimenCategories(categories: string[]) {
+  setControlled(value: boolean) {
     runInAction(() => {
-      this.selectedRegimenCategories = categories;
+      this.isControlled = value;
     });
   }
+
+  setPsychotropic(value: boolean) {
+    runInAction(() => {
+      this.isPsychotropic = value;
+    });
+  }
+
 
   async save() {
     // Validate all required fields
@@ -343,7 +313,7 @@ export class MedicationEntryViewModel {
 
     const dosageInfo: DosageInfo = {
       medicationId: this.selectedMedication!.id,
-      form: this.dosageForm as DosageForm,
+      form: this.dosageRoute as DosageRoute,  // Use the specific route for the API
       amount: parseFloat(this.dosageAmount),
       unit: this.dosageUnit as DosageUnit,
       frequency: this.frequency as any,
@@ -373,12 +343,12 @@ export class MedicationEntryViewModel {
   reset() {
     this.medicationName = '';
     this.selectedMedication = null;
-    this.dosageFormCategory = '';
     this.dosageForm = '';
+    this.dosageRoute = '';
     this.dosageAmount = '';
     this.dosageUnit = '';
-    this.totalAmount = '';
-    this.totalUnit = '';
+    this.inventoryQuantity = '';
+    this.inventoryUnit = '';
     this.frequency = '';
     this.condition = '';
     this.startDate = null;
@@ -388,12 +358,13 @@ export class MedicationEntryViewModel {
     this.errors.clear();
     this.searchResults = [];
     this.selectedTherapeuticClasses = [];
-    this.selectedRegimenCategories = [];
+    this.isControlled = null;
+    this.isPsychotropic = null;
     this.showMedicationDropdown = false;
-    this.showFormCategoryDropdown = false;
-    this.showFormTypeDropdown = false;
+    this.showDosageFormDropdown = false;
+    this.showDosageRouteDropdown = false;
     this.showFormDropdown = false;
-    this.showUnitDropdown = false;
+    this.showDosageUnitDropdown = false;
     this.showFrequencyDropdown = false;
     this.showConditionDropdown = false;
   }

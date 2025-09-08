@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
-import { MedicationEntryViewModel } from '@/viewModels/medication/MedicationEntryViewModel';
+import { MedicationManagementViewModel } from '@/viewModels/medication/MedicationManagementViewModel';
 import { useDiagnostics } from '@/contexts/DiagnosticsContext';
 
 interface MobXDebuggerProps {
-  viewModel: MedicationEntryViewModel;
+  viewModel: MedicationManagementViewModel;
 }
 
 /**
@@ -66,12 +66,6 @@ export const MobXDebugger: React.FC<MobXDebuggerProps> = observer(({ viewModel }
         Therapeutic Classes ({viewModel.selectedTherapeuticClasses.length}):
         <div style={{ marginLeft: '10px', color: '#00ffff' }}>
           {JSON.stringify(viewModel.selectedTherapeuticClasses, null, 2)}
-        </div>
-      </div>
-      <div style={{ marginBottom: '5px' }}>
-        Regimen Categories ({viewModel.selectedRegimenCategories.length}):
-        <div style={{ marginLeft: '10px', color: '#00ffff' }}>
-          {JSON.stringify(viewModel.selectedRegimenCategories, null, 2)}
         </div>
       </div>
       <div style={{ fontSize: '10px', color: '#888', marginTop: '5px' }}>

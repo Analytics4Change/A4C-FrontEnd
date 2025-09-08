@@ -21,9 +21,10 @@ const developmentConfig: LogConfig = {
   level: 'debug',
   categories: {
     // Core functionality - verbose in development
+    'main': 'info',
     'mobx': 'debug',
     'navigation': 'debug',
-    'component': 'info',
+    'component': 'debug',
     'hook': 'info',
     'viewmodel': 'debug',
     'ui': 'info',

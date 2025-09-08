@@ -1,21 +1,22 @@
-import { DosageForm, DosageUnit, DosageFrequency, DosageCondition, DosageFormUnits, DosageFormCategory } from '@/types/models';
+import { DosageForm, DosageRoute, DosageUnit, DosageFrequency, DosageCondition, DosageFormUnits } from '@/types/models';
 import { 
   dosageFormHierarchy, 
-  dosageFormCategoryMap,
+  dosageFormMap,
   getAllCategories,
   getAllDosageForms,
+  getRoutesByDosageForm,
   getDosageFormsByCategory,
   getUnitsForDosageForm
 } from './dosageFormHierarchy.mock';
 
-// Export all categories
-export const dosageFormCategories: DosageFormCategory[] = getAllCategories();
+// Export all dosage forms (categories like Solid, Liquid, etc.)
+export const dosageForms: DosageForm[] = getAllCategories();
 
-// Export all dosage forms (flattened list for backward compatibility)
-export const dosageForms: DosageForm[] = getAllDosageForms() as DosageForm[];
+// Export all dosage routes (specific forms like Tablet, Capsule, etc.)
+export const dosageRoutes: DosageRoute[] = getAllDosageForms() as DosageRoute[];
 
 // Export the hierarchical structure
-export { dosageFormHierarchy, dosageFormCategoryMap } from './dosageFormHierarchy.mock';
+export { dosageFormHierarchy, dosageFormMap } from './dosageFormHierarchy.mock';
 
 // Export helper functions
 export { 
@@ -31,7 +32,7 @@ export {
 export const dosageUnits: DosageFormUnits = (() => {
   const units: DosageFormUnits = {};
   for (const hierarchy of dosageFormHierarchy) {
-    for (const form of hierarchy.forms) {
+    for (const form of hierarchy.routes) {
       units[form.name] = form.units;
     }
   }

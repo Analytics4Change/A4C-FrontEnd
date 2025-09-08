@@ -1,5 +1,5 @@
-// Dosage Form Categories
-export type DosageFormCategory = 
+// Dosage Forms (broad categories like Solid, Liquid, etc.)
+export type DosageForm = 
   | 'Solid'
   | 'Liquid'
   | 'Topical/Local'
@@ -66,8 +66,8 @@ export type MiscellaneousDosageForm =
   | 'Implant'
   | 'Lollipop (medicated)';
 
-// Union type for all dosage forms
-export type DosageForm = 
+// Union type for all specific dosage routes
+export type DosageRoute = 
   | SolidDosageForm
   | LiquidDosageForm
   | TopicalDosageForm
@@ -158,17 +158,17 @@ export interface DosageSchedule {
 
 // Hierarchical structure for dosage forms
 export interface DosageFormHierarchy {
-  category: DosageFormCategory;
-  forms: DosageFormType[];
+  type: DosageFormType;
+  routes: DosageRouteOption[];
 }
 
-export interface DosageFormType {
-  name: DosageForm;
+export interface DosageRouteOption {
+  name: DosageRoute;
   units: DosageUnit[];
 }
 
-export interface DosageFormCategoryMap {
-  [key: string]: DosageFormType[];
+export interface DosageFormMap {
+  [key: string]: DosageRouteOption[];
 }
 
 // Legacy support

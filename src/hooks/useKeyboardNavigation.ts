@@ -101,7 +101,6 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions): Us
         includeSelectors,
         excludeSelectors
       });
-      
       focusableElementsRef.current = elements;
       setFocusableElementsCount(elements.length);
       
@@ -261,7 +260,6 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions): Us
     
     // Skip if event has already been handled (e.g., by a dropdown)
     if (event.defaultPrevented) {
-      console.log('[useKeyboardNavigation] Skipping key handling - event already prevented');
       return;
     }
     
@@ -278,11 +276,9 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions): Us
                                      target?.getAttribute('aria-expanded') === 'true';
         
         if (inDropdown || isDropdownController) {
-          console.log('[useKeyboardNavigation] Tab in dropdown context - skipping modal handler');
           return;
         }
         
-        console.log(`[useKeyboardNavigation] Handling Tab: trapFocus=${trapFocus}, allowTab=${allowTabNavigation}`);
         if (allowTabNavigation && (trapFocus || wrapAround)) {
           // Only prevent default if we're trapping or wrapping
           const isFirstElement = currentFocusIndex === 0;
@@ -330,7 +326,6 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions): Us
                                    escapeTarget?.getAttribute('aria-expanded') === 'true');
         
         if (inDropdownContext) {
-          console.log('[useKeyboardNavigation] Escape in dropdown context - skipping modal handler');
           return;
         }
         

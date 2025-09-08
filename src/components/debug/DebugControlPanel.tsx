@@ -39,22 +39,27 @@ export const DebugControlPanel: React.FC = () => {
         <button
           onClick={() => updateConfig({ controlPanelMinimized: false })}
           style={{
-            background: 'rgba(0, 0, 0, 0.8)',
-            border: '1px solid #666',
-            borderRadius: '5px',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            border: '2px solid #fff',
+            borderRadius: '8px',
             color: '#fff',
-            padding: '8px',
+            padding: '10px 14px',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '5px',
-            fontSize: '12px',
-            fontFamily: 'monospace'
+            gap: '8px',
+            fontSize: '13px',
+            fontFamily: 'monospace',
+            fontWeight: 'bold',
+            boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)',
+            transition: 'transform 0.2s',
           }}
-          title="Open Debug Control Panel (Ctrl+Shift+D)"
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          title="Open Debug Control Panel (Alt+D or Ctrl+Alt+D)"
         >
-          <Bug size={16} />
-          Debug
+          <Bug size={18} />
+          Debug Panel
         </button>
       </div>
     );

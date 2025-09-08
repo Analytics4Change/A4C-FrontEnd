@@ -1,10 +1,10 @@
 import { reaction } from 'mobx';
-import { MedicationEntryViewModel } from './MedicationEntryViewModel';
+import { MedicationManagementViewModel } from './MedicationManagementViewModel';
 
-export class MedicationEntryValidation {
-  private vm: MedicationEntryViewModel;
+export class MedicationManagementValidation {
+  private vm: MedicationManagementViewModel;
 
-  constructor(viewModel: MedicationEntryViewModel) {
+  constructor(viewModel: MedicationManagementViewModel) {
     this.vm = viewModel;
   }
 
@@ -15,28 +15,25 @@ export class MedicationEntryValidation {
     );
 
     reaction(
-      () => this.vm.totalAmount,
-      () => this.validateTotalAmount()
+      () => this.vm.inventoryQuantity,
+      () => this.validateInventoryQuantity()
     );
 
     reaction(
-      () => this.vm.dosageFormCategory,
+      () => this.vm.dosageForm,
       () => {
-        // Reset form type and unit when category changes
-        this.vm.dosageFormType = '';
-        this.vm.dosageForm = '';
+        // Reset dosage route and dosage unit when form changes
+        this.vm.dosageRoute = '';
         this.vm.dosageUnit = '';
-        this.vm.totalUnit = '';
+        this.vm.inventoryUnit = '';
       }
     );
 
     reaction(
-      () => this.vm.dosageFormType,
+      () => this.vm.dosageRoute,
       () => {
-        // Reset unit when form type changes
+        // Reset dosage unit when dosage route changes
         this.vm.dosageUnit = '';
-        // Keep dosageForm in sync
-        this.vm.dosageForm = this.vm.dosageFormType;
       }
     );
 
@@ -54,13 +51,13 @@ export class MedicationEntryValidation {
       isValid = false;
     }
     
-    if (!this.vm.dosageFormCategory) {
-      this.setError('dosageFormCategory', 'Please select a dosage form category');
+    if (!this.vm.dosageForm) {
+      this.setError('dosageForm', 'Please select a dosage form');
       isValid = false;
     }
     
-    if (!this.vm.dosageFormType) {
-      this.setError('dosageFormType', 'Please select a dosage form type');
+    if (!this.vm.dosageRoute) {
+      this.setError('dosageRoute', 'Please select a dosage route');
       isValid = false;
     }
     
@@ -75,27 +72,27 @@ export class MedicationEntryValidation {
     }
     
     if (!this.vm.dosageUnit) {
-      this.setError('dosageUnit', 'Please select a unit');
+      this.setError('dosageUnit', 'Please select a dosage unit');
       isValid = false;
     }
     
-    if (!this.vm.totalAmount) {
-      this.setError('totalAmount', 'Please enter the total amount');
+    if (!this.vm.inventoryQuantity) {
+      this.setError('inventoryQuantity', 'Please enter the inventory quantity');
       isValid = false;
     } else {
-      this.validateTotalAmount();
-      if (this.vm.errors.has('totalAmount')) {
+      this.validateInventoryQuantity();
+      if (this.vm.errors.has('inventoryQuantity')) {
         isValid = false;
       }
     }
     
-    if (!this.vm.totalUnit) {
-      this.setError('totalUnit', 'Please select a total unit');
+    if (!this.vm.inventoryUnit) {
+      this.setError('inventoryUnit', 'Please select an inventory unit');
       isValid = false;
     }
     
     if (!this.vm.frequency) {
-      this.setError('frequency', 'Please select frequency');
+      this.setError('frequency', 'Please select dosage frequency');
       isValid = false;
     }
     
@@ -118,30 +115,30 @@ export class MedicationEntryValidation {
     if (isNaN(numValue)) {
       this.setError('dosageAmount', 'Please enter a valid number');
     } else if (numValue <= 0) {
-      this.setError('dosageAmount', 'Amount must be greater than 0');
+      this.setError('dosageAmount', 'Dosage amount must be greater than 0');
     } else if (numValue > 9999) {
-      this.setError('dosageAmount', 'Amount cannot exceed 9999');
+      this.setError('dosageAmount', 'Dosage amount cannot exceed 9999');
     } else {
       this.clearError('dosageAmount');
     }
   }
 
-  validateTotalAmount() {
-    if (!this.vm.totalAmount) {
-      this.clearError('totalAmount');
+  validateInventoryQuantity() {
+    if (!this.vm.inventoryQuantity) {
+      this.clearError('inventoryQuantity');
       return;
     }
     
-    const numValue = parseFloat(this.vm.totalAmount);
+    const numValue = parseFloat(this.vm.inventoryQuantity);
     
     if (isNaN(numValue)) {
-      this.setError('totalAmount', 'Please enter a valid number');
+      this.setError('inventoryQuantity', 'Please enter a valid number');
     } else if (numValue <= 0) {
-      this.setError('totalAmount', 'Amount must be greater than 0');
+      this.setError('inventoryQuantity', 'Quantity must be greater than 0');
     } else if (numValue > 9999) {
-      this.setError('totalAmount', 'Amount cannot exceed 9999');
+      this.setError('inventoryQuantity', 'Quantity cannot exceed 9999');
     } else {
-      this.clearError('totalAmount');
+      this.clearError('inventoryQuantity');
     }
   }
 

@@ -1,30 +1,23 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { DosageFormInputsEditable } from './DosageFormInputsEditable';
-import { TotalAmountInputs } from './TotalAmountInputs';
-import { FrequencyConditionInputsEditable } from './FrequencyConditionInputsEditable';
+import { DosageFrequencyInput } from './DosageFrequencyInput';
+import { DosageConditionInput } from './DosageConditionInput';
 
 interface DosageFormProps {
-  dosageFormCategory: string;
-  dosageFormType: string;
-  dosageForm: string;
+  dosageForm: string;  // Broad category (Solid, Liquid, etc.)
+  dosageRoute: string;  // Specific route (Tablet, Capsule, etc.)
   dosageAmount: string;
   dosageUnit: string;
-  totalAmount: string;
-  totalUnit: string;
   frequency: string;
   condition: string;
-  availableFormTypes: string[];
-  availableUnits: string[];
-  availableTotalUnits: string[];
+  availableDosageRoutes: string[];
+  availableDosageUnits: string[];
   errors: Map<string, string>;
-  onCategoryChange: (category: string) => void;
-  onFormTypeChange: (formType: string) => void;
-  onFormChange: (form: string) => void;
-  onAmountChange: (amount: string) => void;
-  onUnitChange: (unit: string) => void;
-  onTotalAmountChange: (amount: string) => void;
-  onTotalUnitChange: (unit: string) => void;
+  onDosageFormChange: (form: string) => void;
+  onDosageRouteChange: (dosageRoute: string) => void;
+  onDosageAmountChange: (amount: string) => void;
+  onDosageUnitChange: (dosageUnit: string) => void;
   onFrequencyChange: (freq: string) => void;
   onConditionChange: (cond: string) => void;
   onDropdownOpen?: (elementId: string) => void;
@@ -32,24 +25,19 @@ interface DosageFormProps {
 
 export const DosageFormEditable = observer((props: DosageFormProps) => {
   const {
-    dosageFormCategory,
-    dosageFormType,
+    dosageForm,
+    dosageRoute,
     dosageAmount,
     dosageUnit,
-    totalAmount,
-    totalUnit,
     frequency,
     condition,
-    availableFormTypes,
-    availableUnits,
-    availableTotalUnits,
+    availableDosageRoutes,
+    availableDosageUnits,
     errors,
-    onCategoryChange,
-    onFormTypeChange,
-    onAmountChange,
-    onUnitChange,
-    onTotalAmountChange,
-    onTotalUnitChange,
+    onDosageFormChange,
+    onDosageRouteChange,
+    onDosageAmountChange,
+    onDosageUnitChange,
     onFrequencyChange,
     onConditionChange,
     onDropdownOpen
@@ -57,42 +45,36 @@ export const DosageFormEditable = observer((props: DosageFormProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Dosage Form and Unit Inputs - Using Editable Version */}
+      {/* Dosage Form and Dosage Unit Inputs - Using Editable Version */}
       <DosageFormInputsEditable
-        dosageFormCategory={dosageFormCategory}
-        dosageFormType={dosageFormType}
+        dosageForm={dosageForm}
+        dosageRoute={dosageRoute}
         dosageAmount={dosageAmount}
         dosageUnit={dosageUnit}
-        availableFormTypes={availableFormTypes}
-        availableUnits={availableUnits}
+        availableDosageRoutes={availableDosageRoutes}
+        availableDosageUnits={availableDosageUnits}
         errors={errors}
-        onCategoryChange={onCategoryChange}
-        onFormTypeChange={onFormTypeChange}
-        onAmountChange={onAmountChange}
-        onUnitChange={onUnitChange}
+        onDosageFormChange={onDosageFormChange}
+        onDosageRouteChange={onDosageRouteChange}
+        onDosageAmountChange={onDosageAmountChange}
+        onDosageUnitChange={onDosageUnitChange}
         onDropdownOpen={onDropdownOpen}
       />
 
-      {/* Total Amount Inputs - Keep existing as it's already editable */}
-      <TotalAmountInputs
-        totalAmount={totalAmount}
-        totalUnit={totalUnit}
-        availableTotalUnits={availableTotalUnits}
-        errors={errors}
-        onTotalAmountChange={onTotalAmountChange}
-        onTotalUnitChange={onTotalUnitChange}
-        onDropdownOpen={onDropdownOpen}
-      />
-
-      {/* Frequency and Condition Inputs - Using Editable Version */}
-      <FrequencyConditionInputsEditable
-        frequency={frequency}
-        condition={condition}
-        errors={errors}
-        onFrequencyChange={onFrequencyChange}
-        onConditionChange={onConditionChange}
-        onDropdownOpen={onDropdownOpen}
-      />
+      {/* Dosage Frequency and Condition Inputs */}
+      <div className="grid grid-cols-2 gap-6">
+        <DosageFrequencyInput
+          frequency={frequency}
+          errors={errors}
+          onFrequencyChange={onFrequencyChange}
+          onDropdownOpen={onDropdownOpen}
+        />
+        <DosageConditionInput
+          condition={condition}
+          onConditionChange={onConditionChange}
+          onDropdownOpen={onDropdownOpen}
+        />
+      </div>
     </div>
   );
 });

@@ -1,363 +1,98 @@
-import React, { useRef, useState } from 'react';
-import { ChevronDown, Edit2 } from 'lucide-react';
+import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AutocompleteDropdown, SelectionMethod } from '@/components/ui/autocomplete-dropdown';
-import { dosageFormCategories } from '@/mocks/data/dosages.mock';
-import { useDropdownBlur } from '@/hooks/useDropdownBlur';
-import { useFocusAdvancement } from '@/hooks/useFocusAdvancement';
+import { EditableDropdown } from '@/components/ui/EditableDropdown';
+import { dosageForms } from '@/mocks/data/dosages.mock';
 import { useEnterAsTab } from '@/hooks/useEnterAsTab';
-import { filterStringItems, isItemHighlighted } from '@/utils/dropdown-filter';
 
 interface DosageFormInputsProps {
-  dosageFormCategory: string;
-  dosageFormType: string;
+  dosageForm: string;
+  dosageRoute: string;
   dosageAmount: string;
   dosageUnit: string;
-  availableFormTypes: string[];
-  availableUnits: string[];
+  availableDosageRoutes: string[];
+  availableDosageUnits: string[];
   errors: Map<string, string>;
-  onCategoryChange: (category: string) => void;
-  onFormTypeChange: (formType: string) => void;
-  onAmountChange: (amount: string) => void;
-  onUnitChange: (unit: string) => void;
+  onDosageFormChange: (form: string) => void;
+  onDosageRouteChange: (dosageRoute: string) => void;
+  onDosageAmountChange: (amount: string) => void;
+  onDosageUnitChange: (dosageUnit: string) => void;
   onDropdownOpen?: (elementId: string) => void;
 }
 
 export const DosageFormInputsEditable: React.FC<DosageFormInputsProps> = ({
-  dosageFormCategory,
-  dosageFormType,
+  dosageForm,
+  dosageRoute,
   dosageAmount,
   dosageUnit,
-  availableFormTypes,
-  availableUnits,
+  availableDosageRoutes,
+  availableDosageUnits,
   errors,
-  onCategoryChange,
-  onFormTypeChange,
-  onAmountChange,
-  onUnitChange,
+  onDosageFormChange,
+  onDosageRouteChange,
+  onDosageAmountChange,
+  onDosageUnitChange,
   onDropdownOpen
 }) => {
-  const [categoryInput, setCategoryInput] = useState('');
-  const [formTypeInput, setFormTypeInput] = useState('');
-  const [unitInput, setUnitInput] = useState('');
-  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-  const [showFormTypeDropdown, setShowFormTypeDropdown] = useState(false);
-  const [showUnitDropdown, setShowUnitDropdown] = useState(false);
-  
-  // Edit mode states
-  const [editingCategory, setEditingCategory] = useState(false);
-  const [editingFormType, setEditingFormType] = useState(false);
-  const [editingUnit, setEditingUnit] = useState(false);
-
-  const categoryInputRef = useRef<HTMLInputElement>(null);
-  const formTypeInputRef = useRef<HTMLInputElement>(null);
-  const unitInputRef = useRef<HTMLInputElement>(null);
-
-  // Dropdown blur handlers using abstracted timing logic
-  const handleCategoryBlur = useDropdownBlur(() => {
-    setShowCategoryDropdown(false);
-    if (!dosageFormCategory) {
-      setEditingCategory(false);
-    }
-  });
-  
-  const handleFormTypeBlur = useDropdownBlur(() => {
-    setShowFormTypeDropdown(false);
-    if (!dosageFormType) {
-      setEditingFormType(false);
-    }
-  });
-  
-  const handleUnitBlur = useDropdownBlur(() => {
-    setShowUnitDropdown(false);
-    if (!dosageUnit) {
-      setEditingUnit(false);
-    }
-  });
-
-  // Focus advancement hooks for keyboard navigation
-  const categoryFocusAdvancement = useFocusAdvancement({
-    targetTabIndex: 5, // Move to Form Type input
-    enabled: true
-  });
-
-  const formTypeFocusAdvancement = useFocusAdvancement({
-    targetTabIndex: 7, // Move to Dosage Amount input
-    enabled: true
-  });
-
-  const unitFocusAdvancement = useFocusAdvancement({
-    targetTabIndex: 10, // Move to Total Amount input
-    enabled: true
-  });
-
-  // Hook for Enter key navigation in amount field
-  const handleAmountEnterKey = useEnterAsTab(8); // Move to Unit field
-
-  // Enter edit mode handlers
-  const enterCategoryEdit = () => {
-    setEditingCategory(true);
-    setCategoryInput(dosageFormCategory);
-    setShowCategoryDropdown(true);
-    setTimeout(() => categoryInputRef.current?.focus(), 0);
-  };
-
-  const enterFormTypeEdit = () => {
-    setEditingFormType(true);
-    setFormTypeInput(dosageFormType);
-    setShowFormTypeDropdown(true);
-    setTimeout(() => formTypeInputRef.current?.focus(), 0);
-  };
-
-  const enterUnitEdit = () => {
-    setEditingUnit(true);
-    setUnitInput(dosageUnit);
-    setShowUnitDropdown(true);
-    setTimeout(() => unitInputRef.current?.focus(), 0);
-  };
-
-  // Use generic filtering utilities
-  const filteredCategories = filterStringItems(dosageFormCategories, categoryInput, 'contains');
-  const filteredFormTypes = filterStringItems(availableFormTypes, formTypeInput, 'contains');
-  const filteredUnits = filterStringItems(availableUnits, unitInput, 'contains');
-  
-  // Highlighting functions using the utility
-  const isCategoryHighlighted = (category: string) => 
-    isItemHighlighted(category, categoryInput, 'startsWith');
-  
-  const isFormTypeHighlighted = (formType: string) => 
-    isItemHighlighted(formType, formTypeInput, 'startsWith');
-  
-  const isUnitHighlighted = (unit: string) => 
-    isItemHighlighted(unit, unitInput, 'startsWith');
+  // Hook for Enter key navigation in dosage amount field
+  const handleDosageAmountEnterKey = useEnterAsTab(9); // Move to Dosage Unit field
 
   return (
     <>
-      {/* First Row: Dosage Form Category and Form Type */}
+      {/* First Row: Dosage Form and Dosage Route */}
       <div className="grid grid-cols-2 gap-6">
-        {/* Dosage Form Category */}
-        <div className="relative">
-          <Label htmlFor="dosage-category" className="text-base font-medium">
-            Dosage Form
-          </Label>
-          <div id="dosage-category-container" className="relative mt-2">
-            <Input
-              ref={categoryInputRef}
-              id="dosage-category"
-              data-testid="dosage-category-input"
-              type="text"
-              value={editingCategory ? categoryInput : (dosageFormCategory || categoryInput)}
-              onChange={(e) => {
-                setCategoryInput(e.target.value);
-                if (!dosageFormCategory || editingCategory) {
-                  setShowCategoryDropdown(true);
-                  onDropdownOpen?.('dosage-category-container');
-                }
-              }}
-              onClick={() => {
-                if (dosageFormCategory && !editingCategory) {
-                  enterCategoryEdit();
-                }
-              }}
-              onFocus={() => {
-                if (!dosageFormCategory || editingCategory) {
-                  setShowCategoryDropdown(true);
-                }
-              }}
-              onBlur={handleCategoryBlur}
-              placeholder="Select dosage form..."
-              className={`pr-10 cursor-pointer ${
-                dosageFormCategory && !editingCategory ? 'border-blue-500 bg-blue-50 hover:bg-blue-100' : ''
-              } ${errors.get('dosageFormCategory') ? 'border-red-500' : ''} ${
-                editingCategory ? 'bg-white' : ''
-              }`}
-              readOnly={!!dosageFormCategory && !editingCategory}
-              aria-label="Dosage form category"
-              aria-describedby={errors.get('dosageFormCategory') ? 'dosage-category-error' : undefined}
-              tabIndex={3}
-            />
-            {dosageFormCategory && !editingCategory && (
-              <button
-                type="button"
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded"
-                onClick={enterCategoryEdit}
-                aria-label="Edit dosage form"
-                tabIndex={4}
-              >
-                <Edit2 className="text-gray-400" size={16} />
-              </button>
-            )}
-            {(!dosageFormCategory || editingCategory) && (
-              <button
-                type="button"
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded"
-                onClick={() => {
-                  setShowCategoryDropdown(true);
-                  categoryInputRef.current?.focus();
-                  onDropdownOpen?.('dosage-category-container');
-                }}
-                aria-label="Open dosage form dropdown"
-                tabIndex={4}
-              >
-                <ChevronDown className="text-gray-400" size={20} />
-              </button>
-            )}
-          </div>
-          
-          <AutocompleteDropdown
-            isOpen={showCategoryDropdown && (!dosageFormCategory || editingCategory)}
-            items={filteredCategories}
-            inputRef={categoryInputRef}
-            onSelect={(category, method) => {
-              onCategoryChange(category);
-              setCategoryInput(category);
-              setShowCategoryDropdown(false);
-              setEditingCategory(false);
-              
-              // Use hook for focus advancement
-              categoryFocusAdvancement.handleSelection(category, method);
-            }}
-            getItemKey={(category) => category}
-            isItemHighlighted={isCategoryHighlighted}
-            testId="dosage-category-dropdown"
-            modalId="dosage-form-dropdown"
-            renderItem={(category, index) => (
-              <div data-testid={`dosage-category-option-${index}`}>
-                {category}
-              </div>
-            )}
-          />
-          
-          {errors.get('dosageFormCategory') && (
-            <p id="dosage-category-error" className="mt-1 text-sm text-red-600" role="alert">
-              {errors.get('dosageFormCategory')}
-            </p>
-          )}
-        </div>
+        {/* Dosage Form */}
+        <EditableDropdown
+          id="dosage-form"
+          label="Dosage Form"
+          value={dosageForm}
+          options={dosageForms}
+          placeholder="Select dosage form..."
+          error={errors.get('dosageForm')}
+          tabIndex={4}
+          targetTabIndex={6}
+          onChange={onDosageFormChange}
+          onDropdownOpen={onDropdownOpen}
+          testIdPrefix="dosage-form"
+        />
 
-        {/* Form Type */}
-        <div className="relative">
-          <Label htmlFor="form-type" className="text-base font-medium">
-            Type {!dosageFormCategory && <span className="text-gray-400 text-sm">(select form first)</span>}
-          </Label>
-          <div id="form-type-container" className="relative mt-2">
-            <Input
-              ref={formTypeInputRef}
-              id="form-type"
-              data-testid="form-type-input"
-              type="text"
-              value={editingFormType ? formTypeInput : (dosageFormType || formTypeInput)}
-              onChange={(e) => {
-                setFormTypeInput(e.target.value);
-                if (dosageFormCategory && (!dosageFormType || editingFormType)) {
-                  setShowFormTypeDropdown(true);
-                  onDropdownOpen?.('form-type-container');
-                }
-              }}
-              onClick={() => {
-                if (dosageFormCategory && dosageFormType && !editingFormType) {
-                  enterFormTypeEdit();
-                }
-              }}
-              onFocus={() => {
-                if (dosageFormCategory && (!dosageFormType || editingFormType)) {
-                  setShowFormTypeDropdown(true);
-                }
-              }}
-              onBlur={handleFormTypeBlur}
-              placeholder={dosageFormCategory ? "Select type..." : "Select form first"}
-              className={`pr-10 ${
-                dosageFormCategory ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
-              } ${
-                dosageFormType && !editingFormType ? 'border-blue-500 bg-blue-50 hover:bg-blue-100' : ''
-              } ${errors.get('dosageFormType') ? 'border-red-500' : ''} ${
-                editingFormType ? 'bg-white' : ''
-              }`}
-              readOnly={!dosageFormCategory || (!!dosageFormType && !editingFormType)}
-              aria-label="Dosage form type"
-              aria-describedby={errors.get('dosageFormType') ? 'form-type-error' : undefined}
-              tabIndex={dosageFormCategory ? 5 : -1}
-            />
-            {dosageFormCategory && dosageFormType && !editingFormType && (
-              <button
-                type="button"
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded"
-                onClick={enterFormTypeEdit}
-                aria-label="Edit form type"
-                tabIndex={6}
-              >
-                <Edit2 className="text-gray-400" size={16} />
-              </button>
-            )}
-            {dosageFormCategory && (!dosageFormType || editingFormType) && (
-              <button
-                type="button"
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded"
-                onClick={() => {
-                  setShowFormTypeDropdown(true);
-                  formTypeInputRef.current?.focus();
-                  onDropdownOpen?.('form-type-container');
-                }}
-                aria-label="Open form type dropdown"
-                tabIndex={6}
-              >
-                <ChevronDown className="text-gray-400" size={20} />
-              </button>
-            )}
-          </div>
-          
-          <AutocompleteDropdown
-            isOpen={showFormTypeDropdown && !!dosageFormCategory && (!dosageFormType || editingFormType)}
-            items={filteredFormTypes}
-            inputRef={formTypeInputRef}
-            onSelect={(formType, method) => {
-              onFormTypeChange(formType);
-              setFormTypeInput(formType);
-              setShowFormTypeDropdown(false);
-              setEditingFormType(false);
-              
-              // Use hook for focus advancement
-              formTypeFocusAdvancement.handleSelection(formType, method);
-            }}
-            getItemKey={(formType) => formType}
-            isItemHighlighted={isFormTypeHighlighted}
-            testId="form-type-dropdown"
-            modalId="form-type-dropdown"
-            renderItem={(formType, index) => (
-              <div data-testid={`form-type-option-${index}`}>
-                {formType}
-              </div>
-            )}
-          />
-          
-          {errors.get('dosageFormType') && (
-            <p id="form-type-error" className="mt-1 text-sm text-red-600" role="alert">
-              {errors.get('dosageFormType')}
-            </p>
-          )}
-        </div>
+        {/* Dosage Route */}
+        <EditableDropdown
+          id="dosage-route"
+          label="Dosage Route"
+          value={dosageRoute}
+          options={availableDosageRoutes}
+          placeholder={dosageForm ? "Select route..." : "Select form first"}
+          disabled={!dosageForm}
+          disabledMessage="(select form first)"
+          error={errors.get('dosageRoute')}
+          tabIndex={dosageForm ? 6 : -1}
+          targetTabIndex={8}
+          onChange={onDosageRouteChange}
+          onDropdownOpen={onDropdownOpen}
+          testIdPrefix="dosage-route"
+        />
       </div>
 
-      {/* Second Row: Dosage Amount and Unit */}
+      {/* Second Row: Dosage Amount and Dosage Unit */}
       <div className="grid grid-cols-2 gap-6">
         {/* Dosage Amount */}
         <div>
           <Label htmlFor="dosage-amount" className="text-base font-medium">
-            Amount
+            Dosage Amount
           </Label>
           <Input
             id="dosage-amount"
             data-testid="dosage-amount-input"
             type="text"
             value={dosageAmount}
-            onChange={(e) => onAmountChange(e.target.value)}
-            onKeyDown={handleAmountEnterKey}
-            placeholder="Enter amount..."
-            className={`mt-2 ${errors.get('dosageAmount') ? 'border-red-500' : ''}`}
+            onChange={(e) => onDosageAmountChange(e.target.value)}
+            onKeyDown={handleDosageAmountEnterKey}
+            placeholder="Enter dosage amount..."
+            className={`mt-2 ${dosageAmount ? 'border-blue-500 bg-blue-50' : ''} ${errors.get('dosageAmount') ? 'border-red-500' : ''}`}
             aria-label="Dosage amount"
             aria-describedby={errors.get('dosageAmount') ? 'dosage-amount-error' : undefined}
-            tabIndex={7}
+            tabIndex={8}
           />
           {errors.get('dosageAmount') && (
             <p id="dosage-amount-error" className="mt-1 text-sm text-red-600" role="alert">
@@ -367,106 +102,21 @@ export const DosageFormInputsEditable: React.FC<DosageFormInputsProps> = ({
         </div>
 
         {/* Dosage Unit */}
-        <div className="relative">
-          <Label htmlFor="dosage-unit" className="text-base font-medium">
-            Unit {!dosageFormType && <span className="text-gray-400 text-sm">(select type first)</span>}
-          </Label>
-          <div id="dosage-unit-container" className="relative mt-2">
-            <Input
-              ref={unitInputRef}
-              id="dosage-unit"
-              data-testid="dosage-unit-input"
-              type="text"
-              value={editingUnit ? unitInput : (dosageUnit || unitInput)}
-              onChange={(e) => {
-                setUnitInput(e.target.value);
-                if (dosageFormType && (!dosageUnit || editingUnit)) {
-                  setShowUnitDropdown(true);
-                  onDropdownOpen?.('dosage-unit-container');
-                }
-              }}
-              onClick={() => {
-                if (dosageFormType && dosageUnit && !editingUnit) {
-                  enterUnitEdit();
-                }
-              }}
-              onFocus={() => {
-                if (dosageFormType && (!dosageUnit || editingUnit)) {
-                  setShowUnitDropdown(true);
-                }
-              }}
-              onBlur={handleUnitBlur}
-              placeholder={dosageFormType ? "Select unit..." : "Select type first"}
-              className={`pr-10 ${
-                dosageFormType ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
-              } ${
-                dosageUnit && !editingUnit ? 'border-blue-500 bg-blue-50 hover:bg-blue-100' : ''
-              } ${errors.get('dosageUnit') ? 'border-red-500' : ''} ${
-                editingUnit ? 'bg-white' : ''
-              }`}
-              readOnly={!dosageFormType || (!!dosageUnit && !editingUnit)}
-              aria-label="Dosage unit"
-              aria-describedby={errors.get('dosageUnit') ? 'dosage-unit-error' : undefined}
-              tabIndex={dosageFormType ? 8 : -1}
-            />
-            {dosageFormType && dosageUnit && !editingUnit && (
-              <button
-                type="button"
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded"
-                onClick={enterUnitEdit}
-                aria-label="Edit unit"
-                tabIndex={9}
-              >
-                <Edit2 className="text-gray-400" size={16} />
-              </button>
-            )}
-            {dosageFormType && (!dosageUnit || editingUnit) && (
-              <button
-                type="button"
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded"
-                onClick={() => {
-                  setShowUnitDropdown(true);
-                  unitInputRef.current?.focus();
-                  onDropdownOpen?.('dosage-unit-container');
-                }}
-                aria-label="Open unit dropdown"
-                tabIndex={9}
-              >
-                <ChevronDown className="text-gray-400" size={20} />
-              </button>
-            )}
-          </div>
-          
-          <AutocompleteDropdown
-            isOpen={showUnitDropdown && !!dosageFormType && (!dosageUnit || editingUnit)}
-            items={filteredUnits}
-            inputRef={unitInputRef}
-            onSelect={(unit, method) => {
-              onUnitChange(unit);
-              setUnitInput(unit);
-              setShowUnitDropdown(false);
-              setEditingUnit(false);
-              
-              // Use hook for focus advancement
-              unitFocusAdvancement.handleSelection(unit, method);
-            }}
-            getItemKey={(unit) => unit}
-            isItemHighlighted={isUnitHighlighted}
-            testId="dosage-unit-dropdown"
-            modalId="dosage-unit-dropdown"
-            renderItem={(unit, index) => (
-              <div data-testid={`dosage-unit-option-${index}`}>
-                {unit}
-              </div>
-            )}
-          />
-          
-          {errors.get('dosageUnit') && (
-            <p id="dosage-unit-error" className="mt-1 text-sm text-red-600" role="alert">
-              {errors.get('dosageUnit')}
-            </p>
-          )}
-        </div>
+        <EditableDropdown
+          id="dosage-unit"
+          label="Dosage Unit"
+          value={dosageUnit}
+          options={availableDosageUnits}
+          placeholder={dosageRoute ? "Select dosage unit..." : "Select route first"}
+          disabled={!dosageRoute}
+          disabledMessage="(select route first)"
+          error={errors.get('dosageUnit')}
+          tabIndex={dosageRoute ? 9 : -1}
+          targetTabIndex={10}
+          onChange={onDosageUnitChange}
+          onDropdownOpen={onDropdownOpen}
+          testIdPrefix="dosage-unit"
+        />
       </div>
     </>
   );

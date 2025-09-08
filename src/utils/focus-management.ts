@@ -188,10 +188,11 @@ export function getAllFocusableElements(
     ? elements.filter(el => !options.excludeSelectors!.some(sel => el.matches(sel)))
     : elements;
   
-  // Filter out invisible elements
+  // Filter out invisible elements and elements with tabIndex=-1
   const visible = filtered.filter(el => {
     const rect = el.getBoundingClientRect();
-    return rect.width > 0 && rect.height > 0;
+    const hasNegativeTabIndex = el.getAttribute('tabindex') === '-1';
+    return rect.width > 0 && rect.height > 0 && !hasNegativeTabIndex;
   });
   
   // Sort by tabIndex order

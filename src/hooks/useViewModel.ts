@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { MockMedicationApi } from '@/services/mock/MockMedicationApi';
 import { MockClientApi } from '@/services/mock/MockClientApi';
 import { DosageValidator } from '@/services/validation/DosageValidator';
-import { MedicationEntryViewModel } from '@/viewModels/medication/MedicationEntryViewModel';
+import { MedicationManagementViewModel } from '@/viewModels/medication/MedicationManagementViewModel';
 import { ClientSelectionViewModel } from '@/viewModels/client/ClientSelectionViewModel';
 
 // Create singleton instances
@@ -25,8 +25,8 @@ export function useViewModel<T>(
 
     let instance: T;
     
-    if (ViewModelClass === MedicationEntryViewModel as any) {
-      instance = new MedicationEntryViewModel(medicationApi, dosageValidator) as T;
+    if (ViewModelClass === MedicationManagementViewModel as any) {
+      instance = new MedicationManagementViewModel(medicationApi, dosageValidator) as T;
     } else if (ViewModelClass === ClientSelectionViewModel as any) {
       instance = new ClientSelectionViewModel(clientApi) as T;
     } else {

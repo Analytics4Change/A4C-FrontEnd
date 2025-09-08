@@ -6,11 +6,8 @@ import { MultiSelectDropdown } from '@/components/ui/MultiSelectDropdown';
 
 interface CategorySelectionProps {
   selectedTherapeuticClasses: string[];
-  selectedRegimenCategories: string[];
   onTherapeuticClassesChange?: (classes: string[]) => void;
-  onRegimenCategoriesChange?: (categories: string[]) => void;
   onToggleTherapeuticClass?: (category: string) => void;
-  onToggleRegimenCategory?: (category: string) => void;
   categoriesCompleted: boolean;
 }
 
@@ -25,15 +22,6 @@ const therapeuticClasses = [
   'Vitamins & Supplements'
 ];
 
-const regimenCategories = [
-  'Chronic Condition',
-  'As Needed (PRN)',
-  'Short-term Treatment',
-  'Preventive',
-  'Emergency Use',
-  'Post-operative',
-  'Maintenance Therapy'
-];
 
 /**
  * Simplified CategorySelection using unified MultiSelectDropdown
@@ -43,17 +31,13 @@ const regimenCategories = [
  */
 export const CategorySelection: React.FC<CategorySelectionProps> = observer(({
   selectedTherapeuticClasses,
-  selectedRegimenCategories,
   onTherapeuticClassesChange,
-  onRegimenCategoriesChange,
   onToggleTherapeuticClass,
-  onToggleRegimenCategory,
   categoriesCompleted
 }) => {
   // Debug: Log every render
   console.log('[CategorySelection] Rendering with:', {
-    therapeutic: selectedTherapeuticClasses.slice(),
-    regimen: selectedRegimenCategories.slice()
+    therapeutic: selectedTherapeuticClasses.slice()
   });
   // Handle therapeutic classes changes
   const handleTherapeuticClassesChange = (selected: string[]) => {
@@ -72,20 +56,6 @@ export const CategorySelection: React.FC<CategorySelectionProps> = observer(({
     }
   };
 
-  // Handle regimen categories changes
-  const handleRegimenCategoriesChange = (selected: string[]) => {
-    if (onRegimenCategoriesChange) {
-      // Use setter method if available
-      onRegimenCategoriesChange(selected);
-    } else if (onToggleRegimenCategory) {
-      // Fall back to toggle method
-      const added = selected.filter(s => !selectedRegimenCategories.includes(s));
-      const removed = selectedRegimenCategories.filter(s => !selected.includes(s));
-      
-      added.forEach(item => onToggleRegimenCategory(item));
-      removed.forEach(item => onToggleRegimenCategory(item));
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -99,20 +69,6 @@ export const CategorySelection: React.FC<CategorySelectionProps> = observer(({
           selected={selectedTherapeuticClasses}
           onChange={handleTherapeuticClassesChange}
           placeholder="Select therapeutic classes..."
-          buttonTabIndex={17}
-        />
-      </div>
-
-      {/* Regimen Categories */}
-      <div className="space-y-3">
-        <Label className="text-sm font-medium">Regimen Categories</Label>
-        <MultiSelectDropdown
-          id="regimen-categories"
-          label="Regimen Categories"
-          options={regimenCategories}
-          selected={selectedRegimenCategories}
-          onChange={handleRegimenCategoriesChange}
-          placeholder="Select regimen categories..."
           buttonTabIndex={18}
         />
       </div>

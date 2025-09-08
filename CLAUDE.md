@@ -60,6 +60,99 @@ npm run lint       # Run ESLint
   - Supports WCAG 2.1 Level AA compliance
   - Handles both keyboard and mouse interactions seamlessly
 
+### Accessibility & WCAG Compliance
+
+#### WCAG 2.1 Level AA Requirements
+- **ALL interactive elements** must meet WCAG 2.1 Level AA standards
+- Color contrast ratios: 4.5:1 for normal text, 3:1 for large text
+- All functionality available via keyboard
+- No keyboard traps (except intentional modal focus traps)
+- Provide text alternatives for non-text content
+- Make all functionality available from keyboard interface
+
+#### Focus Management Standards
+- **TabIndex Guidelines**:
+  - Use sequential tabIndex (1, 2, 3...) for logical flow within components
+  - Reserve tabIndex=0 for natural DOM order
+  - Use tabIndex=-1 for programmatically focusable elements
+  - Never skip numbers in tabIndex sequence
+  - Document tabIndex order in complex components
+  - Reset tabIndex sequence for each major section/modal
+
+- **Focus Trapping**:
+  - Modals MUST trap focus while open
+  - First focusable element receives focus on open
+  - Focus returns to trigger element on close
+  - Implement circular tab navigation within trap
+  - ESC key should close modal and return focus
+
+- **Focus Restoration**:
+  - Store reference to active element before modal/overlay
+  - Restore focus to previous element on close
+  - Use refs and useEffect, never setTimeout
+  - Handle cases where trigger element is removed from DOM
+
+#### ARIA Requirements
+- **Required ARIA attributes for all components**:
+  - `role` for non-semantic elements (dialog, navigation, main, etc.)
+  - `aria-label` or `aria-labelledby` for ALL interactive elements
+  - `aria-describedby` for additional help text or descriptions
+  - `aria-expanded` for expandable elements (dropdowns, accordions)
+  - `aria-selected` for selectable items in lists
+  - `aria-disabled` for disabled states (not just disabled attribute)
+  - `aria-live` for dynamic content updates
+  - `aria-modal="true"` for modal dialogs
+  - `aria-current` for current page/step indicators
+
+- **Form Controls MUST include**:
+  - `aria-required="true"` for required fields
+  - `aria-invalid="true"` for fields with errors
+  - `aria-errormessage` pointing to error message ID
+  - `aria-describedby` for help text
+  - Proper `<label>` association or `aria-label`
+
+- **Modal/Dialog Requirements**:
+  - `role="dialog"`
+  - `aria-modal="true"`
+  - `aria-labelledby` pointing to dialog title
+  - `aria-describedby` for dialog description if present
+
+#### Keyboard Navigation Requirements
+- **Tab Order**: 
+  - Logical left-to-right, top-to-bottom flow
+  - Header → Main Content → Sidebar → Footer
+  - Within modals: Header → Content → Footer buttons
+- **Focus Indicators**: 
+  - Visible focus rings on ALL interactive elements
+  - High contrast focus indicators (not just browser default)
+  - Focus indicator must meet color contrast requirements
+- **Keyboard Shortcuts**:
+  - Document all shortcuts in component comments
+  - Avoid conflicts with browser/OS shortcuts
+  - Provide alternative access methods
+  - Common patterns:
+    - ESC to close modals/dropdowns
+    - Enter to submit/confirm
+    - Space to toggle checkboxes/buttons
+    - Arrow keys for navigation within components
+
+#### Testing Requirements
+- **Manual Testing**:
+  - Test with keyboard only (unplug mouse)
+  - Tab through entire application
+  - Verify all functionality accessible via keyboard
+  - Check focus indicators are always visible
+- **Screen Reader Testing**:
+  - Test with NVDA (Windows)
+  - Test with VoiceOver (Mac)
+  - Verify all content is announced properly
+  - Check form labels and errors are announced
+- **Automated Testing**:
+  - Use axe DevTools for accessibility audits
+  - Include `@axe-core/playwright` in E2E tests
+  - Run accessibility tests in CI pipeline
+  - Zero accessibility violations as merge requirement
+
 ## Project Structure
 
 ```

@@ -1,8 +1,9 @@
 import { 
-  DosageFormCategory, 
+  DosageForm, 
   DosageFormHierarchy,
-  DosageFormType,
-  DosageFormCategoryMap,
+  DosageRoute,
+  DosageRouteOption,
+  DosageFormMap,
   SolidDosageForm,
   LiquidDosageForm,
   TopicalDosageForm,
@@ -14,7 +15,7 @@ import {
 } from '@/types/models';
 
 // Solid Dosage Forms with their units
-const solidDosageForms: DosageFormType[] = [
+const solidDosageForms: DosageRouteOption[] = [
   {
     name: 'Tablet' as SolidDosageForm,
     units: ['mg', 'g', 'mcg', 'tablet(s)', 'scored tablet(s)']
@@ -46,7 +47,7 @@ const solidDosageForms: DosageFormType[] = [
 ];
 
 // Liquid Dosage Forms with their units
-const liquidDosageForms: DosageFormType[] = [
+const liquidDosageForms: DosageRouteOption[] = [
   {
     name: 'Solution' as LiquidDosageForm,
     units: ['mg/mL', 'mcg/mL', 'mL', 'tsp', 'tbsp', 'drop(s)', 'L']
@@ -70,7 +71,7 @@ const liquidDosageForms: DosageFormType[] = [
 ];
 
 // Topical and Local Application Forms with their units
-const topicalDosageForms: DosageFormType[] = [
+const topicalDosageForms: DosageRouteOption[] = [
   {
     name: 'Cream' as TopicalDosageForm,
     units: ['%', 'g', 'application(s)']
@@ -98,7 +99,7 @@ const topicalDosageForms: DosageFormType[] = [
 ];
 
 // Inhalation and Respiratory Forms with their units
-const inhalationDosageForms: DosageFormType[] = [
+const inhalationDosageForms: DosageRouteOption[] = [
   {
     name: 'Inhaler (MDI or DPI)' as InhalationDosageForm,
     units: ['puff(s)', 'mcg/puff', 'mg/puff', 'inhalation(s)']
@@ -114,7 +115,7 @@ const inhalationDosageForms: DosageFormType[] = [
 ];
 
 // Injectable Forms with their units
-const injectableDosageForms: DosageFormType[] = [
+const injectableDosageForms: DosageRouteOption[] = [
   {
     name: 'Injection (IV, IM, SubQ)' as InjectableDosageForm,
     units: ['mg/mL', 'mL', 'unit(s)', 'vial(s)', 'syringe(s)', 'ampule(s)']
@@ -126,7 +127,7 @@ const injectableDosageForms: DosageFormType[] = [
 ];
 
 // Rectal and Vaginal Forms with their units
-const rectalVaginalDosageForms: DosageFormType[] = [
+const rectalVaginalDosageForms: DosageRouteOption[] = [
   {
     name: 'Suppository' as RectalVaginalDosageForm,
     units: ['mg', 'suppository(ies)']
@@ -142,7 +143,7 @@ const rectalVaginalDosageForms: DosageFormType[] = [
 ];
 
 // Ophthalmic and Otic Forms with their units
-const ophthalmicOticDosageForms: DosageFormType[] = [
+const ophthalmicOticDosageForms: DosageRouteOption[] = [
   {
     name: 'Eye Drops / Ear Drops' as OphthalmicOticDosageForm,
     units: ['drop(s)', 'mL', '%']
@@ -154,7 +155,7 @@ const ophthalmicOticDosageForms: DosageFormType[] = [
 ];
 
 // Miscellaneous Forms with their units
-const miscellaneousDosageForms: DosageFormType[] = [
+const miscellaneousDosageForms: DosageRouteOption[] = [
   {
     name: 'Lozenge / Troche' as MiscellaneousDosageForm,
     units: ['mg', 'lozenge(s)', 'troche(s)']
@@ -180,41 +181,41 @@ const miscellaneousDosageForms: DosageFormType[] = [
 // Complete hierarchical structure
 export const dosageFormHierarchy: DosageFormHierarchy[] = [
   {
-    category: 'Solid',
-    forms: solidDosageForms
+    form: 'Solid',
+    routes: solidDosageForms
   },
   {
-    category: 'Liquid',
-    forms: liquidDosageForms
+    form: 'Liquid',
+    routes: liquidDosageForms
   },
   {
-    category: 'Topical/Local',
-    forms: topicalDosageForms
+    form: 'Topical/Local',
+    routes: topicalDosageForms
   },
   {
-    category: 'Inhalation',
-    forms: inhalationDosageForms
+    form: 'Inhalation',
+    routes: inhalationDosageForms
   },
   {
-    category: 'Injectable',
-    forms: injectableDosageForms
+    form: 'Injectable',
+    routes: injectableDosageForms
   },
   {
-    category: 'Rectal/Vaginal',
-    forms: rectalVaginalDosageForms
+    form: 'Rectal/Vaginal',
+    routes: rectalVaginalDosageForms
   },
   {
-    category: 'Ophthalmic/Otic',
-    forms: ophthalmicOticDosageForms
+    form: 'Ophthalmic/Otic',
+    routes: ophthalmicOticDosageForms
   },
   {
-    category: 'Miscellaneous',
-    forms: miscellaneousDosageForms
+    form: 'Miscellaneous',
+    routes: miscellaneousDosageForms
   }
 ];
 
 // Category map for easy lookup
-export const dosageFormCategoryMap: DosageFormCategoryMap = {
+export const dosageFormMap: DosageFormMap = {
   'Solid': solidDosageForms,
   'Liquid': liquidDosageForms,
   'Topical/Local': topicalDosageForms,
@@ -225,15 +226,18 @@ export const dosageFormCategoryMap: DosageFormCategoryMap = {
   'Miscellaneous': miscellaneousDosageForms
 };
 
-// Helper function to get dosage forms by category
-export function getDosageFormsByCategory(category: DosageFormCategory): DosageFormType[] {
-  return dosageFormCategoryMap[category] || [];
+// Helper function to get dosage routes by form type
+export function getRoutesByDosageForm(form: DosageForm): DosageRouteOption[] {
+  return dosageFormMap[form] || [];
 }
+
+// Legacy name for backward compatibility
+export const getDosageFormsByCategory = getRoutesByDosageForm;
 
 // Helper function to get units for a specific dosage form
 export function getUnitsForDosageForm(formName: string): string[] {
   for (const hierarchy of dosageFormHierarchy) {
-    const form = hierarchy.forms.find(f => f.name === formName);
+    const form = hierarchy.routes.find(f => f.name === formName);
     if (form) {
       return form.units;
     }
@@ -241,27 +245,30 @@ export function getUnitsForDosageForm(formName: string): string[] {
   return [];
 }
 
-// Helper function to get the category for a dosage form
-export function getCategoryForDosageForm(formName: string): DosageFormCategory | null {
+// Helper function to get the form type for a dosage route
+export function getDosageFormForRoute(routeName: string): DosageForm | null {
   for (const hierarchy of dosageFormHierarchy) {
-    const form = hierarchy.forms.find(f => f.name === formName);
-    if (form) {
-      return hierarchy.category;
+    const route = hierarchy.routes.find(r => r.name === routeName);
+    if (route) {
+      return hierarchy.form;
     }
   }
   return null;
 }
 
-// Get all categories
-export function getAllCategories(): DosageFormCategory[] {
-  return dosageFormHierarchy.map(h => h.category);
+// Legacy name for backward compatibility
+export const getCategoryForDosageForm = getDosageFormForRoute;
+
+// Get all dosage forms (categories)
+export function getAllCategories(): DosageForm[] {
+  return dosageFormHierarchy.map(h => h.form);
 }
 
 // Get all dosage forms (flattened)
 export function getAllDosageForms(): string[] {
   const forms: string[] = [];
   for (const hierarchy of dosageFormHierarchy) {
-    forms.push(...hierarchy.forms.map(f => f.name));
+    forms.push(...hierarchy.routes.map(f => f.name));
   }
   return forms;
 }
@@ -270,7 +277,7 @@ export function getAllDosageForms(): string[] {
 export function getAllUnits(): string[] {
   const unitsSet = new Set<string>();
   for (const hierarchy of dosageFormHierarchy) {
-    for (const form of hierarchy.forms) {
+    for (const form of hierarchy.routes) {
       form.units.forEach(unit => unitsSet.add(unit));
     }
   }

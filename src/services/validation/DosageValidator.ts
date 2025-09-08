@@ -1,7 +1,7 @@
-import { DosageForm, DosageUnit, DosageFormCategory } from '@/types/models';
+import { DosageForm, DosageRoute, DosageUnit } from '@/types/models';
 import { 
   dosageUnits, 
-  dosageFormCategories,
+  dosageForms,
   getAllDosageForms,
   getUnitsForDosageForm 
 } from '@/mocks/data/dosages.mock';
@@ -17,22 +17,22 @@ export class DosageValidator {
     return isNumericFormat && !isNaN(numericValue) && numericValue > 0;
   }
 
-  getUnitsForForm(form: DosageForm | string): DosageUnit[] {
+  getUnitsForForm(route: DosageRoute | string): DosageUnit[] {
     // Use the new helper function from the hierarchical mock data
-    return getUnitsForDosageForm(form) as DosageUnit[];
-  }
-
-  validateDosageCategory(category: string): boolean {
-    return dosageFormCategories.includes(category as DosageFormCategory);
+    return getUnitsForDosageForm(route) as DosageUnit[];
   }
 
   validateDosageForm(form: string): boolean {
-    const validForms = getAllDosageForms();
-    return validForms.includes(form);
+    return dosageForms.includes(form as DosageForm);
   }
 
-  validateDosageUnit(unit: string, form: DosageForm | string): boolean {
-    const availableUnits = this.getUnitsForForm(form);
+  validateDosageRoute(route: string): boolean {
+    const validRoutes = getAllDosageForms();
+    return validRoutes.includes(route);
+  }
+
+  validateDosageUnit(unit: string, route: DosageRoute | string): boolean {
+    const availableUnits = this.getUnitsForForm(route);
     return availableUnits.includes(unit as DosageUnit);
   }
 
@@ -54,8 +54,8 @@ export class DosageValidator {
   }
 
   validateCompleteDosage(
-    category: DosageFormCategory | string,
     form: DosageForm | string,
+    route: DosageRoute | string,
     amount: string,
     unit: DosageUnit | string,
     frequency: string,
@@ -63,20 +63,20 @@ export class DosageValidator {
   ): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
 
-    if (category && !this.validateDosageCategory(category)) {
-      errors.push('Invalid dosage form category');
+    if (form && !this.validateDosageForm(form)) {
+      errors.push('Invalid dosage form');
     }
 
-    if (!this.validateDosageForm(form)) {
-      errors.push('Invalid dosage form');
+    if (!this.validateDosageRoute(route)) {
+      errors.push('Invalid dosage route');
     }
 
     if (!this.isValidDosageAmount(amount)) {
       errors.push('Invalid dosage amount');
     }
 
-    if (!this.validateDosageUnit(unit, form)) {
-      errors.push('Invalid dosage unit for selected form');
+    if (!this.validateDosageUnit(unit, route)) {
+      errors.push('Invalid dosage unit for selected route');
     }
 
     if (!this.validateDosageFrequency(frequency)) {
